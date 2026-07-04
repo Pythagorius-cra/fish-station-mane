@@ -1,6 +1,7 @@
 using Content.Server.Atmos.Components;
 using Content.Server.Atmos.EntitySystems;
 using Content.Server.Atmos.Monitor.Systems;
+using Content.Server._Sunrise.Doors.Components;
 using Content.Server.Power.Components;
 using Content.Server.Power.EntitySystems;
 using Content.Server.Shuttles.Components;
@@ -165,7 +166,7 @@ namespace Content.Server.Doors.Systems
                 tiles.Add(pos);
 
             var gasses = _atmosSystem.GetTileMixtures(xform.ParentUid, xform.MapUid, tiles);
-            if (gasses == null)
+            if (gasses.Length == 0)
                 return (false, false);
 
             for (var i = 0; i < count; i++)
@@ -225,6 +226,10 @@ namespace Content.Server.Doors.Systems
         {
             foreach (var ent in enumerable)
             {
+                // Блокеры мультитайловых шлюзов — часть одной двери, не отдельная герметичная преграда.
+                if (HasComp<SunriseMultiTileAirtightBlockerComponent>(ent))
+                    continue;
+
                 if (!airtightQuery.TryGetComponent(ent, out var airtight) || !airtight.AirBlocked)
                     continue;
 

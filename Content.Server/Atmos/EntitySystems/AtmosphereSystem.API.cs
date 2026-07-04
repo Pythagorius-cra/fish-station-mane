@@ -162,65 +162,17 @@ public partial class AtmosphereSystem
     /// <param name="excite">Whether to mark the tiles as active for atmosphere processing.</param>
     /// <returns>>An array of gas mixtures corresponding to the input tiles.</returns>
     [PublicAPI]
-    public GasMixture?[]? GetTileMixtures(
+    public GasMixture?[] GetTileMixtures(
         Entity<GridAtmosphereComponent?, GasTileOverlayComponent?>? grid,
         Entity<MapAtmosphereComponent?>? map,
         List<Vector2i> tiles,
         bool excite = false)
     {
-        GasMixture?[]? mixtures = null;
-        var handled = false;
+        var mixtures = new GasMixture?[tiles.Count];
 
-        // If we've been passed a grid, try to let it handle it.
-        if (grid is { } gridEnt && _atmosQuery.Resolve(gridEnt, ref gridEnt.Comp1))
-        {
-            if (excite)
-                Resolve(gridEnt, ref gridEnt.Comp2);
-
-            handled = true;
-            mixtures = new GasMixture?[tiles.Count];
-
-            for (var i = 0; i < tiles.Count; i++)
-            {
-                var tile = tiles[i];
-                if (!gridEnt.Comp1.Tiles.TryGetValue(tile, out var atmosTile))
-                {
-                    // need to get map atmosphere
-                    handled = false;
-                    continue;
-                }
-
-                mixtures[i] = atmosTile.Air;
-
-                if (excite)
-                {
-                    AddActiveTile(gridEnt.Comp1, atmosTile);
-                    InvalidateVisuals((gridEnt.Owner, gridEnt.Comp2), tile);
-                }
-            }
-        }
-
-        if (handled)
-            return mixtures;
-
-        // We either don't have a grid, or the event wasn't handled.
-        // Let the map handle it instead, and also broadcast the event.
-        if (map is { } mapEnt && _mapAtmosQuery.Resolve(mapEnt, ref mapEnt.Comp))
-        {
-            mixtures ??= new GasMixture?[tiles.Count];
-            for (var i = 0; i < tiles.Count; i++)
-            {
-                mixtures[i] ??= mapEnt.Comp.Mixture;
-            }
-
-            return mixtures;
-        }
-
-        // Default to a space mixture... This is a space game, after all!
-        mixtures ??= new GasMixture?[tiles.Count];
         for (var i = 0; i < tiles.Count; i++)
         {
-            mixtures[i] ??= GasMixture.SpaceGas;
+            mixtures[i] = GetTileMixture(grid, map, tiles[i], excite);
         }
 
         return mixtures;

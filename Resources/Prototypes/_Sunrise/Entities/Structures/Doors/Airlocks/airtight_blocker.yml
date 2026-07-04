@@ -6,3 +6,4 @@
   - type: Airtight
     airBlocked: false
     noAirWhenFullyAirBlocked: false
+  - type: SunriseMultiTileAirtightBlocker

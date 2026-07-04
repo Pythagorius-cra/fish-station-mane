@@ -248,6 +248,9 @@ public sealed class AtmosMonitorSystem : EntitySystem
         if (component.MonitorsPipeNet && _nodeContainerSystem.TryGetNode<PipeNode>(uid, component.NodeNameMonitoredPipe, out var pipeNode))
             component.TileGas = pipeNode.Air;
 
+        if (component.TileGas == null && !component.MonitorsPipeNet)
+            component.TileGas = _atmosphereSystem.GetContainingMixture(uid, true);
+
         UpdateState(uid, component.TileGas, component);
     }
 
@@ -261,9 +264,15 @@ public sealed class AtmosMonitorSystem : EntitySystem
     // of the monitor, it is set in the Alert call.
     private void UpdateState(EntityUid uid, GasMixture? air, AtmosMonitorComponent? monitor = null)
     {
-        if (air == null) return;
-
         if (!Resolve(uid, ref monitor)) return;
+
+        if (air == null)
+        {
+            if (monitor.LastAlarmState != AtmosAlarmType.Danger)
+                Alert(uid, AtmosAlarmType.Danger, null, monitor);
+
+            return;
+        }
 
         var state = AtmosAlarmType.Normal;
         var alarmTypes = monitor.TrippedThresholds;
@@ -300,14 +309,18 @@ public sealed class AtmosMonitorSystem : EntitySystem
         if (monitor.GasThresholds != null)
         {
             var tripped = false;
-            foreach (var (gas, threshold) in monitor.GasThresholds)
+
+            if (air.TotalMoles > 1e-8f)
             {
-                var gasRatio = air.GetMoles(gas) / air.TotalMoles;
-                if (threshold.CheckThreshold(gasRatio, out var gasState)
-                    && gasState > state)
+                foreach (var (gas, threshold) in monitor.GasThresholds)
                 {
-                    state = gasState;
-                    tripped = true;
+                    var gasRatio = air.GetMoles(gas) / air.TotalMoles;
+                    if (threshold.CheckThreshold(gasRatio, out var gasState)
+                        && gasState > state)
+                    {
+                        state = gasState;
+                        tripped = true;
+                    }
                 }
             }
 
