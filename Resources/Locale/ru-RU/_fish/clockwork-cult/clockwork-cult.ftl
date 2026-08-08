@@ -8,8 +8,6 @@ roles-antag-clockwork-servant-name = Слуга Ратвара
 roles-antag-clockwork-servant-objective = Возведите Ковчег и освободите Ратвара на станции.
 
 objective-issuer-clockwork-cult = Ратвар
-objective-clockwork-protect-ark-name = Защитите Ковчег
-objective-clockwork-protect-ark-desc = Постройте и защитите Ковчег Часового Судии, пока не восстанет Ратвар.
 
 clockwork-cult-cond-ongoing = Судьба Культа Ратвара не определена.
 clockwork-cult-cond-cultwin = Ратвар восстал! Культ Ратвара победил!

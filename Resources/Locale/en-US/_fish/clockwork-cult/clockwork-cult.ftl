@@ -8,8 +8,6 @@ roles-antag-clockwork-servant-name = Servant of Ratvar
 roles-antag-clockwork-servant-objective = Raise the Ark and free Ratvar upon the station.
 
 objective-issuer-clockwork-cult = Ratvar
-objective-clockwork-protect-ark-name = Protect the Ark
-objective-clockwork-protect-ark-desc = Construct and defend the Ark of the Clockwork Justiciar until Ratvar rises.
 
 # Round end
 clockwork-cult-cond-ongoing = The Clockwork Cult's fate is undecided.
