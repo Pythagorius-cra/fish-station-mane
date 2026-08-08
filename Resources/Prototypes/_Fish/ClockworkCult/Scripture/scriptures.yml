@@ -1,0 +1,269 @@
+# Servitude
+- type: clockworkScripture
+  id: ClockworkScriptureIntegrationCog
+  name: clockwork-scripture-integration-cog-name
+  description: clockwork-scripture-integration-cog-desc
+  category: Servitude
+  powerCost: 50
+  cogUnlockCost: 0
+  startsUnlocked: true
+  invokeTime: 3
+  effect: integration_cog
+  spawnPrototype: ClockworkIntegrationCog
+
+- type: clockworkScripture
+  id: ClockworkScriptureReplicant
+  name: clockwork-scripture-replicant-name
+  description: clockwork-scripture-replicant-desc
+  category: Servitude
+  powerCost: 100
+  cogUnlockCost: 0
+  startsUnlocked: true
+  invokeTime: 3
+  effect: replicant
+
+- type: clockworkScripture
+  id: ClockworkScriptureKindle
+  name: clockwork-scripture-kindle-name
+  description: clockwork-scripture-kindle-desc
+  category: Servitude
+  powerCost: 125
+  cogUnlockCost: 1
+  invokeTime: 2
+  effect: empower_kindle
+  setsEmpowerment: Kindle
+
+- type: clockworkScripture
+  id: ClockworkScriptureManacles
+  name: clockwork-scripture-manacles-name
+  description: clockwork-scripture-manacles-desc
+  category: Servitude
+  powerCost: 100
+  cogUnlockCost: 1
+  invokeTime: 2
+  effect: empower_manacles
+  setsEmpowerment: Manacles
+
+- type: clockworkScripture
+  id: ClockworkScriptureSigilSubmission
+  name: clockwork-scripture-sigil-submission-name
+  description: clockwork-scripture-sigil-submission-desc
+  category: Servitude
+  powerCost: 250
+  cogUnlockCost: 1
+  invokeTime: 5
+  effect: spawn_structure
+  spawnPrototype: ClockworkSigilSubmission
+
+- type: clockworkScripture
+  id: ClockworkScriptureVitalityMatrix
+  name: clockwork-scripture-vitality-matrix-name
+  description: clockwork-scripture-vitality-matrix-desc
+  category: Servitude
+  powerCost: 400
+  cogUnlockCost: 2
+  invokeTime: 5
+  effect: spawn_structure
+  spawnPrototype: ClockworkVitalityMatrix
+
+- type: clockworkScripture
+  id: ClockworkScriptureAbscond
+  name: clockwork-scripture-abscond-name
+  description: clockwork-scripture-abscond-desc
+  category: Servitude
+  powerCost: 150
+  cogUnlockCost: 1
+  invokeTime: 4
+  effect: abscond
+
+- type: clockworkScripture
+  id: ClockworkScriptureDimensionalBreach
+  name: clockwork-scripture-dimensional-breach-name
+  description: clockwork-scripture-dimensional-breach-desc
+  category: Servitude
+  powerCost: 1000
+  cogUnlockCost: 3
+  invokeTime: 10
+  invokerCount: 2
+  effect: dimensional_breach
+
+# Preservation
+- type: clockworkScripture
+  id: ClockworkScriptureArmaments
+  name: clockwork-scripture-armaments-name
+  description: clockwork-scripture-armaments-desc
+  category: Preservation
+  powerCost: 250
+  cogUnlockCost: 1
+  invokeTime: 4
+  effect: armaments
+
+- type: clockworkScripture
+  id: ClockworkScriptureCompromise
+  name: clockwork-scripture-compromise-name
+  description: clockwork-scripture-compromise-desc
+  category: Preservation
+  powerCost: 100
+  vitalityCost: 10
+  cogUnlockCost: 1
+  invokeTime: 3
+  effect: empower_compromise
+  setsEmpowerment: Compromise
+
+- type: clockworkScripture
+  id: ClockworkScriptureVanguard
+  name: clockwork-scripture-vanguard-name
+  description: clockwork-scripture-vanguard-desc
+  category: Preservation
+  powerCost: 200
+  cogUnlockCost: 2
+  invokeTime: 3
+  effect: vanguard
+
+- type: clockworkScripture
+  id: ClockworkScriptureCogscarab
+  name: clockwork-scripture-cogscarab-name
+  description: clockwork-scripture-cogscarab-desc
+  category: Preservation
+  powerCost: 300
+  vitalityCost: 50
+  cogUnlockCost: 2
+  invokeTime: 6
+  effect: summon_cogscarab
+  spawnPrototype: MobClockworkCogscarab
+
+- type: clockworkScripture
+  id: ClockworkScriptureMarauder
+  name: clockwork-scripture-marauder-name
+  description: clockwork-scripture-marauder-desc
+  category: Preservation
+  powerCost: 500
+  vitalityCost: 100
+  cogUnlockCost: 3
+  invokeTime: 8
+  effect: summon_marauder
+  spawnPrototype: MobClockworkMarauder
+
+# Structures
+- type: clockworkScripture
+  id: ClockworkScriptureReplicaFabricator
+  name: clockwork-scripture-fabricator-name
+  description: clockwork-scripture-fabricator-desc
+  category: Structures
+  powerCost: 100
+  cogUnlockCost: 0
+  startsUnlocked: true
+  invokeTime: 3
+  effect: fabricator
+  spawnPrototype: ClockworkReplicaFabricator
+
+- type: clockworkScripture
+  id: ClockworkScriptureOcularWarden
+  name: clockwork-scripture-ocular-warden-name
+  description: clockwork-scripture-ocular-warden-desc
+  category: Structures
+  powerCost: 350
+  cogUnlockCost: 1
+  invokeTime: 5
+  effect: spawn_structure
+  spawnPrototype: ClockworkOcularWarden
+
+- type: clockworkScripture
+  id: ClockworkScriptureProsperityPrism
+  name: clockwork-scripture-prosperity-prism-name
+  description: clockwork-scripture-prosperity-prism-desc
+  category: Structures
+  powerCost: 300
+  cogUnlockCost: 2
+  invokeTime: 5
+  effect: spawn_structure
+  spawnPrototype: ClockworkProsperityPrism
+
+- type: clockworkScripture
+  id: ClockworkScriptureInterdictionLens
+  name: clockwork-scripture-interdiction-lens-name
+  description: clockwork-scripture-interdiction-lens-desc
+  category: Structures
+  powerCost: 400
+  cogUnlockCost: 2
+  invokeTime: 5
+  effect: spawn_structure
+  spawnPrototype: ClockworkInterdictionLens
+
+- type: clockworkScripture
+  id: ClockworkScriptureTinkerersCache
+  name: clockwork-scripture-cache-name
+  description: clockwork-scripture-cache-desc
+  category: Structures
+  powerCost: 200
+  cogUnlockCost: 1
+  invokeTime: 5
+  effect: spawn_structure
+  spawnPrototype: ClockworkTinkerersCache
+
+- type: clockworkScripture
+  id: ClockworkScriptureStargazer
+  name: clockwork-scripture-stargazer-name
+  description: clockwork-scripture-stargazer-desc
+  category: Structures
+  powerCost: 450
+  cogUnlockCost: 2
+  invokeTime: 5
+  effect: spawn_structure
+  spawnPrototype: ClockworkStargazer
+
+- type: clockworkScripture
+  id: ClockworkScriptureTransmissionSigil
+  name: clockwork-scripture-transmission-name
+  description: clockwork-scripture-transmission-desc
+  category: Structures
+  powerCost: 200
+  cogUnlockCost: 1
+  invokeTime: 4
+  effect: spawn_structure
+  spawnPrototype: ClockworkTransmissionSigil
+
+- type: clockworkScripture
+  id: ClockworkScriptureArk
+  name: clockwork-scripture-ark-name
+  description: clockwork-scripture-ark-desc
+  category: Structures
+  powerCost: 1500
+  cogUnlockCost: 4
+  invokeTime: 15
+  invokerCount: 3
+  effect: spawn_structure
+  spawnPrototype: ClockworkArk
+
+- type: clockworkScripture
+  id: ClockworkScriptureTrapSkewer
+  name: clockwork-scripture-trap-name
+  description: clockwork-scripture-trap-desc
+  category: Structures
+  powerCost: 150
+  cogUnlockCost: 1
+  invokeTime: 3
+  effect: spawn_structure
+  spawnPrototype: ClockworkTrapSkewer
+
+- type: clockworkScripture
+  id: ClockworkScriptureObservationConsole
+  name: clockwork-scripture-observation-name
+  description: clockwork-scripture-observation-desc
+  category: Structures
+  powerCost: 250
+  cogUnlockCost: 2
+  invokeTime: 5
+  effect: spawn_structure
+  spawnPrototype: ClockworkObservationConsole
+
+- type: clockworkScripture
+  id: ClockworkScriptureEminenceSpire
+  name: clockwork-scripture-eminence-spire-name
+  description: clockwork-scripture-eminence-spire-desc
+  category: Structures
+  powerCost: 500
+  cogUnlockCost: 3
+  invokeTime: 8
+  effect: spawn_structure
+  spawnPrototype: ClockworkEminenceSpire

@@ -1,0 +1,17 @@
+- type: gamePreset
+  id: ClockworkCult
+  alias:
+  - clockworkcult
+  - ratvar
+  - clockcult
+  name: clockwork-cult-title
+  description: clockwork-cult-description
+  showInVote: true
+  hide: false
+  minPlayers: 20
+  rules:
+  - ClockworkCult
+  - BasicStationEventScheduler
+  - MeteorSwarmScheduler
+  - SpaceTrafficControlEventScheduler
+  - BasicRoundstartVariation

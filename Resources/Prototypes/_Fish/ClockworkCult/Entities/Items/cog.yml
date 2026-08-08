@@ -1,0 +1,12 @@
+- type: entity
+  parent: BaseItem
+  id: ClockworkIntegrationCog
+  name: integration cog
+  description: A brass parasite designed to nest inside an APC and siphon power for Ratvar.
+  components:
+  - type: Sprite
+    sprite: Objects/Materials/Sheets/metal.rsi
+    state: brass
+  - type: Item
+    size: Small
+  - type: ClockworkIntegrationCog

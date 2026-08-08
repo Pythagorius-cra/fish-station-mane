@@ -1,0 +1,13 @@
+- type: entity
+  id: ClockworkConvertEffect
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: TimedDespawn
+    lifetime: 1.5
+  - type: Sprite
+    sprite: Effects/atmospherics.rsi
+    state: hot
+    color: "#c9a227"
+  - type: PointLight
+    radius: 2
+    color: "#c9a227"

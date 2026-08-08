@@ -1,0 +1,356 @@
+- type: entity
+  id: ClockworkSigilSubmission
+  name: sigil of submission
+  description: A glowing brass sigil. Victims held upon it can be converted.
+  placement:
+    mode: SnapgridCenter
+  components:
+  - type: Transform
+    anchored: true
+  - type: Sprite
+    sprite: Tiles/Misc/clockwork/clockwork_floor_filled.png
+    drawdepth: FloorTiles
+  - type: Clickable
+  - type: InteractionOutline
+  - type: ClockworkSigilSubmission
+  - type: Damageable
+    damageContainer: StructuralInorganic
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 100
+      behaviors:
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
+
+- type: entity
+  id: ClockworkVitalityMatrix
+  name: vitality matrix
+  description: A lattice of brass that drinks life from unbelievers and restores servants.
+  placement:
+    mode: SnapgridCenter
+  components:
+  - type: Transform
+    anchored: true
+  - type: Sprite
+    sprite: Structures/Furniture/Tables/brass.rsi
+    state: full
+  - type: Clickable
+  - type: ClockworkVitalityMatrix
+  - type: ClockworkStructure
+    powerDrawPerSecond: 1
+  - type: Damageable
+    damageContainer: StructuralInorganic
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 150
+      behaviors:
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
+
+- type: entity
+  id: ClockworkTransmissionSigil
+  name: sigil of transmission
+  description: Channels clockwork power to nearby structures.
+  placement:
+    mode: SnapgridCenter
+  components:
+  - type: Transform
+    anchored: true
+  - type: Sprite
+    sprite: Tiles/Misc/clockwork/reebe.png
+    drawdepth: FloorTiles
+  - type: Clickable
+  - type: ClockworkTransmissionSigil
+  - type: Damageable
+    damageContainer: StructuralInorganic
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 80
+      behaviors:
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
+
+- type: entity
+  id: ClockworkTinkerersCache
+  name: tinkerer's cache
+  description: A brass sanctum and Abscond anchorage for servants of Ratvar.
+  placement:
+    mode: SnapgridCenter
+  components:
+  - type: Transform
+    anchored: true
+  - type: Sprite
+    sprite: Structures/Storage/closet.rsi
+    state: base
+    color: "#c9a227"
+  - type: Clickable
+  - type: InteractionOutline
+  - type: ClockworkCache
+  - type: ClockworkAbscondTarget
+  - type: Damageable
+    damageContainer: StructuralInorganic
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 300
+      behaviors:
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
+
+- type: entity
+  id: ClockworkOcularWarden
+  name: ocular warden
+  description: A fragile brass eye that lashes at unbelievers.
+  placement:
+    mode: SnapgridCenter
+  components:
+  - type: Transform
+    anchored: true
+  - type: Sprite
+    sprite: Structures/Wallmounts/camera.rsi
+    state: camera
+    color: "#c9a227"
+  - type: Clickable
+  - type: ClockworkOcularWarden
+  - type: ClockworkStructure
+    powerDrawPerSecond: 3
+  - type: Damageable
+    damageContainer: StructuralInorganic
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 60
+      behaviors:
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
+
+- type: entity
+  id: ClockworkProsperityPrism
+  name: prosperity prism
+  description: Cleanses toxins and fatigue from nearby servants.
+  placement:
+    mode: SnapgridCenter
+  components:
+  - type: Transform
+    anchored: true
+  - type: Sprite
+    sprite: Structures/Furniture/Tables/brass.rsi
+    state: full
+    color: "#88ff88"
+  - type: Clickable
+  - type: ClockworkProsperityPrism
+  - type: ClockworkStructure
+    powerDrawPerSecond: 2
+    requiresTransmission: true
+  - type: Damageable
+    damageContainer: StructuralInorganic
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 100
+      behaviors:
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
+
+- type: entity
+  id: ClockworkInterdictionLens
+  name: interdiction lens
+  description: Slows unbelievers that enter its gaze.
+  placement:
+    mode: SnapgridCenter
+  components:
+  - type: Transform
+    anchored: true
+  - type: Sprite
+    sprite: Structures/Wallmounts/camera.rsi
+    state: camera
+    color: "#aa44ff"
+  - type: Clickable
+  - type: ClockworkInterdictionLens
+  - type: ClockworkStructure
+    powerDrawPerSecond: 3
+  - type: Damageable
+    damageContainer: StructuralInorganic
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 100
+      behaviors:
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
+
+- type: entity
+  id: ClockworkStargazer
+  name: stargazer
+  description: A clockwork forge that briefly enchants weapons.
+  placement:
+    mode: SnapgridCenter
+  components:
+  - type: Transform
+    anchored: true
+  - type: Sprite
+    sprite: Structures/Machines/anomaly_generator.rsi
+    state: icon
+    color: "#c9a227"
+  - type: Clickable
+  - type: InteractionOutline
+  - type: ClockworkStargazer
+  - type: Damageable
+    damageContainer: StructuralInorganic
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 200
+      behaviors:
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
+
+- type: entity
+  id: ClockworkArk
+  name: ark of the clockwork justiciar
+  description: A massive brass gateway. If it awakens, Ratvar will rise on the station.
+  placement:
+    mode: SnapgridCenter
+  components:
+  - type: Transform
+    anchored: true
+  - type: Sprite
+    sprite: Structures/Machines/gateway.rsi
+    state: frame
+    scale: 1.5, 1.5
+    color: "#c9a227"
+  - type: Clickable
+  - type: InteractionOutline
+  - type: ClockworkArk
+  - type: ClockworkAbscondTarget
+  - type: Damageable
+    damageContainer: StructuralInorganic
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 1000
+      behaviors:
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
+
+- type: entity
+  id: ClockworkTrapSkewer
+  name: brass skewer trap
+  description: A pressure-triggered spike of brass.
+  placement:
+    mode: SnapgridCenter
+  components:
+  - type: Transform
+    anchored: true
+  - type: Sprite
+    sprite: Objects/Weapons/Melee/spear.rsi
+    state: spear
+    color: "#c9a227"
+  - type: Fixtures
+    fixtures:
+      trap:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-0.3,-0.3,0.3,0.3"
+        hard: false
+        layer:
+        - MidImpassable
+  - type: ClockworkTrap
+  - type: Damageable
+    damageContainer: StructuralInorganic
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 50
+      behaviors:
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
+
+- type: entity
+  id: ClockworkObservationConsole
+  name: clockwork observation console
+  description: Allows servants to warp to a Tinkerer's Cache.
+  placement:
+    mode: SnapgridCenter
+  components:
+  - type: Transform
+    anchored: true
+  - type: Sprite
+    sprite: Structures/Machines/computers.rsi
+    state: computer
+    color: "#c9a227"
+  - type: Clickable
+  - type: InteractionOutline
+  - type: ClockworkObservationConsole
+  - type: Damageable
+    damageContainer: StructuralInorganic
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 150
+      behaviors:
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
+
+- type: entity
+  id: ClockworkEminenceSpire
+  name: eminence spire
+  description: A brass beacon that can call forth the Eminence.
+  placement:
+    mode: SnapgridCenter
+  components:
+  - type: Transform
+    anchored: true
+  - type: Sprite
+    sprite: Structures/Machines/holopad.rsi
+    state: base
+    color: "#c9a227"
+  - type: Clickable
+  - type: InteractionOutline
+  - type: GhostRole
+    name: ghost-role-information-clockwork-eminence-name
+    description: ghost-role-information-clockwork-eminence-description
+    rules: ghost-role-information-freeagent-rules
+  - type: GhostRoleMobSpawner
+    prototype: MobClockworkEminence
+  - type: Damageable
+    damageContainer: StructuralInorganic
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 250
+      behaviors:
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
+
+- type: entity
+  id: ClockworkRift
+  name: clockwork rift
+  description: Space-time tears under the Ark's pressure.
+  components:
+  - type: Transform
+  - type: Sprite
+    sprite: Effects/portal.rsi
+    state: portal-blue
+    color: "#c9a227"
+  - type: TimedDespawn
+    lifetime: 120
+  - type: ClockworkRift
+  - type: PointLight
+    radius: 3
+    color: "#c9a227"

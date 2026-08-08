@@ -1,0 +1,17 @@
+- type: npcFaction
+  id: ClockworkCult
+  friendly:
+  - ClockworkCult
+  hostile:
+  - NanoTrasen
+  - Syndicate
+  - Thief
+  - Zombie
+  - Revolutionary
+  - Xeno
+  - Flesh
+  - FleshHuman
+  - Carps
+  - AllHostile
+  - Pirate
+  - BloodCult

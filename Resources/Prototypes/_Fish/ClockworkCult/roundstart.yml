@@ -1,0 +1,25 @@
+- type: entity
+  id: ClockworkCult
+  parent: BaseGameRule
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: GameRule
+    minPlayers: 30
+  - type: ClockworkCultRule
+  - type: AntagObjectives
+    objectives:
+    - ClockworkProtectArkObjective
+  - type: AntagSelection
+    definitions:
+    - prefRoles: [ ClockworkServant ]
+      max: 4
+      playerRatio: 15
+      blacklist:
+        components:
+        - AntagImmune
+        - BibleUser
+      lateJoinAdditional: true
+      mindRoles:
+      - MindRoleClockworkServant
+  - type: DynamicRuleCost
+    cost: 150

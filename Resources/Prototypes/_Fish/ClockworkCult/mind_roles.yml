@@ -1,0 +1,10 @@
+- type: entity
+  parent: BaseMindRoleAntag
+  id: MindRoleClockworkServant
+  name: Clockwork Servant Role
+  components:
+  - type: MindRole
+    antagPrototype: ClockworkServant
+    exclusiveAntag: true
+    roleType: TeamAntagonist
+  - type: ClockworkServantRole

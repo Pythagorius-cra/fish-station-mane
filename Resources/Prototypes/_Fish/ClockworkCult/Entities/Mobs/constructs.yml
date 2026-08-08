@@ -1,0 +1,119 @@
+- type: entity
+  parent: BaseMob
+  id: MobClockworkCogscarab
+  name: cogscarab
+  description: A tiny brass drone loyal to Ratvar. Built for construction.
+  components:
+  - type: Sprite
+    sprite: Mobs/Silicon/drone.rsi
+    layers:
+    - state: shell
+      color: "#c9a227"
+  - type: ClockworkCogscarab
+  - type: ClockworkServant
+  - type: CultMember
+  - type: NpcFactionMember
+    factions:
+    - ClockworkCult
+  - type: GhostRole
+    name: ghost-role-information-cogscarab-name
+    description: ghost-role-information-cogscarab-description
+    rules: ghost-role-information-freeagent-rules
+    raffle:
+      settings: default
+  - type: GhostTakeoverAvailable
+  - type: InputMover
+  - type: MobMover
+  - type: Physics
+    bodyType: KinematicController
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeCircle
+          radius: 0.25
+        density: 80
+        mask:
+        - SmallMobMask
+        layer:
+        - SmallMobLayer
+  - type: MobState
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      50: Dead
+  - type: Damageable
+    damageContainer: Biological
+  - type: Hands
+  - type: ComplexInteraction
+  - type: Tag
+    tags:
+    - ClockworkServant
+
+- type: entity
+  parent: BaseMob
+  id: MobClockworkMarauder
+  name: clockwork marauder
+  description: A hulking brass warrior with a regenerating projectile shield.
+  components:
+  - type: Sprite
+    sprite: Mobs/Demons/ratvar.rsi
+    layers:
+    - state: spawn
+      color: "#c9a227"
+  - type: ClockworkMarauder
+  - type: ClockworkServant
+  - type: CultMember
+  - type: NpcFactionMember
+    factions:
+    - ClockworkCult
+  - type: GhostRole
+    name: ghost-role-information-marauder-name
+    description: ghost-role-information-marauder-description
+    rules: ghost-role-information-freeagent-rules
+    raffle:
+      settings: default
+  - type: GhostTakeoverAvailable
+  - type: InputMover
+  - type: MobMover
+  - type: Physics
+    bodyType: KinematicController
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeCircle
+          radius: 0.35
+        density: 200
+        mask:
+        - MobMask
+        layer:
+        - MobLayer
+  - type: MobState
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      200: Dead
+  - type: Damageable
+    damageContainer: Biological
+  - type: MeleeWeapon
+    damage:
+      types:
+        Blunt: 25
+        Structural: 20
+  - type: Hands
+  - type: Tag
+    tags:
+    - ClockworkServant
+
+- type: entity
+  parent: MobObserverBase
+  id: MobClockworkEminence
+  name: the Eminence
+  description: An incorporeal commander of the Clockwork Cult.
+  components:
+  - type: Sprite
+    color: "#c9a227"
+  - type: ClockworkEminence
+  - type: MovementIgnoreGravity
+  - type: GhostTakeoverAvailable

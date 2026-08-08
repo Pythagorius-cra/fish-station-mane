@@ -1,0 +1,24 @@
+- type: entity
+  abstract: true
+  parent: [BaseObjective, BaseLivingObjective]
+  id: BaseClockworkCultObjective
+  components:
+  - type: Objective
+    issuer: objective-issuer-clockwork-cult
+  - type: RoleRequirement
+    roles:
+    - ClockworkServantRole
+
+- type: entity
+  categories: [ HideSpawnMenu ]
+  parent: BaseClockworkCultObjective
+  id: ClockworkProtectArkObjective
+  name: objective-clockwork-protect-ark-name
+  description: objective-clockwork-protect-ark-desc
+  components:
+  - type: Objective
+    difficulty: 3.0
+    icon:
+      sprite: Structures/Walls/solid.rsi
+      state: full
+  - type: SurviveCondition

@@ -1,0 +1,23 @@
+- type: entity
+  parent: BaseItem
+  id: ClockworkSlab
+  name: clockwork slab
+  description: A strange brass tablet covered in shifting glyphs. The Hierophant Network hums within.
+  components:
+  - type: Sprite
+    sprite: Objects/Misc/books.rsi
+    state: book_icon
+    color: "#c9a227"
+  - type: Item
+    size: Normal
+  - type: ClockworkSlab
+  - type: ActivatableUI
+    key: enum.ClockworkSlabUiKey.Key
+    inHandsOnly: true
+    requireActiveHand: false
+  - type: UserInterface
+    interfaces:
+      enum.ClockworkSlabUiKey.Key:
+        type: ClockworkSlabBoundUserInterface
+  - type: UseDelay
+    delay: 0.5

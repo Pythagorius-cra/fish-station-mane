@@ -1237,6 +1237,13 @@
         - !type:ReagentCondition
           reagent: Holywater
           min: 10 # Пусть культистов крови не будут выбивать сразу из раунда, а попробуют перевести в нормальных людей
+      # ===== FISH EDIT START: CLOCKWORK CULT =====
+      - !type:DeconvertClockworkServant
+        conditions:
+        - !type:ReagentCondition
+          reagent: Holywater
+          min: 10
+      # ===== FISH EDIT END: CLOCKWORK CULT =====
       # Sunrise-End
     Medicine:
       effects:

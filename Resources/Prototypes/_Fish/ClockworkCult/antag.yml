@@ -1,0 +1,8 @@
+- type: antag
+  id: ClockworkServant
+  name: roles-antag-clockwork-servant-name
+  antagonist: true
+  setPreference: true
+  objective: roles-antag-clockwork-servant-objective
+  playTimeTracker: AntagClockworkServant
+  storytellerStress: 1

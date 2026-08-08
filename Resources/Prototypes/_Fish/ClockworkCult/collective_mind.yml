@@ -1,0 +1,6 @@
+- type: collectiveMind
+  id: ClockworkCult
+  name: collective-mind-clockwork-cult
+  keycode: 'ч'
+  color: "#c9a227"
+  voiceId: necrophos_dota_2

@@ -1,0 +1,17 @@
+- type: entity
+  parent: BaseItem
+  id: ClockworkReplicaFabricator
+  name: replica fabricator
+  description: A handheld brass device that fabricates clockwork materials.
+  components:
+  - type: Sprite
+    sprite: Objects/Tools/multitool.rsi
+    state: icon
+    color: "#c9a227"
+  - type: Item
+    size: Normal
+  - type: ClockworkFabricator
+  - type: Tool
+    qualities:
+    - Screwing
+    - Anchoring
