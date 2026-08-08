@@ -3,5 +3,5 @@
   priority: 0
   locationPreference: Left
   icon:
-    sprite: /Textures/Interface/Misc/job_icons.rsi
-    state: antag
+    sprite: /Textures/_Sunrise/BloodCult/cult_hud.rsi
+    state: cult
