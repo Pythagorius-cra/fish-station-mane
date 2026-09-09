@@ -416,7 +416,6 @@
 #откат
   - type: Gun
     fireRate: 12
-    semiAutoFireRate: 14
     selectedMode: SemiAuto
     availableModes:
       - SemiAuto
