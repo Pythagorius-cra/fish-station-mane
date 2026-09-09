@@ -12,7 +12,7 @@
   id: VendorSalvageClothingOuterHardsuitMaxim
   productEntity: ClothingOuterHardsuitMaxim
   cost:
-    SalvageTicket: 3333
+    SalvageTicket: 1200
   categories:
   - SalvageEquipment
   conditions:
@@ -224,6 +224,17 @@
   - !type:ListingLimitedStockCondition
     stock: 5
 
+- type: listing
+  id: VendorSalvageMedipenCaseSalvage
+  productEntity: MedipenCaseSalvage
+  cost:
+    SalvageTicket: 100
+  categories:
+  - SalvageEquipment
+  conditions:
+  - !type:ListingLimitedStockCondition
+    stock: 8
+
 # weapons
 - type: listing
   id: VendorSalvageWeaponLaserSvalinn
@@ -265,7 +276,7 @@
   icon: { sprite: _Sunrise/Structures/Storage/Crates/woodcrate_ussp_mosin.rsi, state: icon }
   productEntity: CrateShelfMosin
   cost:
-    SalvageTicket: 235
+    SalvageTicket: 300
   categories:
   - SalvageWeapons
 
@@ -289,7 +300,7 @@
   id: VendorSalvageWeaponShotgunCycler
   productEntity: WeaponShotgunCycler
   cost:
-    SalvageTicket: 2000
+    SalvageTicket: 900
   categories:
   - SalvageWeapons
   conditions:

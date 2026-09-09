@@ -718,9 +718,9 @@
   name: uplink-grenade-launcher-m79-name
   description: uplink-grenade-launcher-m79-desc
   icon: { sprite: /Textures/_RMC14/Objects/Weapons/Guns/Launchers/m79/big.rsi, state: base }
-  productEntity: ClothingBackpackDuffelSyndicateFilledGrenadeLauncherM79
+  productEntity: BriefcaseWeaponM79Filled
   cost:
-    Doubloon: 17
+    Doubloon: 15
   categories:
   - UplinkPirateRangedWeaponry
   conditions:
@@ -2652,14 +2652,6 @@
   - UplinkPiratePointless
 
 - type: listing
-  id: UplinkPiratePaintWarboss
-  productEntity: MechPaintDollHouseWarboss
-  cost:
-    Doubloon: 5
-  categories:
-  - UplinkPiratePointless
-
-- type: listing
   id: UplinkPirateOperativeSkirt
   name: uplink-operative-skirt-name
   description: uplink-operative-skirt-desc
@@ -2871,7 +2863,7 @@
   id: UplinkPirateDollHouseBundle
   name: uplink-mech-teleporter-ussp-name
   description: uplink-mech-teleporter-ussp-desc
-  icon: { sprite: /Textures/Objects/Specific/Mech/durand.rsi, state: dollhouse }
+  icon: { sprite: /Textures/_Sunrise/Objects/Specific/Mech/durand.rsi, state: dollhouse }
   productEntity: CratePirateMechDollHouseBundle
   cost:
     Doubloon: 300
