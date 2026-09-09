@@ -70,7 +70,7 @@ public sealed class GhostRoleProfileSpawnerSystem : EntitySystem
         if (ent.Comp.StartingGear is { } gearId &&
             _prototypes.TryIndex(gearId, out StartingGearPrototype? gear))
         {
-            _stationSpawning.EquipStartingGear(mob, gear, raiseEvent: true);
+            _stationSpawning.EquipStartingGear(mob, gear, raiseEvent: false);
         }
 
         _transform.AttachToGridOrMap(mob);

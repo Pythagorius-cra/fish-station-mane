@@ -18,15 +18,15 @@ public sealed class PlanetWarBriefingSystem : EntitySystem
         SubscribeLocalEvent<PlanetWarBriefingComponent, MindAddedMessage>(OnMindAdded);
     }
 
-    private void OnMindAdded(EntityUid uid, PlanetWarBriefingComponent component, MindAddedMessage args)
+    private void OnMindAdded(Entity<PlanetWarBriefingComponent> ent, ref MindAddedMessage args)
     {
-        if (!TryComp<ActorComponent>(uid, out var actor))
+        if (!TryComp<ActorComponent>(ent.Owner, out var actor))
             return;
 
         _antag.SendBriefing(
             actor.PlayerSession,
-            Loc.GetString(component.BriefingText),
-            component.BriefingColor,
-            component.BriefingSound);
+            Loc.GetString(ent.Comp.BriefingText),
+            ent.Comp.BriefingColor,
+            ent.Comp.BriefingSound);
     }
 }

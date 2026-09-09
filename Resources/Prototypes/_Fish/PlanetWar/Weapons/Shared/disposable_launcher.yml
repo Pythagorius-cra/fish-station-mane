@@ -24,7 +24,7 @@
   categories: [ HideSpawnMenu ]
   components:
   - type: Sprite
-    sprite: _Sunrise/Objects/Weapons/Guns/Launchers/disposal_rocket_launcher.rsi
+    sprite: _Fish/Objects/Weapons/Guns/Launchers/disposal_rocket_launcher.rsi
     layers:
     - state: unwielded
       map: [ base ]
@@ -39,7 +39,7 @@
       color: "#ffaa44"
       visible: false
   - type: Clothing
-    sprite: _Sunrise/Objects/Weapons/Guns/Launchers/disposal_rocket_launcher.rsi
+    sprite: _Fish/Objects/Weapons/Guns/Launchers/disposal_rocket_launcher.rsi
     quickEquip: false
     slots:
     - Back
@@ -48,7 +48,7 @@
     size: Huge
     shape:
     - 0,0,2,1
-    sprite: _Sunrise/Objects/Weapons/Guns/Launchers/disposal_rocket_launcher.rsi
+    sprite: _Fish/Objects/Weapons/Guns/Launchers/disposal_rocket_launcher.rsi
   - type: PhysicalComposition
     materialComposition:
       MoneyWarMizMaterial: 100

@@ -19,21 +19,21 @@ public sealed class CancelTimedDespawnOnInsertSystem : EntitySystem
         SubscribeLocalEvent<CancelTimedDespawnOnInsertComponent, EntGotInsertedIntoContainerMessage>(OnInserted);
     }
 
-    private void OnMapInit(EntityUid uid, CancelTimedDespawnOnInsertComponent component, MapInitEvent args)
+    private void OnMapInit(Entity<CancelTimedDespawnOnInsertComponent> ent, ref MapInitEvent args)
     {
         // Уже в контейнере при спавне (loadout / StorageFill) — таймер не нужен.
-        if (_container.IsEntityInContainer(uid))
-            Cancel(uid);
+        if (_container.IsEntityInContainer(ent.Owner))
+            Cancel(ent.Owner);
     }
 
-    private void OnEquippedHand(EntityUid uid, CancelTimedDespawnOnInsertComponent component, GotEquippedHandEvent args)
+    private void OnEquippedHand(Entity<CancelTimedDespawnOnInsertComponent> ent, ref GotEquippedHandEvent args)
     {
-        Cancel(uid);
+        Cancel(ent.Owner);
     }
 
-    private void OnInserted(EntityUid uid, CancelTimedDespawnOnInsertComponent component, EntGotInsertedIntoContainerMessage args)
+    private void OnInserted(Entity<CancelTimedDespawnOnInsertComponent> ent, ref EntGotInsertedIntoContainerMessage args)
     {
-        Cancel(uid);
+        Cancel(ent.Owner);
     }
 
     private void Cancel(EntityUid uid)
