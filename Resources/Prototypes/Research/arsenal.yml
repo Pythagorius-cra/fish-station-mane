@@ -231,7 +231,6 @@
   - ShellFragArtillery # Sunrise-Add
   - RifleHeavyMagazineEmpty # Sunrise-Add
   - RifleHeavyMagazineFMJ # Sunrise-Add
-  - RifleHeavyMagazineHP # Sunrise-Add
   - RifleHeavyMagazineSP # Sunrise-Add
   - ShuttleGunSvalinnMachineGunCircuitboard
   - ShuttleGunPerforatorCircuitboard
@@ -271,7 +270,6 @@
   - WeaponAdvancedLaser
   - PortableRecharger
   - WeaponMechCombatImmolationGun # Sunrise-Add
-  - WeaponMechCombatIon # Sunrise-Add
   radioChannels: # Sunrise-Add
   - Security
 
