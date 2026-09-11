@@ -10,6 +10,10 @@ namespace Content.Shared._Fish.PlanetWar;
 [RegisterComponent, NetworkedComponent]
 public sealed partial class PlanetWarMemberComponent : Component
 {
+    /// <summary>
+    /// Фракционная иконка статуса участника PlanetWar.
+    /// По умолчанию <c>FactionIconCoreBase</c>.
+    /// </summary>
     [DataField]
     public ProtoId<FactionIconPrototype> StatusIcon = "FactionIconCoreBase";
 }

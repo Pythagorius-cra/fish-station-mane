@@ -19,3 +19,9 @@ job-title-republic-lieutenant = Lieutenant
 job-title-republic-doctor = Doctor
 job-title-republic-engineer = Engineer
 job-supervisors-republic-council = Council of Lieutenants
+
+pw-briefing-rebels-dronarm = Agile disorienting drone. Can trigger an electromagnetic flash blinding enemies in a 5x5 radius for 1 second, an EMP burst in a 3x3 radius, and shock all enemies within a 3x3 radius.
+pw-vehicles-rebels-dronarm-desc = Disposable homing projectile
+pw-vehicles-rebels-markerdronarmturretmine-desc = Turret minelayer
+pw-vehicles-republic-markerdroncore-desc = Disposable homing projectile
+pw-vehicles-republic-markerdroncoreturretmine-desc = Turret minelayer

@@ -66,11 +66,11 @@ public sealed class GhostRoleProfileSpawnerSystem : EntitySystem
             mob = _stationSpawning.SpawnPlayerMob(coords, null, profile, station);
         }
 
-        // FIsh: экипировка через startingGear (Sunrise), а не Loadout MapInit на мобе
+        // Fish: экипировка через startingGear (Sunrise), а не Loadout MapInit на мобе
         if (ent.Comp.StartingGear is { } gearId &&
             _prototypes.TryIndex(gearId, out StartingGearPrototype? gear))
         {
-            _stationSpawning.EquipStartingGear(mob, gear, raiseEvent: false);
+            _stationSpawning.EquipStartingGear(mob, gear, raiseEvent: true);
         }
 
         _transform.AttachToGridOrMap(mob);
