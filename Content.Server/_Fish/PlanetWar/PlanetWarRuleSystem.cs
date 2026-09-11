@@ -55,6 +55,46 @@ public sealed class PlanetWarRuleSystem : GameRuleSystem<PlanetWarRuleComponent>
 
     private void OnGatewayTriggered(Entity<PlanetWarGatewayComponent> ent, ref TriggerEvent args)
     {
+        if (args.Handled)
+            return;
+
+        if (TryEndPlanetWar(ent))
+            args.Handled = true;
+    }
+
+    /// <summary>
+    /// Попытка завершить PlanetWar при уничтожении врат.
+    /// </summary>
+    public bool TryEndPlanetWar(Entity<PlanetWarGatewayComponent> gateway)
+    {
+        if (!CanEndPlanetWar(gateway, out var targetRule, out var winner))
+            return false;
+
+        EndPlanetWar(targetRule, winner.Value);
+        return true;
+    }
+
+    /// <summary>
+    /// Проверка возможности завершения PlanetWar при уничтожении врат.
+    /// </summary>
+    public bool CanEndPlanetWar(
+        Entity<PlanetWarGatewayComponent> gateway,
+        [System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out PlanetWarRuleComponent? targetRule,
+        [System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out PlanetWarTeam? winner)
+    {
+        targetRule = null;
+        winner = null;
+
+        var calculatedWinner = gateway.Comp.Team switch
+        {
+            PlanetWarTeam.Core => PlanetWarTeam.Arm,
+            PlanetWarTeam.Arm => PlanetWarTeam.Core,
+            _ => (PlanetWarTeam?) null,
+        };
+
+        if (calculatedWinner == null)
+            return false;
+
         var query = EntityQueryEnumerator<PlanetWarRuleComponent, GameRuleComponent>();
         while (query.MoveNext(out var ruleUid, out var rule, out var gameRule))
         {
@@ -62,22 +102,14 @@ public sealed class PlanetWarRuleSystem : GameRuleSystem<PlanetWarRuleComponent>
                 continue;
 
             if (rule.Ending)
-                return;
+                continue;
 
-            // Уничтожены врата команды → побеждает противоположная.
-            var winner = ent.Comp.Team switch
-            {
-                PlanetWarTeam.Core => PlanetWarTeam.Arm,
-                PlanetWarTeam.Arm => PlanetWarTeam.Core,
-                _ => (PlanetWarTeam?) null,
-            };
-
-            if (winner == null)
-                return;
-
-            EndPlanetWar(rule, winner.Value);
-            return;
+            targetRule = rule;
+            winner = calculatedWinner;
+            return true;
         }
+
+        return false;
     }
 
     private void EndPlanetWar(PlanetWarRuleComponent rule, PlanetWarTeam winner)
