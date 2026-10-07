@@ -1,3 +1,7 @@
+using Content.Shared.Mind;
+using Content.Shared.Ghost;
+using Content.Shared.Mind;
+using Content.Shared.Ghost;
 using System.Linq;
 using System.Numerics;
 using Content.Server._Sunrise.BloodCult.GameRule;
@@ -1356,8 +1360,8 @@ namespace Content.Server._Sunrise.BloodCult.Runes.Systems
 
             if (_entityManager.TryGetComponent<MindContainerComponent>(target, out var mindComponent) && mindComponent.HasMind)
             {
-                targetMindId = mindComponent.Mind.Value.Owner;
-                targetMind = mindComponent.Mind.Value.Comp;
+                targetMindId = mindComponent.Mind;
+                if (targetMindId.HasValue) targetMind = _entityManager.GetComponent<MindComponent>(targetMindId.Value);
             }
             else
             {
@@ -1504,3 +1508,7 @@ namespace Content.Server._Sunrise.BloodCult.Runes.Systems
          */
     }
 }
+
+
+
+
