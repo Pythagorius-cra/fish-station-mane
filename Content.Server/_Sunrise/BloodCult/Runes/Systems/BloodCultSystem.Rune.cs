@@ -520,7 +520,11 @@ namespace Content.Server._Sunrise.BloodCult.Runes.Systems
                     _cultistTargetsConditionSystem.RefresTitle(obj, rule.CultTargets, killCultistTargetsComponent);
                 }
 
-                _gibbing.Gib(target);
+                if (!SpawnShard(target))
+                {
+                    _gibbing.Gib(target);
+                }
+
                 _bloodCultRuleSystem.ChangeSacrificeCount(rule, rule.SacrificeCount + 1);
 
                 return true;
@@ -1342,18 +1346,57 @@ namespace Content.Server._Sunrise.BloodCult.Runes.Systems
 
         private bool SpawnShard(EntityUid target)
         {
-            if (!_entityManager.TryGetComponent<MindContainerComponent>(target, out var mindComponent))
-                return false;
-
             var transform = CompOrNull<TransformComponent>(target)?.Coordinates;
 
             if (transform == null)
                 return false;
 
+            EntityUid? targetMindId = null;
+            MindComponent? targetMind = null;
+
+            if (_entityManager.TryGetComponent<MindContainerComponent>(target, out var mindComponent) && mindComponent.HasMind)
+            {
+                targetMindId = mindComponent.Mind.Value.Owner;
+                targetMind = mindComponent.Mind.Value.Comp;
+            }
+            else
+            {
+                var mindQuery = EntityQueryEnumerator<MindComponent>();
+                var targetNet = GetNetEntity(target);
+                while (mindQuery.MoveNext(out var mId, out var mComp))
+                {
+                    if (mComp.OriginalOwnedEntity == targetNet)
+                    {
+                        targetMindId = mId;
+                        targetMind = mComp;
+                        break;
+                    }
+                }
+            }
+
+            if (targetMindId != null && targetMind != null)
+            {
+                var currentEntity = targetMind.CurrentEntity;
+
+                if (currentEntity != null && currentEntity != target && currentEntity != targetMind.VisitingEntity)
+                {
+                    if (_entityManager.HasComponent<MobStateComponent>(currentEntity) && !_entityManager.HasComponent<GhostComponent>(currentEntity))
+                    {
+                        return false;
+                    }
+                }
+            }
+            else
+            {
+                return false;
+            }
+
             var shard = _entityManager.SpawnEntity("SoulShardGhost", transform.Value);
 
-            if (mindComponent.Mind.HasValue)
-                _mindSystem.TransferTo(mindComponent.Mind.Value, shard);
+            if (targetMindId != null && targetMind != null)
+            {
+                _mindSystem.TransferTo(targetMindId.Value, shard, mind: targetMind);
+            }
 
             _gibbing.Gib(target);
 
@@ -1432,6 +1475,12 @@ namespace Content.Server._Sunrise.BloodCult.Runes.Systems
 
             if (!TryComp<MapGridComponent>(gridUid, out var mapGrid))
                 return false;
+
+            if (_stationSystem.GetOwningStation(gridUid.Value) == null)
+            {
+                _popupSystem.PopupEntity(Loc.GetString("cult-rune-not-on-station") ?? "Руны можно рисовать только на станции.", uid, uid);
+                return false;
+            }
 
             var position = _map.TileIndicesFor(gridUid.Value, mapGrid, transform.Coordinates);
 

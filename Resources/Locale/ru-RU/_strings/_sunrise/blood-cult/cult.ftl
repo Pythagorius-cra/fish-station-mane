@@ -59,3 +59,5 @@ summon-button-label = { $label } ({ $mobState }; { $distance } Рј)
 teleport-button-label = { $label } ({ $distance } Рј)
 revived-cultist-desc = РљСѓР»СЊС‚РёСЃС‚ РєСЂРѕРІРё, РґСѓС€Р° РєРѕС‚РѕСЂРѕРіРѕ СЃРіРёРЅСѓР»Р° РІ РІРµС‡РЅРѕРј РјСЂР°РєРµ.
 tile-has-rune = РќР° СЌС‚РѕРј С‚Р°Р№Р»Рµ СѓР¶Рµ РµСЃС‚СЊ СЂСѓРЅР°!
+
+cult-rune-not-on-station = Руны можно рисовать только на территории станции.

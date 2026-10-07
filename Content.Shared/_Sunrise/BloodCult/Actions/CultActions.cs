@@ -1,4 +1,4 @@
-﻿using Content.Shared.Actions;
+using Content.Shared.Actions;
 using Content.Shared.DoAfter;
 using Robust.Shared.Serialization;
 
@@ -73,6 +73,12 @@ public sealed class TeleportSpellUsedEvent : EntityEventArgs
 [Serializable, NetSerializable]
 public sealed class TwistedConstructSpellUsedEvent : EntityEventArgs
 {
+}
+
+public sealed class CultTeleportStartDoAfterEvent : EntityEventArgs
+{
+    public EntityUid Target;
+    public EntityUid Rune;
 }
 
 [Serializable, NetSerializable]

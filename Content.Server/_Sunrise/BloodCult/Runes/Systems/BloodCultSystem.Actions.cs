@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using Content.Server._Sunrise.BloodCult.UI;
 using Content.Server._Sunrise.BloodCult.Runes.Comps;
 using Content.Server.Body.Components;
@@ -38,6 +38,7 @@ namespace Content.Server._Sunrise.BloodCult.Runes.Systems
             SubscribeLocalEvent<BloodCultistComponent, CultEmpPulseTargetActionEvent>(OnElectromagneticPulse);
             SubscribeLocalEvent<BloodCultistComponent, CultConcealPresenceWorldActionEvent>(OnConcealPresence);
             SubscribeLocalEvent<BloodCultistComponent, CultTeleportTargetActionEvent>(OnTeleport);
+            SubscribeLocalEvent<BloodCultistComponent, CultTeleportStartDoAfterEvent>(OnTeleportStartDoAfter);
             SubscribeLocalEvent<BloodCultistComponent, CultTeleportDoAfterEvent>(OnTeleportDoAfter);
             SubscribeLocalEvent<BloodCultistComponent, CultStunTargetActionEvent>(OnStunTarget);
             SubscribeLocalEvent<BloodCultistComponent, CultShadowShacklesTargetActionEvent>(OnShadowShackles);
@@ -263,11 +264,19 @@ namespace Content.Server._Sunrise.BloodCult.Runes.Systems
 
         private void OnTeleport(EntityUid uid, BloodCultistComponent component, CultTeleportTargetActionEvent args)
         {
-            if (!TryComp<BloodstreamComponent>(args.Performer, out _) || !TryComp<ActorComponent>(uid, out _))
+            if (!TryComp<BloodstreamComponent>(args.Performer, out _) || !TryComp<ActorComponent>(uid, out var actor))
                 return;
 
+            var eui = new TeleportSpellEui(args.Performer, args.Target);
+            _euiManager.OpenEui(eui, actor.PlayerSession);
+            eui.StateDirty();
+            args.Handled = true;
+        }
+
+        private void OnTeleportStartDoAfter(EntityUid uid, BloodCultistComponent comp, CultTeleportStartDoAfterEvent args)
+        {
             var ev = new CultTeleportDoAfterEvent();
-            var doAfter = new DoAfterArgs(_entityManager, args.Performer, TimeSpan.FromSeconds(2), ev, uid)
+            var doAfter = new DoAfterArgs(_entityManager, uid, TimeSpan.FromSeconds(2), ev, uid)
             {
                 BreakOnMove = true,
                 BreakOnDamage = true,
@@ -278,9 +287,8 @@ namespace Content.Server._Sunrise.BloodCult.Runes.Systems
             if (!_doAfterSystem.TryStartDoAfter(doAfter))
                 return;
 
-            // Сохраняем цель телепорта до завершения каста.
             EnsureComp<CultTeleportCastComponent>(uid).Target = args.Target;
-            args.Handled = true;
+            EnsureComp<CultTeleportCastComponent>(uid).Rune = args.Rune;
         }
 
         private void OnTeleportDoAfter(EntityUid uid, BloodCultistComponent component, CultTeleportDoAfterEvent args)
@@ -295,25 +303,30 @@ namespace Content.Server._Sunrise.BloodCult.Runes.Systems
 
             args.Handled = true;
 
-            if (!TryComp<CultTeleportCastComponent>(uid, out var cast) ||
-                !TryComp<ActorComponent>(uid, out var actor))
+            if (!TryComp<CultTeleportCastComponent>(uid, out var cast))
             {
                 RemComp<CultTeleportCastComponent>(uid);
                 return;
             }
 
             var target = cast.Target;
+            var rune = cast.Rune;
             RemComp<CultTeleportCastComponent>(uid);
 
-            if (!Exists(target))
+            if (!Exists(target) || !Exists(rune) || !TryComp<TransformComponent>(rune, out var runeTransform) || !TryComp<TransformComponent>(target, out var targetTransform))
             {
                 _popupSystem.PopupEntity(Loc.GetString("cult-teleport-interrupted"), uid, uid);
                 return;
             }
 
-            var eui = new TeleportSpellEui(args.Args.User, target);
-            _euiManager.OpenEui(eui, actor.PlayerSession);
-            eui.StateDirty();
+            _entityManager.SpawnEntity("CultTeleportInEffect", runeTransform.Coordinates);
+            _entityManager.SpawnEntity("CultTeleportOutEffect", targetTransform.Coordinates);
+            _audio.PlayPvs(new SoundPathSpecifier("/Audio/_Sunrise/BloodCult/veilin.ogg"), runeTransform.Coordinates);
+            _audio.PlayPvs(new SoundPathSpecifier("/Audio/_Sunrise/BloodCult/veilout.ogg"), targetTransform.Coordinates);
+            _transformSystem.SetCoordinates(target, runeTransform.Coordinates);
+
+            var ev = new TeleportSpellUsedEvent();
+            _entityManager.EventBus.RaiseLocalEvent(uid, ev);
         }
 
         private void OnConcealPresence(EntityUid uid,
