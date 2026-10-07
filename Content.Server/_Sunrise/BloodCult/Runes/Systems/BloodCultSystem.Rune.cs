@@ -1,5 +1,7 @@
+// Fish-start
 using Content.Shared.Mind;
 using Content.Shared.Ghost;
+// Fish-end
 using System.Linq;
 using System.Numerics;
 using Content.Server._Sunrise.BloodCult.GameRule;
@@ -1346,6 +1348,7 @@ namespace Content.Server._Sunrise.BloodCult.Runes.Systems
             _entityManager.SpawnEntity(rune, coords);
         }
 
+        // Fish-start
         private bool SpawnShard(EntityUid target)
         {
             var transform = CompOrNull<TransformComponent>(target)?.Coordinates;
@@ -1363,17 +1366,7 @@ namespace Content.Server._Sunrise.BloodCult.Runes.Systems
             }
             else
             {
-                var mindQuery = EntityQueryEnumerator<MindComponent>();
-                var targetNet = GetNetEntity(target);
-                while (mindQuery.MoveNext(out var mId, out var mComp))
-                {
-                    if (mComp.OriginalOwnedEntity == targetNet)
-                    {
-                        targetMindId = mId;
-                        targetMind = mComp;
-                        break;
-                    }
-                }
+                return false;
             }
 
             if (targetMindId != null && targetMind != null)
@@ -1392,6 +1385,7 @@ namespace Content.Server._Sunrise.BloodCult.Runes.Systems
             {
                 return false;
             }
+        // Fish-end
 
             var shard = _entityManager.SpawnEntity("SoulShardGhost", transform.Value);
 
@@ -1478,11 +1472,13 @@ namespace Content.Server._Sunrise.BloodCult.Runes.Systems
             if (!TryComp<MapGridComponent>(gridUid, out var mapGrid))
                 return false;
 
-            if (_stationSystem.GetOwningStation(gridUid.Value) == null)
+            // Fish-start
+            if (_station.GetOwningStation(gridUid.Value) == null)
             {
-                _popupSystem.PopupEntity(Loc.GetString("cult-rune-not-on-station") ?? "Руны можно рисовать только на станции.", uid, uid);
+                _popupSystem.PopupEntity(Loc.GetString("cult-rune-not-on-station"), uid, uid);
                 return false;
             }
+            // Fish-end
 
             var position = _map.TileIndicesFor(gridUid.Value, mapGrid, transform.Coordinates);
 
@@ -1506,7 +1502,6 @@ namespace Content.Server._Sunrise.BloodCult.Runes.Systems
          */
     }
 }
-
 
 
 
