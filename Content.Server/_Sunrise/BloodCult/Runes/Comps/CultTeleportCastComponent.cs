@@ -6,9 +6,8 @@ namespace Content.Server._Sunrise.BloodCult.Runes.Comps;
 [RegisterComponent]
 public sealed partial class CultTeleportCastComponent : Component
 {
-    [DataField]
     public EntityUid Target;
 
-    [DataField]
     public EntityUid Rune;
 }
+

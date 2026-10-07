@@ -1,7 +1,5 @@
 using Content.Shared.Mind;
 using Content.Shared.Ghost;
-using Content.Shared.Mind;
-using Content.Shared.Ghost;
 using System.Linq;
 using System.Numerics;
 using Content.Server._Sunrise.BloodCult.GameRule;
@@ -1508,6 +1506,7 @@ namespace Content.Server._Sunrise.BloodCult.Runes.Systems
          */
     }
 }
+
 
 
 

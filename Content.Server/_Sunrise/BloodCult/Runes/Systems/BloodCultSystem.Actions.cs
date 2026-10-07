@@ -287,8 +287,9 @@ namespace Content.Server._Sunrise.BloodCult.Runes.Systems
             if (!_doAfterSystem.TryStartDoAfter(doAfter))
                 return;
 
-            EnsureComp<CultTeleportCastComponent>(uid).Target = args.Target;
-            EnsureComp<CultTeleportCastComponent>(uid).Rune = args.Rune;
+            var castComp = EnsureComp<CultTeleportCastComponent>(uid);
+            castComp.Target = args.Target;
+            castComp.Rune = args.Rune;
         }
 
         private void OnTeleportDoAfter(EntityUid uid, BloodCultistComponent component, CultTeleportDoAfterEvent args)
@@ -296,6 +297,15 @@ namespace Content.Server._Sunrise.BloodCult.Runes.Systems
             if (args.Cancelled || args.Handled)
             {
                 RemComp<CultTeleportCastComponent>(uid);
+
+            if (Deleted(target) || Deleted(rune))
+            {
+                _popupSystem.PopupEntity(Loc.GetString("cult-teleport-interrupted"), uid, uid);
+                return;
+            }
+
+            var runeTransform = Transform(rune);
+            var targetTransform = Transform(target);
                 if (args.Cancelled)
                     _popupSystem.PopupEntity(Loc.GetString("cult-teleport-interrupted"), uid, uid);
                 return;
@@ -306,6 +316,15 @@ namespace Content.Server._Sunrise.BloodCult.Runes.Systems
             if (!TryComp<CultTeleportCastComponent>(uid, out var cast))
             {
                 RemComp<CultTeleportCastComponent>(uid);
+
+            if (Deleted(target) || Deleted(rune))
+            {
+                _popupSystem.PopupEntity(Loc.GetString("cult-teleport-interrupted"), uid, uid);
+                return;
+            }
+
+            var runeTransform = Transform(rune);
+            var targetTransform = Transform(target);
                 return;
             }
 
@@ -313,11 +332,15 @@ namespace Content.Server._Sunrise.BloodCult.Runes.Systems
             var rune = cast.Rune;
             RemComp<CultTeleportCastComponent>(uid);
 
-            if (!Exists(target) || !Exists(rune) || !TryComp<TransformComponent>(rune, out var runeTransform) || !TryComp<TransformComponent>(target, out var targetTransform))
+            if (Deleted(target) || Deleted(rune))
             {
                 _popupSystem.PopupEntity(Loc.GetString("cult-teleport-interrupted"), uid, uid);
                 return;
             }
+
+            var runeTransform = Transform(rune);
+            var targetTransform = Transform(target);
+
 
             _entityManager.SpawnEntity("CultTeleportInEffect", runeTransform.Coordinates);
             _entityManager.SpawnEntity("CultTeleportOutEffect", targetTransform.Coordinates);
@@ -560,3 +583,7 @@ namespace Content.Server._Sunrise.BloodCult.Runes.Systems
         }
     }
 }
+
+
+
+
