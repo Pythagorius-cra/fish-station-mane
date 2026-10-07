@@ -497,6 +497,9 @@ namespace Content.Server._Sunrise.BloodCult.Runes.Systems
             args.Result = result;
         }
 
+        /// <summary>
+        /// Sacrifices a target on a blood cult offering rune.
+        /// </summary>
         private bool Sacrifice(
             EntityUid rune,
             EntityUid target,
@@ -524,10 +527,12 @@ namespace Content.Server._Sunrise.BloodCult.Runes.Systems
                     _cultistTargetsConditionSystem.RefresTitle(obj, rule.CultTargets, killCultistTargetsComponent);
                 }
 
+                // Fish-start
                 if (!SpawnShard(target))
                 {
                     _gibbing.Gib(target);
                 }
+                // Fish-end
 
                 _bloodCultRuleSystem.ChangeSacrificeCount(rule, rule.SacrificeCount + 1);
 
@@ -1349,6 +1354,10 @@ namespace Content.Server._Sunrise.BloodCult.Runes.Systems
         }
 
         // Fish-start
+        /// <summary>
+        /// Attempts to create a soul shard from the sacrifice target, transferring the victim's mind into it.
+        /// Returns false if the target has no mind or the mind is already in another living body.
+        /// </summary>
         private bool SpawnShard(EntityUid target)
         {
             var transform = CompOrNull<TransformComponent>(target)?.Coordinates;
@@ -1458,6 +1467,9 @@ namespace Content.Server._Sunrise.BloodCult.Runes.Systems
             return metres;
         }
 
+        /// <summary>
+        /// Validates that the entity is on a valid station grid tile where a rune can be placed.
+        /// </summary>
         public bool IsCorrectLocation(EntityUid uid, out EntityCoordinates coords)
         {
             coords = default;

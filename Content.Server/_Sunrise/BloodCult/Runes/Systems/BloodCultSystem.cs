@@ -1,7 +1,9 @@
 using Content.Server._Sunrise.BloodCult.GameRule;
 using Content.Server._Sunrise.BloodCult.Objectives.Systems;
+// Fish-start
 using Content.Shared.Mind;
 using Content.Shared.Ghost;
+// Fish-end
 using Content.Server.Atmos.EntitySystems;
 using Content.Server.Body.Systems;
 using Content.Server.Chat.Systems;
@@ -91,7 +93,9 @@ namespace Content.Server._Sunrise.BloodCult.Runes.Systems
         [Dependency] private KillCultistTargetsConditionSystem _cultistTargetsConditionSystem = default!;
         [Dependency] private EntityQuery<TransformComponent> _xformQuery = default!;
         [Dependency] private EntityQuery<FlammableComponent> _flammableQuery = default!;
-        [Dependency] private readonly Content.Server.Station.Systems.StationSystem _stationSystem = default!;
+        // Fish-start
+        [Dependency] private Content.Server.Station.Systems.StationSystem _station = default!;
+        // Fish-end
 
         [ValidatePrototypeId<StackPrototype>]
         private static string SteelStackPrototypeId = "Steel";

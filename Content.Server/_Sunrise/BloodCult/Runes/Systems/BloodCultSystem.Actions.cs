@@ -262,6 +262,9 @@ namespace Content.Server._Sunrise.BloodCult.Runes.Systems
             args.Handled = true;
         }
 
+        /// <summary>
+        /// Opens the teleport rune selection EUI for the cultist.
+        /// </summary>
         private void OnTeleport(EntityUid uid, BloodCultistComponent component, CultTeleportTargetActionEvent args)
         {
             if (!TryComp<BloodstreamComponent>(args.Performer, out _) || !TryComp<ActorComponent>(uid, out var actor))
@@ -273,6 +276,9 @@ namespace Content.Server._Sunrise.BloodCult.Runes.Systems
             args.Handled = true;
         }
 
+        /// <summary>
+        /// Starts a 2-second DoAfter for the personal cult teleport after the player selects a target rune.
+        /// </summary>
         private void OnTeleportStartDoAfter(EntityUid uid, BloodCultistComponent comp, CultTeleportStartDoAfterEvent args)
         {
             var ev = new CultTeleportDoAfterEvent();
@@ -294,6 +300,9 @@ namespace Content.Server._Sunrise.BloodCult.Runes.Systems
             // Fish-end
         }
 
+        /// <summary>
+        /// Completes the personal cult teleport after the DoAfter finishes: spawns effects, plays sounds, and moves the target.
+        /// </summary>
         private void OnTeleportDoAfter(EntityUid uid, BloodCultistComponent component, CultTeleportDoAfterEvent args)
         {
             if (args.Cancelled || args.Handled)
