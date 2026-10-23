@@ -275,6 +275,14 @@ public abstract partial class SharedSurgerySystem
                     SmallestSuccessRate = toolComp.SuccessRate;
             }
 
+        // Fish-start: SS1984 SURGERY_DURATION_MOD / SURGERY_SUCCESS_MOD через SkillAnatomy
+        duration *= _skills.GetSkillDelayMultiplier(user, "SkillAnatomy");
+        SmallestSuccessRate = Math.Clamp(
+            SmallestSuccessRate * _skills.GetSkillQualityMultiplier(user, "SkillAnatomy"),
+            0.05f,
+            1f);
+        // Fish-end
+
         if (TryComp(body, out TransformComponent? xform))
             _rotateToFace.TryFaceCoordinates(user, _transform.GetMapCoordinates(body, xform).Position);
 

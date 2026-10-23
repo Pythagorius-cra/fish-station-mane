@@ -1,0 +1,144 @@
+# Бюджеты очков по ролям (Bay: skill_points; default 22).
+# Пассажир ~16, специалисты ~22–28, главы ~32–36, капитан ~40.
+
+- type: jobSkillBudget
+  id: Passenger
+  skillPoints: 16
+
+- type: jobSkillBudget
+  id: Clown
+  skillPoints: 16
+
+- type: jobSkillBudget
+  id: Mime
+  skillPoints: 16
+
+- type: jobSkillBudget
+  id: Musician
+  skillPoints: 18
+
+- type: jobSkillBudget
+  id: ServiceWorker
+  skillPoints: 18
+
+- type: jobSkillBudget
+  id: Bartender
+  skillPoints: 20
+
+- type: jobSkillBudget
+  id: Chef
+  skillPoints: 20
+
+- type: jobSkillBudget
+  id: Botanist
+  skillPoints: 20
+
+- type: jobSkillBudget
+  id: Janitor
+  skillPoints: 18
+
+- type: jobSkillBudget
+  id: CargoTechnician
+  skillPoints: 20
+
+- type: jobSkillBudget
+  id: SalvageSpecialist
+  skillPoints: 22
+  minSkills:
+    SkillAthletics: 2
+
+- type: jobSkillBudget
+  id: Quartermaster
+  skillPoints: 28
+
+- type: jobSkillBudget
+  id: StationEngineer
+  skillPoints: 26
+  minSkills:
+    SkillConstruction: 2
+    SkillElectrical: 2
+
+- type: jobSkillBudget
+  id: AtmosphericTechnician
+  skillPoints: 26
+  minSkills:
+    SkillAtmos: 3
+    SkillConstruction: 2
+
+- type: jobSkillBudget
+  id: ChiefEngineer
+  skillPoints: 36
+  minSkills:
+    SkillConstruction: 3
+    SkillElectrical: 3
+    SkillAtmos: 2
+
+- type: jobSkillBudget
+  id: MedicalDoctor
+  skillPoints: 26
+  minSkills:
+    SkillMedical: 3
+
+- type: jobSkillBudget
+  id: Chemist
+  skillPoints: 26
+  minSkills:
+    SkillChemistry: 3
+    SkillMedical: 2
+
+- type: jobSkillBudget
+  id: Paramedic
+  skillPoints: 24
+  minSkills:
+    SkillMedical: 2
+
+- type: jobSkillBudget
+  id: ChiefMedicalOfficer
+  skillPoints: 36
+  minSkills:
+    SkillMedical: 3
+    SkillAnatomy: 2
+
+- type: jobSkillBudget
+  id: Scientist
+  skillPoints: 24
+  minSkills:
+    SkillComputer: 2
+
+- type: jobSkillBudget
+  id: ResearchDirector
+  skillPoints: 34
+  minSkills:
+    SkillComputer: 3
+
+- type: jobSkillBudget
+  id: SecurityOfficer
+  skillPoints: 24
+  minSkills:
+    SkillWeapons: 2
+
+- type: jobSkillBudget
+  id: Warden
+  skillPoints: 28
+  minSkills:
+    SkillWeapons: 2
+
+- type: jobSkillBudget
+  id: Detective
+  skillPoints: 26
+
+- type: jobSkillBudget
+  id: HeadOfSecurity
+  skillPoints: 36
+  minSkills:
+    SkillWeapons: 3
+
+- type: jobSkillBudget
+  id: HeadOfPersonnel
+  skillPoints: 32
+
+- type: jobSkillBudget
+  id: Captain
+  skillPoints: 40
+  minSkills:
+    SkillComputer: 2

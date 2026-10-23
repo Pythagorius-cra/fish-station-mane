@@ -9,6 +9,7 @@ using Content.Shared.Localizations;
 using Content.Shared.Maps;
 using Content.Shared.Popups;
 using Content.Shared.Tools.Components;
+using Content.Shared._Fish.Skills; // Fish-edit: навыки инструментов
 using JetBrains.Annotations;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Map;
@@ -35,9 +36,16 @@ public abstract partial class SharedToolSystem : EntitySystem
     [Dependency] private SharedTransformSystem _transformSystem = default!;
     [Dependency] private TileSystem _tiles = default!;
     [Dependency] private TurfSystem _turfs = default!;
+    [Dependency] private SharedSkillSystem _skills = default!; // Fish-edit: BUILDING/ELECTRICITY_SPEED_MOD
 
     public const string CutQuality = "Cutting";
     public const string PulseQuality = "Pulsing";
+    // Fish-start: качества → навыки (SS1984 building / electrician)
+    private static readonly ProtoId<ToolQualityPrototype> WeldingQuality = "Welding";
+    private static readonly ProtoId<ToolQualityPrototype> AnchoringQuality = "Anchoring";
+    private static readonly ProtoId<SkillPrototype> ConstructionSkill = "SkillConstruction";
+    private static readonly ProtoId<SkillPrototype> ElectricalSkill = "SkillElectrical";
+    // Fish-end
 
     public override void Initialize()
     {
@@ -174,8 +182,13 @@ public abstract partial class SharedToolSystem : EntitySystem
         else
             examineText = Loc.GetString("tool-component-doafter-examine", ("quality", qualitiesText));
 
+        // Fish-start: SS1984 BUILDING_SPEED_MOD / ELECTRICITY_SPEED_MOD для релевантных качеств
+        var skillDelayMult = GetToolSkillDelayMultiplier(user, toolQualitiesNeeded);
+        var adjustedDelay = delay / toolComponent.SpeedModifier * skillDelayMult;
+        // Fish-end
+
         var toolEvent = new ToolDoAfterEvent(fuel, doAfterEv, GetNetEntity(target));
-        var doAfterArgs = new DoAfterArgs(EntityManager, user, delay / toolComponent.SpeedModifier, toolEvent, tool, target: target, used: tool)
+        var doAfterArgs = new DoAfterArgs(EntityManager, user, adjustedDelay, toolEvent, tool, target: target, used: tool)
         {
             BreakOnDamage = true,
             BreakOnMove = true,
@@ -188,6 +201,26 @@ public abstract partial class SharedToolSystem : EntitySystem
         _doAfterSystem.TryStartDoAfter(doAfterArgs, out id);
         return true;
     }
+
+    // Fish-start: выбор навыка по требуемому качеству инструмента
+    private float GetToolSkillDelayMultiplier(EntityUid user, IEnumerable<ProtoId<ToolQualityPrototype>> qualities)
+    {
+        float? worst = null;
+        foreach (var quality in qualities)
+        {
+            float? skillMult = null;
+            if (quality == WeldingQuality || quality == AnchoringQuality)
+                skillMult = _skills.GetSkillDelayMultiplier(user, ConstructionSkill);
+            else if (quality == PulseQuality)
+                skillMult = _skills.GetSkillDelayMultiplier(user, ElectricalSkill);
+
+            if (skillMult is { } m)
+                worst = worst is { } w ? Math.Max(w, m) : m;
+        }
+
+        return worst ?? 1f;
+    }
+    // Fish-end
 
     /// <summary>
     ///     Attempts to use a tool on some entity, which will start a DoAfter. Returns true if an interaction occurred.

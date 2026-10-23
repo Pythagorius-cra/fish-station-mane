@@ -1,0 +1,187 @@
+using System.Diagnostics.CodeAnalysis;
+using Content.Shared.Popups;
+using Content.Shared.Roles;
+using Robust.Shared.Prototypes;
+
+namespace Content.Shared._Fish.Skills;
+
+/// <summary>
+/// API навыков: Bay get_skill_value / skill_check / skill_delay_mult + SS1984 duration/quality tables.
+/// </summary>
+public abstract partial class SharedSkillSystem : EntitySystem
+{
+    public const int DefaultJobSkillPoints = 22;
+
+    [Dependency] protected IPrototypeManager Prototypes = default!;
+    [Dependency] private SharedPopupSystem _popup = default!;
+
+    /// <summary>
+    /// Текущий уровень навыка (минимум SKILL_UNSKILLED).
+    /// </summary>
+    public int GetSkillValue(EntityUid uid, ProtoId<SkillPrototype> skill, SkillsetComponent? skillset = null)
+    {
+        if (!Resolve(uid, ref skillset, false))
+            return SkillLevels.Unskilled;
+
+        return skillset.Skills.GetValueOrDefault(skill, SkillLevels.Unskilled);
+    }
+
+    /// <summary>
+    /// Bay: skill_check — уровень >= needed.
+    /// </summary>
+    public bool SkillCheck(EntityUid uid, ProtoId<SkillPrototype> skill, int needed, SkillsetComponent? skillset = null)
+    {
+        return GetSkillValue(uid, skill, skillset) >= needed;
+    }
+
+    /// <summary>
+    /// Множитель длительности (SS1984 CALCULATE_SKILL_MOD для *_DURATION / *_SPEED_MOD).
+    /// Без таблицы в прототипе — Bay skill_delay_mult.
+    /// </summary>
+    public float GetSkillDelayMultiplier(EntityUid uid, ProtoId<SkillPrototype> skill, float? factorOverride = null, SkillsetComponent? skillset = null)
+    {
+        var points = GetSkillValue(uid, skill, skillset);
+
+        if (Prototypes.TryIndex(skill, out SkillPrototype? proto))
+        {
+            if (proto.DurationMultipliers.Count > 0)
+                return proto.GetDurationMultiplierForLevel(points);
+
+            var factor = factorOverride ?? proto.DelayFactor;
+            return Math.Max(0f, 1f + (SkillLevels.Baseline - points) * factor);
+        }
+
+        var fallbackFactor = factorOverride ?? 0.3f;
+        return Math.Max(0f, 1f + (SkillLevels.Baseline - points) * fallbackFactor);
+    }
+
+    /// <summary>
+    /// Множитель качества/эффективности (SS1984 HEAL_AMOUNT_MOD / SURGERY_SUCCESS_MOD).
+    /// </summary>
+    public float GetSkillQualityMultiplier(EntityUid uid, ProtoId<SkillPrototype> skill, SkillsetComponent? skillset = null)
+    {
+        var points = GetSkillValue(uid, skill, skillset);
+
+        if (Prototypes.TryIndex(skill, out SkillPrototype? proto))
+            return proto.GetQualityMultiplierForLevel(points);
+
+        return Math.Max(0.05f, 1f + (points - SkillLevels.Baseline) * 0.15f);
+    }
+
+    public TimeSpan ApplySkillDelay(EntityUid uid, ProtoId<SkillPrototype> skill, TimeSpan baseDelay, float? factorOverride = null)
+    {
+        return baseDelay * GetSkillDelayMultiplier(uid, skill, factorOverride);
+    }
+
+    public bool TryGetBudget(ProtoId<JobPrototype> job, [NotNullWhen(true)] out JobSkillBudgetPrototype? budget)
+    {
+        if (Prototypes.TryIndex<JobSkillBudgetPrototype>(job, out budget))
+            return true;
+
+        foreach (var proto in Prototypes.EnumeratePrototypes<JobSkillBudgetPrototype>())
+        {
+            if (proto.GetJobId() == job)
+            {
+                budget = proto;
+                return true;
+            }
+        }
+
+        budget = null;
+        return false;
+    }
+
+    public int GetJobSkillPoints(ProtoId<JobPrototype> job)
+    {
+        return TryGetBudget(job, out var budget) ? Math.Max(0, budget.SkillPoints) : DefaultJobSkillPoints;
+    }
+
+    public int GetMinSkill(ProtoId<JobPrototype> job, ProtoId<SkillPrototype> skill)
+    {
+        if (TryGetBudget(job, out var budget) && budget.MinSkills.TryGetValue(skill, out var min))
+            return Math.Clamp(min, SkillLevels.Min, SkillLevels.Max);
+
+        return SkillLevels.Min;
+    }
+
+    public int GetMaxSkill(ProtoId<JobPrototype> job, ProtoId<SkillPrototype> skill)
+    {
+        var min = GetMinSkill(job, skill);
+        if (TryGetBudget(job, out var budget) && budget.MaxSkills.TryGetValue(skill, out var max))
+            return Math.Max(min, Math.Clamp(max, SkillLevels.Min, SkillLevels.Max));
+
+        if (Prototypes.TryIndex(skill, out var proto))
+            return Math.Max(min, Math.Clamp(proto.DefaultMax, SkillLevels.Min, SkillLevels.Max));
+
+        return Math.Max(min, SkillLevels.Trained);
+    }
+
+    public bool CheckPrerequisites(EntityUid uid, SkillPrototype skill, SkillsetComponent skillset)
+    {
+        foreach (var (reqSkill, reqLevel) in skill.Prerequisites)
+        {
+            if (GetSkillValue(uid, reqSkill, skillset) < reqLevel)
+                return false;
+        }
+
+        return true;
+    }
+
+    public bool TryDenyMissingSkill(
+        EntityUid user,
+        ProtoId<SkillPrototype> skill,
+        int needed,
+        string failLocId,
+        SkillsetComponent? skillset = null)
+    {
+        if (SkillCheck(user, skill, needed, skillset))
+            return false;
+
+        var skillName = Prototypes.TryIndex(skill, out var proto)
+            ? Loc.GetString(proto.Name)
+            : skill.ToString();
+
+        _popup.PopupEntity(
+            Loc.GetString(failLocId,
+                ("skill", skillName),
+                ("level", Loc.GetString(SkillLevels.GetLevelNameKey(needed)))),
+            user,
+            user);
+        return true;
+    }
+
+    /// <summary>
+    /// Краткая подсказка эффекта уровня для UI (скорость / эффективность).
+    /// </summary>
+    public string FormatEffectHint(ProtoId<SkillPrototype> skill, int level)
+    {
+        if (!Prototypes.TryIndex(skill, out SkillPrototype? proto))
+            return string.Empty;
+
+        var delay = proto.GetDurationMultiplierForLevel(level);
+        var quality = proto.GetQualityMultiplierForLevel(level);
+        var hasDuration = proto.DurationMultipliers.Count > 0 || Math.Abs(delay - 1f) > 0.001f;
+        var hasQuality = proto.QualityMultipliers.Count > 0 || Math.Abs(quality - 1f) > 0.001f;
+
+        if (hasDuration && hasQuality)
+        {
+            return Loc.GetString("skills-effect-delay-and-quality",
+                ("delay", FormatPercent(delay)),
+                ("quality", FormatPercent(quality)));
+        }
+
+        if (hasQuality)
+            return Loc.GetString("skills-effect-quality", ("quality", FormatPercent(quality)));
+
+        if (hasDuration)
+            return Loc.GetString("skills-effect-delay", ("delay", FormatPercent(delay)));
+
+        return string.Empty;
+    }
+
+    private static string FormatPercent(float mult)
+    {
+        return $"{Math.Round(mult * 100f):0}%";
+    }
+}
+

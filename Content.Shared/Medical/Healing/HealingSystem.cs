@@ -18,6 +18,7 @@ using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
 using Content.Shared.Popups;
 using Content.Shared.Stacks;
+using Content.Shared._Fish.Skills; // Fish-edit: навыки медицины
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Utility;
 
@@ -36,6 +37,7 @@ public sealed partial class HealingSystem : EntitySystem
     [Dependency] private SharedPopupSystem _popupSystem = default!;
     [Dependency] private SharedSolutionContainerSystem _solutionContainerSystem = default!;
     [Dependency] private MobStateSystem _mobState = default!;
+    [Dependency] private SharedSkillSystem _skills = default!; // Fish-edit: множитель времени лечения
 
     public override void Initialize()
     {
@@ -67,11 +69,16 @@ public sealed partial class HealingSystem : EntitySystem
 
         TryComp<BloodstreamComponent>(target, out var bloodstream);
 
+        // Fish-start: SS1984 HEAL_AMOUNT_MOD — величина лечения от навыка медицины
+        var healAmountMod = _skills.GetSkillQualityMultiplier(args.User, "SkillMedical");
+        // Fish-end
+
         // Heal some bloodloss damage.
         if (healing.BloodlossModifier != 0 && bloodstream != null)
         {
             var isBleeding = bloodstream.BleedAmount > 0;
-            _bloodstreamSystem.TryModifyBleedAmount((target.Owner, bloodstream), healing.BloodlossModifier);
+            // Fish-edit: модификатор кровотечения масштабируется навыком
+            _bloodstreamSystem.TryModifyBleedAmount((target.Owner, bloodstream), healing.BloodlossModifier * healAmountMod);
             if (isBleeding != bloodstream.BleedAmount > 0)
             {
                 var popup = (args.User == target.Owner)
@@ -83,9 +90,11 @@ public sealed partial class HealingSystem : EntitySystem
 
         // Restores missing blood
         if (healing.ModifyBloodLevel != 0 && bloodstream != null)
-            _bloodstreamSystem.TryModifyBloodLevel((target.Owner, bloodstream), healing.ModifyBloodLevel);
+            // Fish-edit: объём крови от навыка
+            _bloodstreamSystem.TryModifyBloodLevel((target.Owner, bloodstream), healing.ModifyBloodLevel * healAmountMod);
 
-        if (!_damageable.TryChangeDamage(target.Owner, healing.Damage * _damageable.UniversalTopicalsHealModifier, out var healed, true, origin: args.Args.User) && healing.BloodlossModifier != 0)
+        // Fish-edit: урон лечения * HEAL_AMOUNT_MOD
+        if (!_damageable.TryChangeDamage(target.Owner, healing.Damage * _damageable.UniversalTopicalsHealModifier * healAmountMod, out var healed, true, origin: args.Args.User) && healing.BloodlossModifier != 0)
             return;
 
         var total = healed.GetTotal();
@@ -155,7 +164,13 @@ public sealed partial class HealingSystem : EntitySystem
 
         // Update our self heal delay so it shortens as we heal more damage.
         if (args.User == target.Owner)
-            args.Args.Delay = healing.Delay * GetScaledHealingPenalty(target.Owner, healing.SelfHealPenaltyMultiplier);
+        {
+            // Fish-start: повтор self-heal тоже учитывает HEAL_DURATION_MOD
+            args.Args.Delay = healing.Delay
+                * GetScaledHealingPenalty(target.Owner, healing.SelfHealPenaltyMultiplier)
+                * _skills.GetSkillDelayMultiplier(args.User, "SkillMedical");
+            // Fish-end
+        }
     }
 
     private bool HasDamage(Entity<HealingComponent> healing, Entity<DamageableComponent> target)
@@ -274,6 +289,10 @@ public sealed partial class HealingSystem : EntitySystem
         var delay = isNotSelf
             ? healing.Comp.Delay
             : healing.Comp.Delay * GetScaledHealingPenalty(target, healing.Comp.SelfHealPenaltyMultiplier);
+
+        // Fish-start: Bay skill_delay_mult для медицины
+        delay *= _skills.GetSkillDelayMultiplier(user, "SkillMedical");
+        // Fish-end
 
         var doAfterEventArgs =
             new DoAfterArgs(EntityManager, user, delay, new HealingDoAfterEvent(), target, target: target, used: healing)

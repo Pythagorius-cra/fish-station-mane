@@ -1,0 +1,130 @@
+# Навыки Fish: уровни Bay 1–5 + таблицы длительности/качества в духе SS1984 (master220).
+# SS1984: NONE 1.5 … LEGEND 0.5 (duration); heal amount 0.75…1.5; surgery success 0.5…2.
+
+- type: skill
+  id: SkillConstruction
+  name: skills-construction-name
+  description: skills-construction-desc
+  category: engineering
+  difficulty: 2
+  defaultMax: 5
+  delayFactor: 0.3
+  # SS1984 BUILDING_SPEED_MOD (сжато в 5 уровней)
+  durationMultipliers:
+    1: 1.5
+    2: 1.25
+    3: 1.0
+    4: 0.8
+    5: 0.65
+
+- type: skill
+  id: SkillElectrical
+  name: skills-electrical-name
+  description: skills-electrical-desc
+  category: engineering
+  difficulty: 2
+  defaultMax: 5
+  delayFactor: 0.3
+  # SS1984 ELECTRICITY / LOCKPICK_SPEED_MOD
+  durationMultipliers:
+    1: 1.5
+    2: 1.25
+    3: 1.0
+    4: 0.8
+    5: 0.65
+
+- type: skill
+  id: SkillAtmos
+  name: skills-atmos-name
+  description: skills-atmos-desc
+  category: engineering
+  difficulty: 2
+  defaultMax: 4
+  delayFactor: 0.3
+  durationMultipliers:
+    1: 1.5
+    2: 1.25
+    3: 1.0
+    4: 0.8
+    5: 0.65
+
+- type: skill
+  id: SkillMedical
+  name: skills-medical-name
+  description: skills-medical-desc
+  category: medical
+  difficulty: 4
+  defaultMax: 5
+  delayFactor: 0.3
+  qualityFactor: 0.15
+  # SS1984 HEAL_DURATION_MOD + HEAL_AMOUNT_MOD
+  durationMultipliers:
+    1: 1.5
+    2: 1.25
+    3: 1.0
+    4: 0.8
+    5: 0.65
+  qualityMultipliers:
+    1: 0.75
+    2: 0.9
+    3: 1.0
+    4: 1.2
+    5: 1.35
+
+- type: skill
+  id: SkillAnatomy
+  name: skills-anatomy-name
+  description: skills-anatomy-desc
+  category: medical
+  difficulty: 4
+  defaultMax: 5
+  delayFactor: 0.3
+  qualityFactor: 0.15
+  prerequisites:
+    SkillMedical: 3
+  # SS1984 SURGERY_DURATION_MOD + SURGERY_SUCCESS_MOD
+  durationMultipliers:
+    1: 1.5
+    2: 1.25
+    3: 1.0
+    4: 0.8
+    5: 0.65
+  qualityMultipliers:
+    1: 0.5
+    2: 0.8
+    3: 1.0
+    4: 1.25
+    5: 1.5
+
+- type: skill
+  id: SkillChemistry
+  name: skills-chemistry-name
+  description: skills-chemistry-desc
+  category: medical
+  difficulty: 4
+  defaultMax: 4
+
+- type: skill
+  id: SkillWeapons
+  name: skills-weapons-name
+  description: skills-weapons-desc
+  category: security
+  difficulty: 2
+  defaultMax: 4
+
+- type: skill
+  id: SkillComputer
+  name: skills-computer-name
+  description: skills-computer-desc
+  category: general
+  difficulty: 1
+  defaultMax: 5
+
+- type: skill
+  id: SkillAthletics
+  name: skills-athletics-name
+  description: skills-athletics-desc
+  category: general
+  difficulty: 1
+  defaultMax: 5
+

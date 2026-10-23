@@ -12,6 +12,7 @@ using Content.Shared.Popups;
 using Content.Shared.RCD.Components;
 using Content.Shared.Tag;
 using Content.Shared.Tiles;
+using Content.Shared._Fish.Skills; // Fish-edit: навык строительства для РСУ
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
@@ -43,6 +44,7 @@ public sealed partial class RCDSystem : EntitySystem
     [Dependency] private SharedMapSystem _mapSystem = default!;
     [Dependency] private SharedTransformSystem _transform = default!;
     [Dependency] private TagSystem _tags = default!;
+    [Dependency] private SharedSkillSystem _skills = default!; // Fish-edit
 
     private readonly int _instantConstructionDelay = 0;
     private readonly EntProtoId _instantConstructionFx = "EffectRCDConstruct0";
@@ -164,12 +166,25 @@ public sealed partial class RCDSystem : EntitySystem
         if (!IsRCDOperationStillValid(uid, component, gridUid.Value, mapGrid, tile, position, component.ConstructionDirection, args.Target, args.User))
             return;
 
+        // Fish-start: РСУ (строительство) требует Construction Basic — как Bay skill_check
+        if (prototype.Mode is RcdMode.ConstructTile or RcdMode.ConstructObject)
+        {
+            if (_skills.TryDenyMissingSkill(args.User, "SkillConstruction", SkillLevels.Basic, "skills-rcd-need-construction"))
+            {
+                args.Handled = true;
+                return;
+            }
+        }
+        // Fish-end
+
         if (!_net.IsServer)
             return;
 
         // Get the starting cost, delay, and effect from the prototype
         var cost = prototype.Cost;
         var delay = prototype.Delay;
+        // Fish-edit: скорость РСУ от навыка строительства
+        delay *= _skills.GetSkillDelayMultiplier(args.User, "SkillConstruction");
         var effectPrototype = prototype.Effect;
 
         #region: Operation modifiers
