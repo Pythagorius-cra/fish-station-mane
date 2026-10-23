@@ -1,0 +1,32 @@
+﻿- type: entity
+  parent: MarkerBase
+  id: FishSpawnPointClockworkServant
+  name: clockwork servant spawn
+  suffix: Fish
+  components:
+  - type: SpawnPoint
+  - type: AntagGridSpawnPoint
+    whitelist:
+    - FishClockworkServant
+  - type: FishClockworkReebeMarker
+    servantSpawn: true
+    abscondTarget: true
+  - type: Sprite
+    layers:
+    - state: green
+    - sprite: _Fish/ClockworkCult/objects.rsi
+      state: dread_ipad
+
+- type: entity
+  parent: MarkerBase
+  id: FishMarkerCrewInvasion
+  name: crew invasion marker
+  suffix: Fish
+  components:
+  - type: FishClockworkReebeMarker
+    crewInvasion: true
+    abscondTarget: false
+  - type: Sprite
+    layers:
+    - state: red
+
