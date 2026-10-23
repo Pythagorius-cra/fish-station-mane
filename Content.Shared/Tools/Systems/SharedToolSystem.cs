@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using Content.Shared.Administration.Logs;
 using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.DoAfter;
@@ -9,7 +9,7 @@ using Content.Shared.Localizations;
 using Content.Shared.Maps;
 using Content.Shared.Popups;
 using Content.Shared.Tools.Components;
-using Content.Shared._Fish.Skills; // Fish-edit: навыки инструментов
+using Content.Shared._Fish.Skills; // Fish-edit: РЅР°РІС‹РєРё РёРЅСЃС‚СЂСѓРјРµРЅС‚РѕРІ
 using JetBrains.Annotations;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Map;
@@ -36,15 +36,15 @@ public abstract partial class SharedToolSystem : EntitySystem
     [Dependency] private SharedTransformSystem _transformSystem = default!;
     [Dependency] private TileSystem _tiles = default!;
     [Dependency] private TurfSystem _turfs = default!;
-    [Dependency] private SharedSkillSystem _skills = default!; // Fish-edit: навыки инструментов
+    [Dependency] private SharedSkillSystem _skills = default!; // Fish-edit: РЅР°РІС‹РєРё РёРЅСЃС‚СЂСѓРјРµРЅС‚РѕРІ
 
     public const string CutQuality = "Cutting";
     public const string PulseQuality = "Pulsing";
-    // Fish-start: качества → навыки строительства / электрики
+    // Fish-start: РєР°С‡РµСЃС‚РІР° в†’ РЅР°РІС‹РєРё СЃС‚СЂРѕРёС‚РµР»СЊСЃС‚РІР° / СЌР»РµРєС‚СЂРёРєРё
     private static readonly ProtoId<ToolQualityPrototype> WeldingQuality = "Welding";
     private static readonly ProtoId<ToolQualityPrototype> AnchoringQuality = "Anchoring";
-    private static readonly ProtoId<SkillPrototype> ConstructionSkill = "SkillConstruction";
-    private static readonly ProtoId<SkillPrototype> ElectricalSkill = "SkillElectrical";
+    private static readonly ProtoId<SkillPrototype> ConstructionSkill = "FishSkillConstruction";
+    private static readonly ProtoId<SkillPrototype> ElectricalSkill = "FishSkillElectrical";
     // Fish-end
 
     public override void Initialize()
@@ -182,7 +182,7 @@ public abstract partial class SharedToolSystem : EntitySystem
         else
             examineText = Loc.GetString("tool-component-doafter-examine", ("quality", qualitiesText));
 
-        // Fish-start: множитель навыка для релевантных качеств инструмента
+        // Fish-start: РјРЅРѕР¶РёС‚РµР»СЊ РЅР°РІС‹РєР° РґР»СЏ СЂРµР»РµРІР°РЅС‚РЅС‹С… РєР°С‡РµСЃС‚РІ РёРЅСЃС‚СЂСѓРјРµРЅС‚Р°
         var skillDelayMult = GetToolSkillDelayMultiplier(user, toolQualitiesNeeded);
         var adjustedDelay = delay / toolComponent.SpeedModifier * skillDelayMult;
         // Fish-end
@@ -202,7 +202,7 @@ public abstract partial class SharedToolSystem : EntitySystem
         return true;
     }
 
-    // Fish-start: выбор навыка по требуемому качеству инструмента
+    // Fish-start: РІС‹Р±РѕСЂ РЅР°РІС‹РєР° РїРѕ С‚СЂРµР±СѓРµРјРѕРјСѓ РєР°С‡РµСЃС‚РІСѓ РёРЅСЃС‚СЂСѓРјРµРЅС‚Р°
     private float GetToolSkillDelayMultiplier(EntityUid user, IEnumerable<ProtoId<ToolQualityPrototype>> qualities)
     {
         float? worst = null;

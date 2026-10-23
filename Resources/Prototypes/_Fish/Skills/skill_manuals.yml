@@ -1,4 +1,4 @@
-# Учебники: повышают навык ровно на один уровень (до опытного). Мастер — только стартовые очки.
+﻿# РЈС‡РµР±РЅРёРєРё: РїРѕРІС‹С€Р°СЋС‚ РЅР°РІС‹Рє СЂРѕРІРЅРѕ РЅР° РѕРґРёРЅ СѓСЂРѕРІРµРЅСЊ (РґРѕ РѕРїС‹С‚РЅРѕРіРѕ). РњР°СЃС‚РµСЂ вЂ” С‚РѕР»СЊРєРѕ СЃС‚Р°СЂС‚РѕРІС‹Рµ РѕС‡РєРё.
 
 - type: entity
   parent: BookBase
@@ -14,7 +14,7 @@
       color: "#c45c26"
     - state: icon_text
   - type: SkillTrainingManual
-    skill: SkillConstruction
+    skill: FishSkillConstruction
     targetLevel: 2
     minSkillToStudy: 1
     studyTime: 35
@@ -33,7 +33,7 @@
       color: "#a04820"
     - state: icon_text
   - type: SkillTrainingManual
-    skill: SkillConstruction
+    skill: FishSkillConstruction
     targetLevel: 3
     minSkillToStudy: 2
     studyTime: 50
@@ -52,7 +52,7 @@
       color: "#7a3518"
     - state: icon_text
   - type: SkillTrainingManual
-    skill: SkillConstruction
+    skill: FishSkillConstruction
     targetLevel: 4
     minSkillToStudy: 3
     studyTime: 70
@@ -71,7 +71,7 @@
       color: "#e6c200"
     - state: icon_text
   - type: SkillTrainingManual
-    skill: SkillElectrical
+    skill: FishSkillElectrical
     targetLevel: 2
     minSkillToStudy: 1
     studyTime: 35
@@ -83,7 +83,7 @@
   description: skills-manual-proto-electrical-trained-desc
   components:
   - type: SkillTrainingManual
-    skill: SkillElectrical
+    skill: FishSkillElectrical
     targetLevel: 3
     minSkillToStudy: 2
     studyTime: 50
@@ -102,7 +102,7 @@
       color: "#4da6ff"
     - state: icon_text
   - type: SkillTrainingManual
-    skill: SkillAtmos
+    skill: FishSkillAtmos
     targetLevel: 2
     minSkillToStudy: 1
     studyTime: 40
@@ -114,7 +114,7 @@
   description: skills-manual-proto-atmos-trained-desc
   components:
   - type: SkillTrainingManual
-    skill: SkillAtmos
+    skill: FishSkillAtmos
     targetLevel: 3
     minSkillToStudy: 2
     studyTime: 55
@@ -133,7 +133,7 @@
       color: "#e85d75"
     - state: icon_text
   - type: SkillTrainingManual
-    skill: SkillMedical
+    skill: FishSkillMedical
     targetLevel: 2
     minSkillToStudy: 1
     studyTime: 40
@@ -145,7 +145,7 @@
   description: skills-manual-proto-medical-trained-desc
   components:
   - type: SkillTrainingManual
-    skill: SkillMedical
+    skill: FishSkillMedical
     targetLevel: 3
     minSkillToStudy: 2
     studyTime: 55
@@ -157,7 +157,7 @@
   description: skills-manual-proto-medical-experienced-desc
   components:
   - type: SkillTrainingManual
-    skill: SkillMedical
+    skill: FishSkillMedical
     targetLevel: 4
     minSkillToStudy: 3
     studyTime: 75
@@ -176,7 +176,7 @@
       color: "#c44d6a"
     - state: icon_text
   - type: SkillTrainingManual
-    skill: SkillAnatomy
+    skill: FishSkillAnatomy
     targetLevel: 2
     minSkillToStudy: 1
     studyTime: 45
@@ -195,7 +195,7 @@
       color: "#b33b5a"
     - state: icon_text
   - type: SkillTrainingManual
-    skill: SkillAnatomy
+    skill: FishSkillAnatomy
     targetLevel: 3
     minSkillToStudy: 2
     studyTime: 60
@@ -207,7 +207,7 @@
   description: skills-manual-proto-anatomy-experienced-desc
   components:
   - type: SkillTrainingManual
-    skill: SkillAnatomy
+    skill: FishSkillAnatomy
     targetLevel: 4
     minSkillToStudy: 3
     studyTime: 80
@@ -226,7 +226,7 @@
       color: "#66cc99"
     - state: icon_text
   - type: SkillTrainingManual
-    skill: SkillChemistry
+    skill: FishSkillChemistry
     targetLevel: 2
     minSkillToStudy: 1
     studyTime: 40
@@ -238,7 +238,7 @@
   description: skills-manual-proto-chemistry-trained-desc
   components:
   - type: SkillTrainingManual
-    skill: SkillChemistry
+    skill: FishSkillChemistry
     targetLevel: 3
     minSkillToStudy: 2
     studyTime: 55
@@ -257,7 +257,7 @@
       color: "#555555"
     - state: icon_text
   - type: SkillTrainingManual
-    skill: SkillWeapons
+    skill: FishSkillWeapons
     targetLevel: 2
     minSkillToStudy: 1
     studyTime: 35
@@ -269,7 +269,7 @@
   description: skills-manual-proto-weapons-trained-desc
   components:
   - type: SkillTrainingManual
-    skill: SkillWeapons
+    skill: FishSkillWeapons
     targetLevel: 3
     minSkillToStudy: 2
     studyTime: 50
@@ -288,7 +288,7 @@
       color: "#6a5acd"
     - state: icon_text
   - type: SkillTrainingManual
-    skill: SkillComputer
+    skill: FishSkillComputer
     targetLevel: 2
     minSkillToStudy: 1
     studyTime: 30
@@ -300,7 +300,7 @@
   description: skills-manual-proto-computer-trained-desc
   components:
   - type: SkillTrainingManual
-    skill: SkillComputer
+    skill: FishSkillComputer
     targetLevel: 3
     minSkillToStudy: 2
     studyTime: 45

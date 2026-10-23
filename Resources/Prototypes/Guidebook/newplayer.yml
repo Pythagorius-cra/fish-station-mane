@@ -2,7 +2,8 @@
   id: NewPlayer
   name: guide-entry-newplayer
   priority: 0
-  text: "/ServerInfo/Guidebook/_Fish/NewPlayer/NewPlayer.xml" # Fish-edit: русское введение для новичков
+  # Fish-edit: общий guideEntry остаётся на англ. XML — локаль не выбирается загрузчиком
+  text: "/ServerInfo/Guidebook/NewPlayer/NewPlayer.xml"
   children:
   - Controls
   - CharacterCreation

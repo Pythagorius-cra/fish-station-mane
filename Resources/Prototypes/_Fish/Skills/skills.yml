@@ -1,8 +1,7 @@
 # Навыки Fish Station. Уровни 1–5; стоимость шагов: 2 / 3 / 5 / 8 (мастер с нуля = 18).
 # Книги обучают максимум до уровня 4 (опытный).
-
 - type: skill
-  id: SkillConstruction
+  id: FishSkillConstruction
   name: skills-construction-name
   description: skills-construction-desc
   category: engineering
@@ -17,7 +16,7 @@
     5: 0.65
 
 - type: skill
-  id: SkillElectrical
+  id: FishSkillElectrical
   name: skills-electrical-name
   description: skills-electrical-desc
   category: engineering
@@ -32,7 +31,7 @@
     5: 0.65
 
 - type: skill
-  id: SkillAtmos
+  id: FishSkillAtmos
   name: skills-atmos-name
   description: skills-atmos-desc
   category: engineering
@@ -47,7 +46,7 @@
     5: 0.65
 
 - type: skill
-  id: SkillMedical
+  id: FishSkillMedical
   name: skills-medical-name
   description: skills-medical-desc
   category: medical
@@ -69,7 +68,7 @@
     5: 1.35
 
 - type: skill
-  id: SkillAnatomy
+  id: FishSkillAnatomy
   name: skills-anatomy-name
   description: skills-anatomy-desc
   category: medical
@@ -78,7 +77,7 @@
   delayFactor: 0.3
   qualityFactor: 0.15
   prerequisites:
-    SkillMedical: 3
+    FishSkillMedical: 3
   durationMultipliers:
     1: 1.5
     2: 1.25
@@ -93,7 +92,7 @@
     5: 1.5
 
 - type: skill
-  id: SkillChemistry
+  id: FishSkillChemistry
   name: skills-chemistry-name
   description: skills-chemistry-desc
   category: medical
@@ -101,7 +100,7 @@
   defaultMax: 5
 
 - type: skill
-  id: SkillWeapons
+  id: FishSkillWeapons
   name: skills-weapons-name
   description: skills-weapons-desc
   category: security
@@ -109,7 +108,7 @@
   defaultMax: 5
 
 - type: skill
-  id: SkillComputer
+  id: FishSkillComputer
   name: skills-computer-name
   description: skills-computer-desc
   category: general
@@ -117,7 +116,7 @@
   defaultMax: 5
 
 - type: skill
-  id: SkillAthletics
+  id: FishSkillAthletics
   name: skills-athletics-name
   description: skills-athletics-desc
   category: general

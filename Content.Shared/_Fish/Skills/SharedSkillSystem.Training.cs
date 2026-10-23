@@ -2,6 +2,7 @@ using Content.Shared.DoAfter;
 using Content.Shared.Interaction.Events;
 using Content.Shared.Popups;
 using Content.Shared.Verbs;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 
 namespace Content.Shared._Fish.Skills;
@@ -175,4 +176,24 @@ public abstract partial class SharedSkillSystem
 
 [Serializable, NetSerializable]
 public sealed partial class SkillManualStudyDoAfterEvent : SimpleDoAfterEvent;
+
+/// <summary>
+/// DoAfter написания учебного пособия. Должен жить в Shared из‑за NetSerializable.
+/// </summary>
+[Serializable, NetSerializable]
+public sealed partial class SkillManualAuthorDoAfterEvent : SimpleDoAfterEvent
+{
+    public ProtoId<SkillPrototype> Skill;
+    public int TargetLevel;
+
+    public SkillManualAuthorDoAfterEvent(ProtoId<SkillPrototype> skill, int targetLevel)
+    {
+        Skill = skill;
+        TargetLevel = targetLevel;
+    }
+
+    public SkillManualAuthorDoAfterEvent()
+    {
+    }
+}
 

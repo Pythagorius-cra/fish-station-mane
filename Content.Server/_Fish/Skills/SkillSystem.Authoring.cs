@@ -4,7 +4,6 @@ using Content.Shared.Paper;
 using Content.Shared.Tag;
 using Content.Shared.Verbs;
 using Robust.Shared.Prototypes;
-using Robust.Shared.Serialization;
 
 namespace Content.Server._Fish.Skills;
 
@@ -105,21 +104,3 @@ public sealed partial class SkillSystem
         _serverPopup.PopupEntity(Loc.GetString("skills-manual-authored"), args.User, args.User);
     }
 }
-
-[Serializable, NetSerializable]
-public sealed partial class SkillManualAuthorDoAfterEvent : SimpleDoAfterEvent
-{
-    public ProtoId<SkillPrototype> Skill;
-    public int TargetLevel;
-
-    public SkillManualAuthorDoAfterEvent(ProtoId<SkillPrototype> skill, int targetLevel)
-    {
-        Skill = skill;
-        TargetLevel = targetLevel;
-    }
-
-    public SkillManualAuthorDoAfterEvent()
-    {
-    }
-}
-

@@ -1,7 +1,8 @@
 ﻿- type: guideEntry
   id: Security
   name: guide-entry-security
-  text: "/ServerInfo/Guidebook/_Fish/Security/Security.xml" # Fish-edit: русские руководства СБ
+  # Fish-edit: общий guideEntry на англ. XML — загрузчик не выбирает локаль
+  text: "/ServerInfo/Guidebook/Security/Security.xml"
   children:
   # Fish-start: роли и процедуры СБ
   - SecurityCadet
@@ -27,7 +28,8 @@
 - type: guideEntry
   id: CriminalRecords
   name: guide-entry-criminal-records
-  text: "/ServerInfo/Guidebook/_Fish/Security/CriminalRecords.xml" # Fish-edit: Sunrise/Fish записи и документы
+  # Fish-edit: общий guideEntry на англ. XML — загрузчик не выбирает локаль
+  text: "/ServerInfo/Guidebook/Security/CriminalRecords.xml"
 
 - type: guideEntry
   id: SpaceLaw

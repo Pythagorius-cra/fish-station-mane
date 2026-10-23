@@ -10,7 +10,7 @@ skills-window-decrease = Decrease
 skills-window-confirm = Confirm
 skills-window-reset = Reset
 
-skills-popup-budget-granted = You have { $points } skill points. Open the Skills verb on yourself.
+skills-popup-budget-granted = OOC: You have { $points } skill points. Open the Skills verb on yourself.
 skills-popup-confirmed = Skill allocation confirmed.
 
 skills-error-locked = Allocation is locked or unavailable.

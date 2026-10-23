@@ -62,9 +62,9 @@
     sound:
       path: /Audio/_Sunrise/Items/Handling/cloth_drop.ogg
   # Sunrise end
-  # Fish-start - слот медали на форме
+  # Fish-start - слот медали на форме (smart equip выключен: иначе Z снимает медаль вместо формы)
   - type: ItemSlots
-    allowSmartEquip: true
+    allowSmartEquip: false
     slots:
       medal:
         name: fish-clothing-slot-medal

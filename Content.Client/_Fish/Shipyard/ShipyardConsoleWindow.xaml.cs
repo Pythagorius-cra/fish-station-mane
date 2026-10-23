@@ -81,7 +81,23 @@ public sealed partial class ShipyardConsoleWindow : FancyWindow
                 MinHeight = 36,
             };
 
-            button.OnPressed += _ => OnPurchasePressed?.Invoke(vesselId);
+            button.OnPressed += _ =>
+            {
+                // Блокируем повторные клики до нового состояния с сервера.
+                foreach (var child in VesselsContainer.Children)
+                {
+                    if (child is BoxContainer box)
+                    {
+                        foreach (var nested in box.Children)
+                        {
+                            if (nested is Button b)
+                                b.Disabled = true;
+                        }
+                    }
+                }
+
+                OnPurchasePressed?.Invoke(vesselId);
+            };
 
             row.AddChild(button);
             VesselsContainer.AddChild(row);

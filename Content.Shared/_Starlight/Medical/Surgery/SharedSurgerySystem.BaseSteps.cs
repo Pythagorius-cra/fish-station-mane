@@ -1,4 +1,4 @@
-using Content.Shared.Body;
+﻿using Content.Shared.Body;
 using Content.Shared.Buckle.Components;
 using Content.Shared.DoAfter;
 using Content.Shared.Interaction;
@@ -118,7 +118,7 @@ public abstract partial class SharedSurgerySystem
             AddComp(args.Part, progress);
         }
 
-        // Fish-Edit start: broadcast для achievements (без duplicate SurgeryStepComponent subscription)
+        // Fish-Edit start: broadcast РґР»СЏ achievements (Р±РµР· duplicate SurgeryStepComponent subscription)
         var fishAchEv = new FishSurgeryStepCompleteEvent(args.User, args.Body, args.Part)
         {
             StepProto = args.StepProto,
@@ -131,7 +131,7 @@ public abstract partial class SharedSurgerySystem
         if (args.IsFinal)
             progress.CompletedSurgeries.Add(args.SurgeryProto);
 
-        Dirty(args.Part, progress); // синхронизируем завершенный шаг с BUI
+        Dirty(args.Part, progress); // СЃРёРЅС…СЂРѕРЅРёР·РёСЂСѓРµРј Р·Р°РІРµСЂС€РµРЅРЅС‹Р№ С€Р°Рі СЃ BUI
     }
     private void OnStep(Entity<SurgeryStepComponent> ent, ref SurgeryStepEvent args)
     {
@@ -257,8 +257,8 @@ public abstract partial class SharedSurgerySystem
             return;
         }
 
-        // Fish-start: хирургия требует базовой анатомии (вики: навык «Хирургия»)
-        if (_skills.TryDenyMissingSkill(user, "SkillAnatomy", SkillLevels.Basic, "skills-surgery-need-anatomy"))
+        // Fish-start: С…РёСЂСѓСЂРіРёСЏ С‚СЂРµР±СѓРµС‚ Р±Р°Р·РѕРІРѕР№ Р°РЅР°С‚РѕРјРёРё (РІРёРєРё: РЅР°РІС‹Рє В«РҐРёСЂСѓСЂРіРёСЏВ»)
+        if (_skills.TryDenyMissingSkill(user, "FishSkillAnatomy", SkillLevels.Basic, "skills-surgery-need-anatomy"))
             return;
         // Fish-end
 
@@ -281,10 +281,10 @@ public abstract partial class SharedSurgerySystem
                     SmallestSuccessRate = toolComp.SuccessRate;
             }
 
-        // Fish-start: скорость и шанс успеха хирургии от анатомии
-        duration *= _skills.GetSkillDelayMultiplier(user, "SkillAnatomy");
+        // Fish-start: СЃРєРѕСЂРѕСЃС‚СЊ Рё С€Р°РЅСЃ СѓСЃРїРµС…Р° С…РёСЂСѓСЂРіРёРё РѕС‚ Р°РЅР°С‚РѕРјРёРё
+        duration *= _skills.GetSkillDelayMultiplier(user, "FishSkillAnatomy");
         SmallestSuccessRate = Math.Clamp(
-            SmallestSuccessRate * _skills.GetSkillQualityMultiplier(user, "SkillAnatomy"),
+            SmallestSuccessRate * _skills.GetSkillQualityMultiplier(user, "FishSkillAnatomy"),
             0.05f,
             1f);
         // Fish-end

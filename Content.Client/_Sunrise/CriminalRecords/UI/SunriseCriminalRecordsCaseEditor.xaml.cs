@@ -35,9 +35,10 @@ public sealed partial class SunriseCriminalRecordsCaseEditor : Control
     public Action? OnReopen;
     public Action? OnBack;
     // Fish-start - быстрая печать
-    public Action<uint, string>? OnPrintQuickDocument;
+    public Action<uint, uint, string>? OnPrintQuickDocument;
     public string? PrisonerName;
     public string? PrisonerJob;
+    public uint? SelectedStationRecord;
     // Fish-end
 
     private List<ProtoId<CorporateLawPrototype>> _currentLaws = new();
@@ -49,6 +50,7 @@ public sealed partial class SunriseCriminalRecordsCaseEditor : Control
     private uint? _lastCaseId;
     private int _savedSentence;
     private bool _isWarning;
+    private int _previewSentence;
 
     private float _saveTimer;
     private const float SaveDelay = 1.0f;
@@ -157,8 +159,14 @@ public sealed partial class SunriseCriminalRecordsCaseEditor : Control
     // Fish-start - превью и печать типового документа
     private void TryPrintQuick(string templateId)
     {
-        if (_lastCaseId is not { } caseId)
+        if (_lastCaseId is not { } caseId || SelectedStationRecord is not { } recordId)
             return;
+
+        // Сохраняем заметки до печати — иначе сервер получит старое значение.
+        if (_dirty)
+            Save();
+
+        UpdateSentenceDisplay();
 
         var name = string.IsNullOrWhiteSpace(PrisonerName)
             ? Loc.GetString("fish-criminal-records-preview-empty")
@@ -167,11 +175,16 @@ public sealed partial class SunriseCriminalRecordsCaseEditor : Control
             ? Loc.GetString("fish-criminal-records-preview-empty")
             : PrisonerJob;
 
-        var sentence = _isWarning
-            ? Loc.GetString("fish-criminal-doc-sentence-warning")
-            : _savedSentence > 0
-                ? Loc.GetString("fish-criminal-doc-sentence-minutes", ("minutes", _savedSentence))
-                : Loc.GetString("fish-criminal-records-preview-empty");
+        _stationLaw.GetEffectiveLawset(ConsoleEntity, out _, out _, out _, out var threshold);
+        string sentence;
+        if (_isWarning)
+            sentence = Loc.GetString("fish-criminal-doc-sentence-warning");
+        else if (_previewSentence >= threshold)
+            sentence = Loc.GetString("sunrise-records-sentence-life");
+        else if (_previewSentence > 0)
+            sentence = Loc.GetString("fish-criminal-doc-sentence-minutes", ("minutes", _previewSentence));
+        else
+            sentence = Loc.GetString("fish-criminal-records-preview-empty");
 
         var lawsSb = new StringBuilder();
         foreach (var lawId in _currentLaws)
@@ -205,7 +218,7 @@ public sealed partial class SunriseCriminalRecordsCaseEditor : Control
         var cancel = new Button { Text = Loc.GetString("fish-criminal-records-print-cancel") };
         confirm.OnPressed += _ =>
         {
-            OnPrintQuickDocument?.Invoke(caseId, templateId);
+            OnPrintQuickDocument?.Invoke(recordId, caseId, templateId);
             dialog.Close();
         };
         cancel.OnPressed += _ => dialog.Close();
@@ -496,6 +509,8 @@ public sealed partial class SunriseCriminalRecordsCaseEditor : Control
         }
 
         _stationLaw.GetEffectiveLawset(ConsoleEntity, out _, out _, out _, out var threshold);
+        _previewSentence = total;
+        _isWarning = isWarning;
 
         if (isWarning)
         {

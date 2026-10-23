@@ -7,6 +7,7 @@ using Content.Shared._Sunrise.CopyMachine;
 using Content.Shared._Sunrise.CriminalRecords;
 using Content.Shared._Sunrise.CriminalRecords.Components;
 using Content.Shared._Sunrise.Laws;
+using Content.Shared._Sunrise.Laws.Systems;
 using Content.Shared.Access.Systems;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Paper;
@@ -32,6 +33,7 @@ public sealed partial class FishCaseDocumentSystem : EntitySystem
     [Dependency] private AccessReaderSystem _accessReader = default!;
     [Dependency] private IResourceManager _resources = default!;
     [Dependency] private IPrototypeManager _prototypes = default!;
+    [Dependency] private SharedStationCorporateLawSystem _corporateLaw = default!;
 
     public override void Initialize()
     {
@@ -49,6 +51,10 @@ public sealed partial class FishCaseDocumentSystem : EntitySystem
             return;
 
         if (ent.Comp.SelectedKey is not { } key)
+            return;
+
+        // Печать только для той записи, которую клиент имел в виду при запросе.
+        if (key.Id != args.RecordId)
             return;
 
         if (!_stationRecords.TryGetRecord<GeneralStationRecord>(key, out var general))
@@ -79,7 +85,7 @@ public sealed partial class FishCaseDocumentSystem : EntitySystem
             return;
 
         content = _documentFormat.Format(content, ent);
-        content = ApplyCasePlaceholders(content, general, criminalCase);
+        content = ApplyCasePlaceholders(content, ent, general, criminalCase);
 
         var paperUid = Spawn("Paper", Transform(ent).Coordinates);
         if (!TryComp<PaperComponent>(paperUid, out var paperComp))
@@ -114,7 +120,11 @@ public sealed partial class FishCaseDocumentSystem : EntitySystem
         return !string.IsNullOrWhiteSpace(content);
     }
 
-    private string ApplyCasePlaceholders(string content, GeneralStationRecord general, CriminalCase criminalCase)
+    private string ApplyCasePlaceholders(
+        string content,
+        EntityUid console,
+        GeneralStationRecord general,
+        CriminalCase criminalCase)
     {
         var prisonerName = general.Name ?? string.Empty;
         var prisonerJob = general.JobTitle ?? string.Empty;
@@ -123,7 +133,7 @@ public sealed partial class FishCaseDocumentSystem : EntitySystem
 
         var laws = FormatLaws(criminalCase.Laws);
         var circumstances = FormatLaws(criminalCase.Circumstances);
-        var sentence = FormatSentence(criminalCase);
+        var sentence = FormatSentence(console, criminalCase);
 
         var incarcerationStart = criminalCase.IncarcerationStartTime is { } start
             ? $"{start:hh\\:mm}"
@@ -157,20 +167,24 @@ public sealed partial class FishCaseDocumentSystem : EntitySystem
                 sb.Append('\n');
 
             var identifier = law.LawIdentifier ?? law.ID;
-            sb.Append($"{index}) {identifier} — {law.Title}");
+            sb.Append($"{index}) {identifier} — {Loc.GetString(law.Title)}");
             index++;
         }
 
         return sb.ToString();
     }
 
-    private string FormatSentence(CriminalCase criminalCase)
+    private string FormatSentence(EntityUid console, CriminalCase criminalCase)
     {
         if (criminalCase.IsWarning)
             return Loc.GetString("fish-criminal-doc-sentence-warning");
 
         if (criminalCase.CalculatedSentence <= 0)
             return string.Empty;
+
+        _corporateLaw.GetEffectiveLawset(console, out _, out _, out _, out var threshold);
+        if (criminalCase.CalculatedSentence >= threshold)
+            return Loc.GetString("sunrise-records-sentence-life");
 
         return Loc.GetString("fish-criminal-doc-sentence-minutes", ("minutes", criminalCase.CalculatedSentence));
     }

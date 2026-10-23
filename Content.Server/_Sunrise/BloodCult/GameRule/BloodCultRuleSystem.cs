@@ -327,7 +327,10 @@ public sealed partial class BloodCultRuleSystem : GameRuleSystem<BloodCultRuleCo
 
         while (query.MoveNext(out _, out var cultRuleComponent, out _))
         {
-            if (cultRuleComponent.CultTargets.Values.All(value => value))
+            // Fish-start - пустой список целей не считается выполненным (All() на пустом = true)
+            if (cultRuleComponent.CultTargets.Count > 0 &&
+                cultRuleComponent.CultTargets.Values.All(value => value))
+            // Fish-end
             {
                 return true;
             }

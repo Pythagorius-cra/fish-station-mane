@@ -29,9 +29,15 @@ public sealed partial class ShipyardConsoleComponent : Component
     [DataField]
     public string? DefaultPriorityDockTag = "DockPersonal";
 
+    /// <summary>
+    /// Звук успешной покупки и стыковки шаттла.
+    /// </summary>
     [DataField]
     public SoundSpecifier ApproveSound = new SoundPathSpecifier("/Audio/Effects/Cargo/ping.ogg");
 
+    /// <summary>
+    /// Звук отказа в покупке (нет доступа, средств, дока и т.п.).
+    /// </summary>
     [DataField]
     public SoundSpecifier DenySound = new SoundPathSpecifier("/Audio/Effects/Cargo/buzz_sigh.ogg");
 

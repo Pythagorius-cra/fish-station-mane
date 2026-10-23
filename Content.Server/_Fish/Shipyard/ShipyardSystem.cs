@@ -62,75 +62,128 @@ public sealed partial class ShipyardSystem : EntitySystem
 
     private void OnPurchaseMessage(Entity<ShipyardConsoleComponent> ent, ref ShipyardConsolePurchaseMessage args)
     {
-        var actor = args.Actor;
+        TryPurchase(ent, args.Actor, args.VesselId);
+    }
+
+    /// <summary>
+    /// Публичный API покупки: проверки + выполнение.
+    /// </summary>
+    public bool TryPurchase(Entity<ShipyardConsoleComponent> ent, EntityUid actor, string vesselId)
+    {
         if (!Exists(actor))
-            return;
+            return false;
+
+        if (!CanPurchase(ent, actor, vesselId, out var vessel, out var stationUid, out var bank, out var targetGrid, out var reason))
+        {
+            Deny(ent, actor, reason ?? Loc.GetString("shipyard-console-invalid-vessel"));
+            return false;
+        }
+
+        return DoPurchase(ent, actor, vessel!, stationUid!.Value, bank!, targetGrid!.Value);
+    }
+
+    /// <summary>
+    /// Чистая проверка возможности покупки. Не меняет состояние сущностей.
+    /// </summary>
+    public bool CanPurchase(
+        Entity<ShipyardConsoleComponent> ent,
+        EntityUid actor,
+        string vesselId,
+        out VesselPrototype? vessel,
+        out EntityUid? stationUid,
+        out StationBankAccountComponent? bank,
+        out EntityUid? targetGrid,
+        out string? reason,
+        bool quiet = true)
+    {
+        vessel = null;
+        stationUid = null;
+        bank = null;
+        targetGrid = null;
+        reason = null;
 
         if (ent.Comp.Purchasing)
         {
-            Deny(ent, actor, Loc.GetString("shipyard-console-busy"));
-            return;
+            reason = Loc.GetString("shipyard-console-busy");
+            return false;
         }
 
         if (TryComp(ent, out Content.Shared.Access.Components.AccessReaderComponent? accessReader) &&
             !_access.IsAllowed(actor, ent, accessReader))
         {
-            Deny(ent, actor, Loc.GetString("shipyard-console-access-denied"));
-            return;
+            reason = Loc.GetString("shipyard-console-access-denied");
+            return false;
         }
 
-        if (!_prototypes.TryIndex<VesselPrototype>(args.VesselId, out var vessel))
+        if (!_prototypes.TryIndex<VesselPrototype>(vesselId, out vessel))
         {
-            Deny(ent, actor, Loc.GetString("shipyard-console-invalid-vessel"));
-            return;
+            reason = Loc.GetString("shipyard-console-invalid-vessel");
+            return false;
         }
 
         if (!string.Equals(vessel.Group, ent.Comp.VesselGroup, StringComparison.OrdinalIgnoreCase))
         {
-            Deny(ent, actor, Loc.GetString("shipyard-console-invalid-vessel"));
-            _adminLog.Add(LogType.Action, LogImpact.Medium,
-                $"{ToPrettyString(actor)} tried to buy vessel {vessel.ID} not listed on {ToPrettyString(ent)}");
-            return;
+            reason = Loc.GetString("shipyard-console-invalid-vessel");
+            if (!quiet)
+            {
+                _adminLog.Add(LogType.Action, LogImpact.Medium,
+                    $"{ToPrettyString(actor)} tried to buy vessel {vessel.ID} not listed on {ToPrettyString(ent)}");
+            }
+            return false;
         }
 
         if (vessel.Price <= 0 || vessel.ShuttlePath == ResPath.Empty)
         {
-            Deny(ent, actor, Loc.GetString("shipyard-console-invalid-vessel"));
-            return;
+            reason = Loc.GetString("shipyard-console-invalid-vessel");
+            return false;
         }
 
         var station = _station.GetOwningStation(ent);
-        if (station is not { } stationUid ||
-            !TryComp<StationDataComponent>(stationUid, out var stationData) ||
-            !TryComp<StationBankAccountComponent>(stationUid, out var bank))
+        if (station is not { } ownedStation ||
+            !TryComp<StationDataComponent>(ownedStation, out var stationData) ||
+            !TryComp<StationBankAccountComponent>(ownedStation, out bank))
         {
-            Deny(ent, actor, Loc.GetString("shipyard-console-no-station"));
-            return;
+            reason = Loc.GetString("shipyard-console-no-station");
+            return false;
         }
 
-        var targetGrid = _station.GetLargestGrid((stationUid, stationData));
+        stationUid = ownedStation;
+        targetGrid = _station.GetLargestGrid((ownedStation, stationData));
         if (targetGrid == null)
         {
-            Deny(ent, actor, Loc.GetString("shipyard-console-no-station"));
-            return;
+            reason = Loc.GetString("shipyard-console-no-station");
+            return false;
         }
 
-        var balance = _cargo.GetBalanceFromAccount((stationUid, bank), ent.Comp.Account);
+        var balance = _cargo.GetBalanceFromAccount((ownedStation, bank), ent.Comp.Account);
         if (balance < vessel.Price)
         {
-            Deny(ent, actor, Loc.GetString("shipyard-console-insufficient-funds", ("cost", vessel.Price)));
-            return;
+            reason = Loc.GetString("shipyard-console-insufficient-funds", ("cost", vessel.Price));
+            return false;
         }
 
+        return true;
+    }
+
+    private bool DoPurchase(
+        Entity<ShipyardConsoleComponent> ent,
+        EntityUid actor,
+        VesselPrototype vessel,
+        EntityUid stationUid,
+        StationBankAccountComponent bank,
+        EntityUid targetGrid)
+    {
         ent.Comp.Purchasing = true;
-        UpdateUi(ent, Loc.GetString("shipyard-console-purchasing"));
+        string? finalStatus = Loc.GetString("shipyard-console-purchasing");
+        UpdateUi(ent, finalStatus);
 
         try
         {
-            if (!TrySpawnAndDockShuttle(vessel, targetGrid.Value, ent.Comp.DefaultPriorityDockTag, out var shuttle, out var failReason))
+            if (!TrySpawnAndDockShuttle(vessel, targetGrid, ent.Comp.DefaultPriorityDockTag, out var shuttle, out var failReason))
             {
-                Deny(ent, actor, failReason ?? Loc.GetString("shipyard-console-spawn-failed"));
-                return;
+                finalStatus = failReason ?? Loc.GetString("shipyard-console-spawn-failed");
+                Deny(ent, actor, finalStatus);
+                return false;
             }
 
             // Списываем только после успешного спавна и стыковки.
@@ -143,16 +196,16 @@ public sealed partial class ShipyardSystem : EntitySystem
                 $"{ToPrettyString(actor)} purchased vessel {vessel.ID} ({vesselName}) for {vessel.Price} via {ToPrettyString(ent)}; shuttle={ToPrettyString(shuttle)}");
 
             _audio.PlayPvs(ent.Comp.ApproveSound, ent);
-            _popup.PopupEntity(Loc.GetString("shipyard-console-purchase-success", ("vessel", vesselName)), actor, actor);
-
-            UpdateUi(ent, Loc.GetString("shipyard-console-purchase-success", ("vessel", vesselName)));
+            finalStatus = Loc.GetString("shipyard-console-purchase-success", ("vessel", vesselName));
+            _popup.PopupEntity(finalStatus, actor, actor);
+            return true;
         }
         finally
         {
             ent.Comp.Purchasing = false;
-            // Обновляем баланс после сброса флага.
+            // Сохраняем итоговый статус; не затираем success/error повторным UpdateUi(null).
             if (_ui.IsUiOpen(ent.Owner, ShipyardConsoleUiKey.Shipyard))
-                UpdateUi(ent);
+                UpdateUi(ent, finalStatus);
         }
     }
 

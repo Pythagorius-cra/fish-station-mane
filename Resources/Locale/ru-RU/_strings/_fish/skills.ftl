@@ -10,7 +10,7 @@ skills-window-decrease = Понизить
 skills-window-confirm = Подтвердить
 skills-window-reset = Сбросить
 
-skills-popup-budget-granted = Вам доступно { $points } очк. навыков. Откройте меню «Навыки» (verb по себе).
+skills-popup-budget-granted = OOC: Вам доступно очков навыков: { $points }. Откройте меню «Навыки» (альтернативное действие по себе).
 skills-popup-confirmed = Распределение навыков подтверждено.
 
 skills-error-locked = Распределение уже подтверждено или недоступно.

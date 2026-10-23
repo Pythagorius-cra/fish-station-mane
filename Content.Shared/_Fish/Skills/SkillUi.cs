@@ -1,41 +1,10 @@
-using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 
 namespace Content.Shared._Fish.Skills;
 
-[Serializable, NetSerializable]
-public enum SkillUiKey : byte
-{
-    Key,
-}
-
-[Serializable, NetSerializable]
-public sealed class SkillBoundUserInterfaceState : BoundUserInterfaceState
-{
-    public readonly int RemainingPoints;
-    public readonly int TotalPoints;
-    public readonly bool Locked;
-    public readonly string? JobName;
-    public readonly string? StatusMessage;
-    public readonly List<SkillUiEntry> Skills;
-
-    public SkillBoundUserInterfaceState(
-        int remainingPoints,
-        int totalPoints,
-        bool locked,
-        string? jobName,
-        string? statusMessage,
-        List<SkillUiEntry> skills)
-    {
-        RemainingPoints = remainingPoints;
-        TotalPoints = totalPoints;
-        Locked = locked;
-        JobName = jobName;
-        StatusMessage = statusMessage;
-        Skills = skills;
-    }
-}
-
+/// <summary>
+/// Запись навыка для EUI состояния. BUI-контракт навыков удалён — интерфейс идёт через EUI.
+/// </summary>
 [Serializable, NetSerializable]
 public sealed class SkillUiEntry
 {
@@ -80,22 +49,3 @@ public sealed class SkillUiEntry
         EffectHint = effectHint;
     }
 }
-
-[Serializable, NetSerializable]
-public sealed class SkillSetLevelMessage : BoundUserInterfaceMessage
-{
-    public readonly string SkillId;
-    public readonly int Level;
-
-    public SkillSetLevelMessage(string skillId, int level)
-    {
-        SkillId = skillId;
-        Level = level;
-    }
-}
-
-[Serializable, NetSerializable]
-public sealed class SkillConfirmMessage : BoundUserInterfaceMessage;
-
-[Serializable, NetSerializable]
-public sealed class SkillResetMessage : BoundUserInterfaceMessage;

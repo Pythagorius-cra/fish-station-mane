@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Content.Shared._Fish.Skills;
 using NUnit.Framework;
 
@@ -11,15 +11,15 @@ public sealed class SkillPrototypeTests
     [Test]
     public void CostLadderSupportsSpecialistVsUniversal()
     {
-        // Мастер с необученного: 2+3+5+8 = 18
+        // РњР°СЃС‚РµСЂ СЃ РЅРµРѕР±СѓС‡РµРЅРЅРѕРіРѕ: 2+3+5+8 = 18
         Assert.That(SkillMath.CostUnskilledToMaster, Is.EqualTo(18));
         Assert.That(SkillMath.GetLevelCost(2, SkillLevels.Unskilled, SkillLevels.Master), Is.EqualTo(18));
 
-        // Специалист инженера: мин Construction 2, бюджет 16 → ровно до мастера
+        // РЎРїРµС†РёР°Р»РёСЃС‚ РёРЅР¶РµРЅРµСЂР°: РјРёРЅ Construction 2, Р±СЋРґР¶РµС‚ 16 в†’ СЂРѕРІРЅРѕ РґРѕ РјР°СЃС‚РµСЂР°
         Assert.That(SkillMath.GetLevelCost(2, SkillLevels.Basic, SkillLevels.Master), Is.EqualTo(16));
 
-        // Универсал при 16: три навыка до обученного с разных стартов
-        // Construction 2→3 (3) + Electrical 2→3 (3) + Atmos 1→3 (2+3=5) + Computer 1→2 (2) = 13
+        // РЈРЅРёРІРµСЂСЃР°Р» РїСЂРё 16: С‚СЂРё РЅР°РІС‹РєР° РґРѕ РѕР±СѓС‡РµРЅРЅРѕРіРѕ СЃ СЂР°Р·РЅС‹С… СЃС‚Р°СЂС‚РѕРІ
+        // Construction 2в†’3 (3) + Electrical 2в†’3 (3) + Atmos 1в†’3 (2+3=5) + Computer 1в†’2 (2) = 13
         var universal = SkillMath.GetLevelCost(2, 2, 3)
                         + SkillMath.GetLevelCost(2, 2, 3)
                         + SkillMath.GetLevelCost(2, 1, 3)
@@ -27,13 +27,13 @@ public sealed class SkillPrototypeTests
         Assert.That(universal, Is.EqualTo(13));
         Assert.That(universal, Is.LessThanOrEqualTo(16));
 
-        // Гибрид: Construction 2→4 (3+5=8) + Electrical 2→3 (3) + Atmos 1→2 (2) = 13
+        // Р“РёР±СЂРёРґ: Construction 2в†’4 (3+5=8) + Electrical 2в†’3 (3) + Atmos 1в†’2 (2) = 13
         var hybrid = SkillMath.GetLevelCost(2, 2, 4)
                      + SkillMath.GetLevelCost(2, 2, 3)
                      + SkillMath.GetLevelCost(2, 1, 2);
         Assert.That(hybrid, Is.EqualTo(13));
 
-        // Нельзя одновременно освоить два мастера с бюджета 16
+        // РќРµР»СЊР·СЏ РѕРґРЅРѕРІСЂРµРјРµРЅРЅРѕ РѕСЃРІРѕРёС‚СЊ РґРІР° РјР°СЃС‚РµСЂР° СЃ Р±СЋРґР¶РµС‚Р° 16
         var dualMaster = SkillMath.GetLevelCost(2, 2, 5) * 2;
         Assert.That(dualMaster, Is.EqualTo(32));
         Assert.That(dualMaster, Is.GreaterThan(16));
@@ -79,7 +79,7 @@ public sealed class SkillPrototypeTests
     [Test]
     public void TrainingKeyIsStable()
     {
-        Assert.That(SkillMath.MakeTrainingKey("SkillMedical", 3), Is.EqualTo("SkillMedical:3"));
+        Assert.That(SkillMath.MakeTrainingKey("FishSkillMedical", 3), Is.EqualTo("FishSkillMedical:3"));
     }
 }
 

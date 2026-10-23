@@ -344,7 +344,9 @@ namespace Content.Shared.Preferences
         public static HumanoidCharacterProfile Random(HashSet<string>? ignoredSpecies = null)
         {
             var config = RandomizeConfigAll;
-            var baseProfile = new HumanoidCharacterProfile();
+            // Fish-start - случайный профиль тоже получает защиту от целей антагов
+            var baseProfile = DefaultWithSpecies();
+            // Fish-end
             if (ignoredSpecies != null)
             {
                 baseProfile.Species = RandomSpecies(ignoredSpecies);
@@ -411,10 +413,12 @@ namespace Content.Shared.Preferences
         {
             species ??= DefaultSpecies;
 
+            // Fish-start - базовый профиль через DefaultWithSpecies (защита от целей антагов)
             return Random(
                 RandomizeConfigAll ^ RandomizeCfg.Species,
-                new HumanoidCharacterProfile().WithSpecies(species)
+                DefaultWithSpecies(species)
             );
+            // Fish-end
         }
 
         public HumanoidCharacterProfile WithName(string name)

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Content.Shared.Popups;
 using Content.Shared.Roles;
@@ -23,8 +24,9 @@ public abstract partial class SharedSkillSystem : EntitySystem
 
     public int GetSkillValue(EntityUid uid, ProtoId<SkillPrototype> skill, SkillsetComponent? skillset = null)
     {
+        // Без skillset (DeathMatch и т.п.) — нейтральный Baseline, без штрафов Unskilled.
         if (!Resolve(uid, ref skillset, false))
-            return SkillLevels.Unskilled;
+            return SkillLevels.Baseline;
 
         return skillset.Skills.GetValueOrDefault(skill, SkillLevels.Unskilled);
     }
@@ -44,11 +46,11 @@ public abstract partial class SharedSkillSystem : EntitySystem
                 return proto.GetDurationMultiplierForLevel(points);
 
             var factor = factorOverride ?? proto.DelayFactor;
-            return Math.Max(0f, 1f + (SkillLevels.Baseline - points) * factor);
+            return SkillMath.GetDurationMultiplier(proto.DurationMultipliers, factor, points);
         }
 
         var fallbackFactor = factorOverride ?? 0.3f;
-        return Math.Max(0f, 1f + (SkillLevels.Baseline - points) * fallbackFactor);
+        return SkillMath.GetDurationMultiplier(_emptySkillTable, fallbackFactor, points);
     }
 
     public float GetSkillQualityMultiplier(EntityUid uid, ProtoId<SkillPrototype> skill, SkillsetComponent? skillset = null)
@@ -58,8 +60,10 @@ public abstract partial class SharedSkillSystem : EntitySystem
         if (Prototypes.TryIndex(skill, out SkillPrototype? proto))
             return proto.GetQualityMultiplierForLevel(points);
 
-        return Math.Max(0.05f, 1f + (points - SkillLevels.Baseline) * 0.15f);
+        return SkillMath.GetQualityMultiplier(_emptySkillTable, 0.15f, points);
     }
+
+    private static readonly Dictionary<int, float> _emptySkillTable = new();
 
     public TimeSpan ApplySkillDelay(EntityUid uid, ProtoId<SkillPrototype> skill, TimeSpan baseDelay, float? factorOverride = null)
     {

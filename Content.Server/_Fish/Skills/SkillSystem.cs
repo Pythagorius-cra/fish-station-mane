@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using Content.Server.EUI;
 using Content.Server.Popups;
 using Content.Shared._Fish.Skills;
@@ -12,15 +12,15 @@ using Robust.Shared.Prototypes;
 namespace Content.Server._Fish.Skills;
 
 /// <summary>
-/// Серверная логика навыков: бюджет роли, распределение, обучение, эффекты.
+/// РЎРµСЂРІРµСЂРЅР°СЏ Р»РѕРіРёРєР° РЅР°РІС‹РєРѕРІ: Р±СЋРґР¶РµС‚ СЂРѕР»Рё, СЂР°СЃРїСЂРµРґРµР»РµРЅРёРµ, РѕР±СѓС‡РµРЅРёРµ, СЌС„С„РµРєС‚С‹.
 /// </summary>
 public sealed partial class SkillSystem : SharedSkillSystem
 {
     [Dependency] private EuiManager _eui = default!;
     [Dependency] private PopupSystem _serverPopup = default!;
 
-    private static readonly ProtoId<SkillPrototype> ConstructionSkill = "SkillConstruction";
-    private static readonly ProtoId<SkillPrototype> MedicalSkill = "SkillMedical";
+    private static readonly ProtoId<SkillPrototype> ConstructionSkill = "FishSkillConstruction";
+    private static readonly ProtoId<SkillPrototype> MedicalSkill = "FishSkillMedical";
 
     private readonly Dictionary<ICommonSession, SkillEui> _openUis = new();
 

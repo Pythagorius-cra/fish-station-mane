@@ -81,9 +81,9 @@ public sealed class SunriseCriminalRecordsConsoleBoundUserInterface : BoundUserI
     }
 
     // Fish-start - быстрая печать документов
-    public void PrintQuickDocument(uint caseId, string templateId)
+    public void PrintQuickDocument(uint recordId, uint caseId, string templateId)
     {
-        SendMessage(new FishCriminalRecordsPrintDocumentMessage(caseId, templateId));
+        SendMessage(new FishCriminalRecordsPrintDocumentMessage(recordId, caseId, templateId));
     }
     // Fish-end
 }

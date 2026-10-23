@@ -1,4 +1,4 @@
-using Content.Shared.Administration.Logs;
+﻿using Content.Shared.Administration.Logs;
 using Content.Shared.Charges.Systems;
 using Content.Shared.Construction;
 using Content.Shared.Database;
@@ -12,7 +12,7 @@ using Content.Shared.Popups;
 using Content.Shared.RCD.Components;
 using Content.Shared.Tag;
 using Content.Shared.Tiles;
-using Content.Shared._Fish.Skills; // Fish-edit: навык строительства для РСУ
+using Content.Shared._Fish.Skills; // Fish-edit: РЅР°РІС‹Рє СЃС‚СЂРѕРёС‚РµР»СЊСЃС‚РІР° РґР»СЏ Р РЎРЈ
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
@@ -166,10 +166,10 @@ public sealed partial class RCDSystem : EntitySystem
         if (!IsRCDOperationStillValid(uid, component, gridUid.Value, mapGrid, tile, position, component.ConstructionDirection, args.Target, args.User))
             return;
 
-        // Fish-start: РСУ (строительство) требует базового строительства
+        // Fish-start: Р РЎРЈ (СЃС‚СЂРѕРёС‚РµР»СЊСЃС‚РІРѕ) С‚СЂРµР±СѓРµС‚ Р±Р°Р·РѕРІРѕРіРѕ СЃС‚СЂРѕРёС‚РµР»СЊСЃС‚РІР°
         if (prototype.Mode is RcdMode.ConstructTile or RcdMode.ConstructObject)
         {
-            if (_skills.TryDenyMissingSkill(args.User, "SkillConstruction", SkillLevels.Basic, "skills-rcd-need-construction"))
+            if (_skills.TryDenyMissingSkill(args.User, "FishSkillConstruction", SkillLevels.Basic, "skills-rcd-need-construction"))
             {
                 args.Handled = true;
                 return;
@@ -183,8 +183,8 @@ public sealed partial class RCDSystem : EntitySystem
         // Get the starting cost, delay, and effect from the prototype
         var cost = prototype.Cost;
         var delay = prototype.Delay;
-        // Fish-edit: скорость РСУ от навыка строительства
-        delay *= _skills.GetSkillDelayMultiplier(args.User, "SkillConstruction");
+        // Fish-edit: СЃРєРѕСЂРѕСЃС‚СЊ Р РЎРЈ РѕС‚ РЅР°РІС‹РєР° СЃС‚СЂРѕРёС‚РµР»СЊСЃС‚РІР°
+        delay *= _skills.GetSkillDelayMultiplier(args.User, "FishSkillConstruction");
         var effectPrototype = prototype.Effect;
 
         #region: Operation modifiers
