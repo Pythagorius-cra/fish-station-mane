@@ -1,4 +1,4 @@
-meta:
+﻿meta:
   format: 7
   category: Grid
   engineVersion: 271.1.0
@@ -49,7 +49,7 @@ entities:
   - uid: 1
     components:
     - type: MetaData
-      name: PRT "Ржавый"
+      name: PRT "Р Р¶Р°РІС‹Р№"
     - type: Transform
       pos: 2.2710133,-2.4148211
       parent: invalid
@@ -2637,14 +2637,14 @@ entities:
   - uid: 149
     components:
     - type: MetaData
-      name: блок зарядки EXP-3600g "Жабык"
+      name: Р±Р»РѕРє Р·Р°СЂСЏРґРєРё EXP-3600g "Р–Р°Р±С‹Рє"
     - type: Transform
       pos: -0.5,-2.5
       parent: 1
   - uid: 889
     components:
     - type: MetaData
-      name: Зарядка RCT-60 "Веник"
+      name: Р—Р°СЂСЏРґРєР° RCT-60 "Р’РµРЅРёРє"
     - type: Transform
       pos: -2.5,0.5
       parent: 1
@@ -4875,7 +4875,7 @@ entities:
   - uid: 99
     components:
     - type: MetaData
-      name: кнопка сигнала (Ставни)
+      name: РєРЅРѕРїРєР° СЃРёРіРЅР°Р»Р° (РЎС‚Р°РІРЅРё)
     - type: Transform
       rot: 1.5707963267948966 rad
       pos: -3.6272912,-1.8379054
@@ -4901,9 +4901,9 @@ entities:
         - - Pressed
           - Toggle
     - type: Label
-      currentLabel: Ставни
+      currentLabel: РЎС‚Р°РІРЅРё
     - type: NameModifier
-      baseName: кнопка сигнала
+      baseName: РєРЅРѕРїРєР° СЃРёРіРЅР°Р»Р°
     - type: Fixtures
       fixtures: {}
   - uid: 513
@@ -6872,7 +6872,6 @@ entities:
     - type: Transform
       pos: -7.218631,-11.914076
       parent: 1
-...
 
 - proto: FishClockworkArk
   entities:
@@ -6939,3 +6938,4 @@ entities:
     - type: Transform
       pos: -3.5,2.5
       parent: 1
+
