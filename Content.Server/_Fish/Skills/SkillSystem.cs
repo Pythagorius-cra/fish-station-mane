@@ -12,13 +12,12 @@ using Robust.Shared.Prototypes;
 namespace Content.Server._Fish.Skills;
 
 /// <summary>
-/// Серверная логика навыков по модели Baystation12: бюджет роли, распределение, эффекты.
+/// Серверная логика навыков: бюджет роли, распределение, обучение, эффекты.
 /// </summary>
 public sealed partial class SkillSystem : SharedSkillSystem
 {
     [Dependency] private EuiManager _eui = default!;
     [Dependency] private PopupSystem _serverPopup = default!;
-    // RA: Dependency fields must not be readonly (handled above)
 
     private static readonly ProtoId<SkillPrototype> ConstructionSkill = "SkillConstruction";
     private static readonly ProtoId<SkillPrototype> MedicalSkill = "SkillMedical";
@@ -34,6 +33,7 @@ public sealed partial class SkillSystem : SharedSkillSystem
 
         SubscribeLocalEvent<PlayerSpawnCompleteEvent>(OnPlayerSpawnComplete);
         SubscribeLocalEvent<SkillsetComponent, GetVerbsEvent<Verb>>(OnGetVerbs);
+        InitializeAuthoring();
     }
 
     private void OnPlayerSpawnComplete(PlayerSpawnCompleteEvent args)
@@ -52,6 +52,7 @@ public sealed partial class SkillSystem : SharedSkillSystem
         {
             skillset.Skills.Clear();
             skillset.PendingAllocation.Clear();
+            skillset.CompletedTrainings.Clear();
             skillset.BudgetGranted = false;
             skillset.Locked = false;
         }
@@ -67,6 +68,7 @@ public sealed partial class SkillSystem : SharedSkillSystem
         skillset.RemainingPoints = skillset.TotalPoints;
         skillset.Skills.Clear();
         skillset.PendingAllocation.Clear();
+        skillset.CompletedTrainings.Clear();
         skillset.Locked = false;
 
         foreach (var skill in Prototypes.EnumeratePrototypes<SkillPrototype>())

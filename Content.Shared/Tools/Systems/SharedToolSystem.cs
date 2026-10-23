@@ -36,11 +36,11 @@ public abstract partial class SharedToolSystem : EntitySystem
     [Dependency] private SharedTransformSystem _transformSystem = default!;
     [Dependency] private TileSystem _tiles = default!;
     [Dependency] private TurfSystem _turfs = default!;
-    [Dependency] private SharedSkillSystem _skills = default!; // Fish-edit: BUILDING/ELECTRICITY_SPEED_MOD
+    [Dependency] private SharedSkillSystem _skills = default!; // Fish-edit: навыки инструментов
 
     public const string CutQuality = "Cutting";
     public const string PulseQuality = "Pulsing";
-    // Fish-start: качества → навыки (SS1984 building / electrician)
+    // Fish-start: качества → навыки строительства / электрики
     private static readonly ProtoId<ToolQualityPrototype> WeldingQuality = "Welding";
     private static readonly ProtoId<ToolQualityPrototype> AnchoringQuality = "Anchoring";
     private static readonly ProtoId<SkillPrototype> ConstructionSkill = "SkillConstruction";
@@ -182,7 +182,7 @@ public abstract partial class SharedToolSystem : EntitySystem
         else
             examineText = Loc.GetString("tool-component-doafter-examine", ("quality", qualitiesText));
 
-        // Fish-start: SS1984 BUILDING_SPEED_MOD / ELECTRICITY_SPEED_MOD для релевантных качеств
+        // Fish-start: множитель навыка для релевантных качеств инструмента
         var skillDelayMult = GetToolSkillDelayMultiplier(user, toolQualitiesNeeded);
         var adjustedDelay = delay / toolComponent.SpeedModifier * skillDelayMult;
         // Fish-end

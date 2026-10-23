@@ -166,7 +166,7 @@ public sealed partial class RCDSystem : EntitySystem
         if (!IsRCDOperationStillValid(uid, component, gridUid.Value, mapGrid, tile, position, component.ConstructionDirection, args.Target, args.User))
             return;
 
-        // Fish-start: РСУ (строительство) требует Construction Basic — как Bay skill_check
+        // Fish-start: РСУ (строительство) требует базового строительства
         if (prototype.Mode is RcdMode.ConstructTile or RcdMode.ConstructObject)
         {
             if (_skills.TryDenyMissingSkill(args.User, "SkillConstruction", SkillLevels.Basic, "skills-rcd-need-construction"))

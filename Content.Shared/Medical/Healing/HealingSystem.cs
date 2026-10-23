@@ -69,7 +69,7 @@ public sealed partial class HealingSystem : EntitySystem
 
         TryComp<BloodstreamComponent>(target, out var bloodstream);
 
-        // Fish-start: SS1984 HEAL_AMOUNT_MOD — величина лечения от навыка медицины
+        // Fish-start: величина лечения от навыка медицины
         var healAmountMod = _skills.GetSkillQualityMultiplier(args.User, "SkillMedical");
         // Fish-end
 
@@ -165,7 +165,7 @@ public sealed partial class HealingSystem : EntitySystem
         // Update our self heal delay so it shortens as we heal more damage.
         if (args.User == target.Owner)
         {
-            // Fish-start: повтор self-heal тоже учитывает HEAL_DURATION_MOD
+            // Fish-start: повтор self-heal учитывает навык медицины
             args.Args.Delay = healing.Delay
                 * GetScaledHealingPenalty(target.Owner, healing.SelfHealPenaltyMultiplier)
                 * _skills.GetSkillDelayMultiplier(args.User, "SkillMedical");
@@ -290,7 +290,7 @@ public sealed partial class HealingSystem : EntitySystem
             ? healing.Comp.Delay
             : healing.Comp.Delay * GetScaledHealingPenalty(target, healing.Comp.SelfHealPenaltyMultiplier);
 
-        // Fish-start: Bay skill_delay_mult для медицины
+        // Fish-start: множитель времени лечения от навыка медицины
         delay *= _skills.GetSkillDelayMultiplier(user, "SkillMedical");
         // Fish-end
 

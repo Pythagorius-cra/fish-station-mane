@@ -46,7 +46,7 @@ public abstract partial class SharedSurgerySystem : EntitySystem
     [Dependency] private SharedItemSystem _item = default!;
     [Dependency] private StarlightEntitySystem _entitySystem = default!;
     [Dependency] private SharedInteractionSystem _interaction = default!;
-    [Dependency] private SharedSkillSystem _skills = default!; // Fish-edit: SURGERY_*_MOD
+    [Dependency] private SharedSkillSystem _skills = default!; // Fish-edit: навыки хирургии
 
     public override void Initialize()
     {

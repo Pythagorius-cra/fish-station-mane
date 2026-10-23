@@ -1,7 +1,7 @@
 namespace Content.Shared._Fish.Skills;
 
 /// <summary>
-/// Уровни навыков по модели Baystation12 (SKILL_UNSKILLED..SKILL_MASTER).
+/// Уровни навыков Fish Station (1..5).
 /// </summary>
 public static class SkillLevels
 {
@@ -14,16 +14,11 @@ public static class SkillLevels
     public const int Min = Unskilled;
     public const int Max = Master;
 
-    /// <summary>Базовый уровень для расчёта множителя времени (SKILL_BASELINE).</summary>
+    /// <summary>Базовый уровень для расчёта множителя времени.</summary>
     public const int Baseline = Trained;
 
-    /// <summary>Сложность навыка: SKILL_EASY.</summary>
     public const int DifficultyEasy = Unskilled;
-
-    /// <summary>Сложность навыка: SKILL_AVERAGE.</summary>
     public const int DifficultyAverage = Basic;
-
-    /// <summary>Сложность навыка: SKILL_HARD.</summary>
     public const int DifficultyHard = Experienced;
 
     public static string GetLevelNameKey(int level) => level switch
@@ -36,3 +31,4 @@ public static class SkillLevels
         _ => "skills-level-unknown",
     };
 }
+

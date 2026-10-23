@@ -4,7 +4,7 @@ using Robust.Shared.Prototypes;
 namespace Content.Shared._Fish.Skills;
 
 /// <summary>
-/// Бюджет очков и min/max навыков для роли (Bay: job.skill_points / min_skill / max_skill).
+/// Бюджет очков и min/max навыков для роли.
 /// </summary>
 [Prototype]
 public sealed partial class JobSkillBudgetPrototype : IPrototype
@@ -12,29 +12,21 @@ public sealed partial class JobSkillBudgetPrototype : IPrototype
     [IdDataField]
     public string ID { get; private set; } = default!;
 
-    /// <summary>
-    /// Id профессии. Если не задан — совпадает с ID прототипа.
-    /// </summary>
     [DataField]
     public ProtoId<JobPrototype>? Job;
 
     /// <summary>
-    /// Свободные очки сверх минимумов (Bay skill_points, default 22).
+    /// Свободные очки сверх минимумов роли.
     /// </summary>
     [DataField]
-    public int SkillPoints = 22;
+    public int SkillPoints = 14;
 
-    /// <summary>
-    /// Минимальные уровни навыков (бесплатно).
-    /// </summary>
     [DataField]
     public Dictionary<ProtoId<SkillPrototype>, int> MinSkills = new();
 
-    /// <summary>
-    /// Максимальные уровни навыков для роли.
-    /// </summary>
     [DataField]
     public Dictionary<ProtoId<SkillPrototype>, int> MaxSkills = new();
 
     public ProtoId<JobPrototype> GetJobId() => Job ?? ID;
 }
+

@@ -1,17 +1,45 @@
+using Robust.Shared.Prototypes;
+
 namespace Content.Shared._Fish.Skills;
 
 /// <summary>
-/// Формулы стоимости и модификаторов навыков (Bay + таблицы SS1984).
-/// Вынесено из прототипа, чтобы unit-тесты не создавали IPrototype напрямую (RA0039).
+/// Формулы стоимости и модификаторов навыков Fish Station.
+/// Лестница стоимости подобрана так, чтобы мастер одного навыка
+/// почти исчерпывал бюджет специалиста, а универсал оставался на средних уровнях.
 /// </summary>
 public static class SkillMath
 {
+    /// <summary>1→2</summary>
+    public const int CostBasic = 2;
+
+    /// <summary>2→3</summary>
+    public const int CostTrained = 3;
+
+    /// <summary>3→4</summary>
+    public const int CostExperienced = 5;
+
+    /// <summary>4→5</summary>
+    public const int CostMaster = 8;
+
+    /// <summary>Полный путь с необученного до мастера.</summary>
+    public const int CostUnskilledToMaster = CostBasic + CostTrained + CostExperienced + CostMaster; // 18
+
+    /// <summary>С необученного до опытного (потолок обучения книгами).</summary>
+    public const int CostUnskilledToExperienced = CostBasic + CostTrained + CostExperienced; // 10
+
+    /// <summary>Максимальный уровень, достижимый обучением по книгам.</summary>
+    public const int BookTrainingMaxLevel = SkillLevels.Experienced;
+
     public static int GetCostForLevel(int difficulty, int level)
     {
+        // difficulty сохранён в API для совместимости прототипов; на стоимость не влияет.
+        _ = difficulty;
         return level switch
         {
-            SkillLevels.Basic or SkillLevels.Trained => difficulty,
-            SkillLevels.Experienced or SkillLevels.Master => 2 * difficulty,
+            SkillLevels.Basic => CostBasic,
+            SkillLevels.Trained => CostTrained,
+            SkillLevels.Experienced => CostExperienced,
+            SkillLevels.Master => CostMaster,
             _ => 0,
         };
     }
@@ -47,5 +75,9 @@ public static class SkillMath
 
         return Math.Max(0.05f, 1f + (level - SkillLevels.Baseline) * qualityFactor);
     }
+
+    /// <summary>Ключ прогресса обучения: навык + целевой уровень.</summary>
+    public static string MakeTrainingKey(ProtoId<SkillPrototype> skill, int targetLevel) =>
+        $"{skill}:{targetLevel}";
 }
-
+

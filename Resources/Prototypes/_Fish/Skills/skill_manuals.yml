@@ -1,0 +1,307 @@
+# Учебники: повышают навык ровно на один уровень (до опытного). Мастер — только стартовые очки.
+
+- type: entity
+  parent: BookBase
+  id: FishSkillManualConstructionBasic
+  name: skills-manual-proto-construction-basic
+  description: skills-manual-proto-construction-basic-desc
+  components:
+  - type: Sprite
+    sprite: Objects/Misc/books.rsi
+    layers:
+    - state: paper
+    - state: cover_base
+      color: "#c45c26"
+    - state: icon_text
+  - type: SkillTrainingManual
+    skill: SkillConstruction
+    targetLevel: 2
+    minSkillToStudy: 1
+    studyTime: 35
+
+- type: entity
+  parent: BookBase
+  id: FishSkillManualConstructionTrained
+  name: skills-manual-proto-construction-trained
+  description: skills-manual-proto-construction-trained-desc
+  components:
+  - type: Sprite
+    sprite: Objects/Misc/books.rsi
+    layers:
+    - state: paper
+    - state: cover_base
+      color: "#a04820"
+    - state: icon_text
+  - type: SkillTrainingManual
+    skill: SkillConstruction
+    targetLevel: 3
+    minSkillToStudy: 2
+    studyTime: 50
+
+- type: entity
+  parent: BookBase
+  id: FishSkillManualConstructionExperienced
+  name: skills-manual-proto-construction-experienced
+  description: skills-manual-proto-construction-experienced-desc
+  components:
+  - type: Sprite
+    sprite: Objects/Misc/books.rsi
+    layers:
+    - state: paper
+    - state: cover_base
+      color: "#7a3518"
+    - state: icon_text
+  - type: SkillTrainingManual
+    skill: SkillConstruction
+    targetLevel: 4
+    minSkillToStudy: 3
+    studyTime: 70
+
+- type: entity
+  parent: BookBase
+  id: FishSkillManualElectricalBasic
+  name: skills-manual-proto-electrical-basic
+  description: skills-manual-proto-electrical-basic-desc
+  components:
+  - type: Sprite
+    sprite: Objects/Misc/books.rsi
+    layers:
+    - state: paper
+    - state: cover_base
+      color: "#e6c200"
+    - state: icon_text
+  - type: SkillTrainingManual
+    skill: SkillElectrical
+    targetLevel: 2
+    minSkillToStudy: 1
+    studyTime: 35
+
+- type: entity
+  parent: BookBase
+  id: FishSkillManualElectricalTrained
+  name: skills-manual-proto-electrical-trained
+  description: skills-manual-proto-electrical-trained-desc
+  components:
+  - type: SkillTrainingManual
+    skill: SkillElectrical
+    targetLevel: 3
+    minSkillToStudy: 2
+    studyTime: 50
+
+- type: entity
+  parent: BookBase
+  id: FishSkillManualAtmosBasic
+  name: skills-manual-proto-atmos-basic
+  description: skills-manual-proto-atmos-basic-desc
+  components:
+  - type: Sprite
+    sprite: Objects/Misc/books.rsi
+    layers:
+    - state: paper
+    - state: cover_base
+      color: "#4da6ff"
+    - state: icon_text
+  - type: SkillTrainingManual
+    skill: SkillAtmos
+    targetLevel: 2
+    minSkillToStudy: 1
+    studyTime: 40
+
+- type: entity
+  parent: BookBase
+  id: FishSkillManualAtmosTrained
+  name: skills-manual-proto-atmos-trained
+  description: skills-manual-proto-atmos-trained-desc
+  components:
+  - type: SkillTrainingManual
+    skill: SkillAtmos
+    targetLevel: 3
+    minSkillToStudy: 2
+    studyTime: 55
+
+- type: entity
+  parent: BookBase
+  id: FishSkillManualMedicalBasic
+  name: skills-manual-proto-medical-basic
+  description: skills-manual-proto-medical-basic-desc
+  components:
+  - type: Sprite
+    sprite: Objects/Misc/books.rsi
+    layers:
+    - state: paper
+    - state: cover_base
+      color: "#e85d75"
+    - state: icon_text
+  - type: SkillTrainingManual
+    skill: SkillMedical
+    targetLevel: 2
+    minSkillToStudy: 1
+    studyTime: 40
+
+- type: entity
+  parent: BookBase
+  id: FishSkillManualMedicalTrained
+  name: skills-manual-proto-medical-trained
+  description: skills-manual-proto-medical-trained-desc
+  components:
+  - type: SkillTrainingManual
+    skill: SkillMedical
+    targetLevel: 3
+    minSkillToStudy: 2
+    studyTime: 55
+
+- type: entity
+  parent: BookBase
+  id: FishSkillManualMedicalExperienced
+  name: skills-manual-proto-medical-experienced
+  description: skills-manual-proto-medical-experienced-desc
+  components:
+  - type: SkillTrainingManual
+    skill: SkillMedical
+    targetLevel: 4
+    minSkillToStudy: 3
+    studyTime: 75
+
+- type: entity
+  parent: BookBase
+  id: FishSkillManualAnatomyBasic
+  name: skills-manual-proto-anatomy-basic
+  description: skills-manual-proto-anatomy-basic-desc
+  components:
+  - type: Sprite
+    sprite: Objects/Misc/books.rsi
+    layers:
+    - state: paper
+    - state: cover_base
+      color: "#c44d6a"
+    - state: icon_text
+  - type: SkillTrainingManual
+    skill: SkillAnatomy
+    targetLevel: 2
+    minSkillToStudy: 1
+    studyTime: 45
+
+- type: entity
+  parent: BookBase
+  id: FishSkillManualAnatomyTrained
+  name: skills-manual-proto-anatomy-trained
+  description: skills-manual-proto-anatomy-trained-desc
+  components:
+  - type: Sprite
+    sprite: Objects/Misc/books.rsi
+    layers:
+    - state: paper
+    - state: cover_base
+      color: "#b33b5a"
+    - state: icon_text
+  - type: SkillTrainingManual
+    skill: SkillAnatomy
+    targetLevel: 3
+    minSkillToStudy: 2
+    studyTime: 60
+
+- type: entity
+  parent: BookBase
+  id: FishSkillManualAnatomyExperienced
+  name: skills-manual-proto-anatomy-experienced
+  description: skills-manual-proto-anatomy-experienced-desc
+  components:
+  - type: SkillTrainingManual
+    skill: SkillAnatomy
+    targetLevel: 4
+    minSkillToStudy: 3
+    studyTime: 80
+
+- type: entity
+  parent: BookBase
+  id: FishSkillManualChemistryBasic
+  name: skills-manual-proto-chemistry-basic
+  description: skills-manual-proto-chemistry-basic-desc
+  components:
+  - type: Sprite
+    sprite: Objects/Misc/books.rsi
+    layers:
+    - state: paper
+    - state: cover_base
+      color: "#66cc99"
+    - state: icon_text
+  - type: SkillTrainingManual
+    skill: SkillChemistry
+    targetLevel: 2
+    minSkillToStudy: 1
+    studyTime: 40
+
+- type: entity
+  parent: BookBase
+  id: FishSkillManualChemistryTrained
+  name: skills-manual-proto-chemistry-trained
+  description: skills-manual-proto-chemistry-trained-desc
+  components:
+  - type: SkillTrainingManual
+    skill: SkillChemistry
+    targetLevel: 3
+    minSkillToStudy: 2
+    studyTime: 55
+
+- type: entity
+  parent: BookBase
+  id: FishSkillManualWeaponsBasic
+  name: skills-manual-proto-weapons-basic
+  description: skills-manual-proto-weapons-basic-desc
+  components:
+  - type: Sprite
+    sprite: Objects/Misc/books.rsi
+    layers:
+    - state: paper
+    - state: cover_base
+      color: "#555555"
+    - state: icon_text
+  - type: SkillTrainingManual
+    skill: SkillWeapons
+    targetLevel: 2
+    minSkillToStudy: 1
+    studyTime: 35
+
+- type: entity
+  parent: BookBase
+  id: FishSkillManualWeaponsTrained
+  name: skills-manual-proto-weapons-trained
+  description: skills-manual-proto-weapons-trained-desc
+  components:
+  - type: SkillTrainingManual
+    skill: SkillWeapons
+    targetLevel: 3
+    minSkillToStudy: 2
+    studyTime: 50
+
+- type: entity
+  parent: BookBase
+  id: FishSkillManualComputerBasic
+  name: skills-manual-proto-computer-basic
+  description: skills-manual-proto-computer-basic-desc
+  components:
+  - type: Sprite
+    sprite: Objects/Misc/books.rsi
+    layers:
+    - state: paper
+    - state: cover_base
+      color: "#6a5acd"
+    - state: icon_text
+  - type: SkillTrainingManual
+    skill: SkillComputer
+    targetLevel: 2
+    minSkillToStudy: 1
+    studyTime: 30
+
+- type: entity
+  parent: BookBase
+  id: FishSkillManualComputerTrained
+  name: skills-manual-proto-computer-trained
+  description: skills-manual-proto-computer-trained-desc
+  components:
+  - type: SkillTrainingManual
+    skill: SkillComputer
+    targetLevel: 3
+    minSkillToStudy: 2
+    studyTime: 45
+

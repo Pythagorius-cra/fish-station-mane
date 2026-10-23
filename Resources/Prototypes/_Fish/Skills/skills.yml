@@ -1,5 +1,5 @@
-# Навыки Fish: уровни Bay 1–5 + таблицы длительности/качества в духе SS1984 (master220).
-# SS1984: NONE 1.5 … LEGEND 0.5 (duration); heal amount 0.75…1.5; surgery success 0.5…2.
+# Навыки Fish Station. Уровни 1–5; стоимость шагов: 2 / 3 / 5 / 8 (мастер с нуля = 18).
+# Книги обучают максимум до уровня 4 (опытный).
 
 - type: skill
   id: SkillConstruction
@@ -9,7 +9,6 @@
   difficulty: 2
   defaultMax: 5
   delayFactor: 0.3
-  # SS1984 BUILDING_SPEED_MOD (сжато в 5 уровней)
   durationMultipliers:
     1: 1.5
     2: 1.25
@@ -25,7 +24,6 @@
   difficulty: 2
   defaultMax: 5
   delayFactor: 0.3
-  # SS1984 ELECTRICITY / LOCKPICK_SPEED_MOD
   durationMultipliers:
     1: 1.5
     2: 1.25
@@ -39,7 +37,7 @@
   description: skills-atmos-desc
   category: engineering
   difficulty: 2
-  defaultMax: 4
+  defaultMax: 5
   delayFactor: 0.3
   durationMultipliers:
     1: 1.5
@@ -57,7 +55,6 @@
   defaultMax: 5
   delayFactor: 0.3
   qualityFactor: 0.15
-  # SS1984 HEAL_DURATION_MOD + HEAL_AMOUNT_MOD
   durationMultipliers:
     1: 1.5
     2: 1.25
@@ -82,7 +79,6 @@
   qualityFactor: 0.15
   prerequisites:
     SkillMedical: 3
-  # SS1984 SURGERY_DURATION_MOD + SURGERY_SUCCESS_MOD
   durationMultipliers:
     1: 1.5
     2: 1.25
@@ -102,7 +98,7 @@
   description: skills-chemistry-desc
   category: medical
   difficulty: 4
-  defaultMax: 4
+  defaultMax: 5
 
 - type: skill
   id: SkillWeapons
@@ -110,7 +106,7 @@
   description: skills-weapons-desc
   category: security
   difficulty: 2
-  defaultMax: 4
+  defaultMax: 5
 
 - type: skill
   id: SkillComputer

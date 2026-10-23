@@ -6,18 +6,21 @@ using Robust.Shared.Prototypes;
 namespace Content.Shared._Fish.Skills;
 
 /// <summary>
-/// API навыков: Bay get_skill_value / skill_check / skill_delay_mult + SS1984 duration/quality tables.
+/// Общий API навыков Fish Station: уровень, проверка, множители времени и качества.
 /// </summary>
 public abstract partial class SharedSkillSystem : EntitySystem
 {
-    public const int DefaultJobSkillPoints = 22;
+    public const int DefaultJobSkillPoints = 14;
 
     [Dependency] protected IPrototypeManager Prototypes = default!;
     [Dependency] private SharedPopupSystem _popup = default!;
 
-    /// <summary>
-    /// Текущий уровень навыка (минимум SKILL_UNSKILLED).
-    /// </summary>
+    public override void Initialize()
+    {
+        base.Initialize();
+        InitializeTraining();
+    }
+
     public int GetSkillValue(EntityUid uid, ProtoId<SkillPrototype> skill, SkillsetComponent? skillset = null)
     {
         if (!Resolve(uid, ref skillset, false))
@@ -26,18 +29,11 @@ public abstract partial class SharedSkillSystem : EntitySystem
         return skillset.Skills.GetValueOrDefault(skill, SkillLevels.Unskilled);
     }
 
-    /// <summary>
-    /// Bay: skill_check — уровень >= needed.
-    /// </summary>
     public bool SkillCheck(EntityUid uid, ProtoId<SkillPrototype> skill, int needed, SkillsetComponent? skillset = null)
     {
         return GetSkillValue(uid, skill, skillset) >= needed;
     }
 
-    /// <summary>
-    /// Множитель длительности (SS1984 CALCULATE_SKILL_MOD для *_DURATION / *_SPEED_MOD).
-    /// Без таблицы в прототипе — Bay skill_delay_mult.
-    /// </summary>
     public float GetSkillDelayMultiplier(EntityUid uid, ProtoId<SkillPrototype> skill, float? factorOverride = null, SkillsetComponent? skillset = null)
     {
         var points = GetSkillValue(uid, skill, skillset);
@@ -55,9 +51,6 @@ public abstract partial class SharedSkillSystem : EntitySystem
         return Math.Max(0f, 1f + (SkillLevels.Baseline - points) * fallbackFactor);
     }
 
-    /// <summary>
-    /// Множитель качества/эффективности (SS1984 HEAL_AMOUNT_MOD / SURGERY_SUCCESS_MOD).
-    /// </summary>
     public float GetSkillQualityMultiplier(EntityUid uid, ProtoId<SkillPrototype> skill, SkillsetComponent? skillset = null)
     {
         var points = GetSkillValue(uid, skill, skillset);
@@ -150,9 +143,6 @@ public abstract partial class SharedSkillSystem : EntitySystem
         return true;
     }
 
-    /// <summary>
-    /// Краткая подсказка эффекта уровня для UI (скорость / эффективность).
-    /// </summary>
     public string FormatEffectHint(ProtoId<SkillPrototype> skill, int level)
     {
         if (!Prototypes.TryIndex(skill, out SkillPrototype? proto))
@@ -179,9 +169,6 @@ public abstract partial class SharedSkillSystem : EntitySystem
         return string.Empty;
     }
 
-    private static string FormatPercent(float mult)
-    {
-        return $"{Math.Round(mult * 100f):0}%";
-    }
+    private static string FormatPercent(float mult) => $"{Math.Round(mult * 100f):0}%";
 }
-
+

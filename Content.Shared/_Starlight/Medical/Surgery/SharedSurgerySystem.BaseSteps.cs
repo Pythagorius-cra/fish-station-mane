@@ -7,6 +7,7 @@ using Content.Shared.Item;
 using Content.Shared.Item.ItemToggle.Components;
 using Content.Shared.Popups;
 using Content.Shared._Fish.Achievements.Events;
+using Content.Shared._Fish.Skills;
 using Content.Shared.Starlight.Medical.Surgery.Effects.Step;
 using Content.Shared.Starlight.Medical.Surgery.Events;
 using Content.Shared.Starlight.Medical.Surgery.Steps;
@@ -256,6 +257,11 @@ public abstract partial class SharedSurgerySystem
             return;
         }
 
+        // Fish-start: хирургия требует базовой анатомии (вики: навык «Хирургия»)
+        if (_skills.TryDenyMissingSkill(user, "SkillAnatomy", SkillLevels.Basic, "skills-surgery-need-anatomy"))
+            return;
+        // Fish-end
+
         if (_net.IsServer && TryComp(step, out MetaDataComponent? meta))
         {
             var surgeonName = MetaData(user).EntityName;
@@ -275,7 +281,7 @@ public abstract partial class SharedSurgerySystem
                     SmallestSuccessRate = toolComp.SuccessRate;
             }
 
-        // Fish-start: SS1984 SURGERY_DURATION_MOD / SURGERY_SUCCESS_MOD через SkillAnatomy
+        // Fish-start: скорость и шанс успеха хирургии от анатомии
         duration *= _skills.GetSkillDelayMultiplier(user, "SkillAnatomy");
         SmallestSuccessRate = Math.Clamp(
             SmallestSuccessRate * _skills.GetSkillQualityMultiplier(user, "SkillAnatomy"),
