@@ -12,7 +12,7 @@ using Robust.Shared.Prototypes;
 namespace Content.Server._Fish.Skills;
 
 /// <summary>
-/// РЎРµСЂРІРµСЂРЅР°СЏ Р»РѕРіРёРєР° РЅР°РІС‹РєРѕРІ: Р±СЋРґР¶РµС‚ СЂРѕР»Рё, СЂР°СЃРїСЂРµРґРµР»РµРЅРёРµ, РѕР±СѓС‡РµРЅРёРµ, СЌС„С„РµРєС‚С‹.
+/// Серверная логика навыков: бюджет роли, распределение, обучение, эффекты.
 /// </summary>
 public sealed partial class SkillSystem : SharedSkillSystem
 {
@@ -33,6 +33,7 @@ public sealed partial class SkillSystem : SharedSkillSystem
 
         SubscribeLocalEvent<PlayerSpawnCompleteEvent>(OnPlayerSpawnComplete);
         SubscribeLocalEvent<SkillsetComponent, GetVerbsEvent<Verb>>(OnGetVerbs);
+        SubscribeNetworkEvent<RequestOpenSkillsEuiEvent>(OnRequestOpenSkills);
         InitializeAuthoring();
     }
 
@@ -42,6 +43,25 @@ public sealed partial class SkillSystem : SharedSkillSystem
             return;
 
         EnsureSkillset(args.Mob, jobId);
+
+        // Автооткрытие при спавне, пока очки ещё не подтверждены.
+        if (TryComp<SkillsetComponent>(args.Mob, out var skillset) &&
+            !skillset.Locked &&
+            TryComp<ActorComponent>(args.Mob, out var actor))
+        {
+            OpenSkillsUi(args.Mob, actor.PlayerSession);
+        }
+    }
+
+    private void OnRequestOpenSkills(RequestOpenSkillsEuiEvent ev, EntitySessionEventArgs args)
+    {
+        if (args.SenderSession.AttachedEntity is not { } uid)
+            return;
+
+        if (!HasComp<SkillsetComponent>(uid))
+            return;
+
+        OpenSkillsUi(uid, args.SenderSession);
     }
 
     public void EnsureSkillset(EntityUid mob, ProtoId<JobPrototype> jobId)
@@ -109,6 +129,7 @@ public sealed partial class SkillSystem : SharedSkillSystem
         if (!HasComp<SkillsetComponent>(uid))
             return;
 
+        // Уже открыто — только обновить; иначе создать заново (после CloseEui).
         if (_openUis.TryGetValue(session, out var existing))
         {
             existing.StateDirty();
@@ -169,12 +190,16 @@ public sealed partial class SkillSystem : SharedSkillSystem
                 FormatEffectHint(skill.ID, current)));
         }
 
+        string? status = null;
+        if (skillset.Locked)
+            status = Loc.GetString("skills-status-confirmed");
+
         return new SkillEuiState(
             skillset.RemainingPoints,
             skillset.TotalPoints,
             skillset.Locked,
             jobName,
-            null,
+            status,
             entries);
     }
 

@@ -1,4 +1,5 @@
 using Content.Shared.Roles;
+using Robust.Shared.GameObjects;
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
 
@@ -8,7 +9,7 @@ namespace Content.Shared._Fish.Skills;
 /// Набор навыков сущности на текущий раунд.
 /// </summary>
 [RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
-[Access(typeof(SharedSkillSystem))]
+[Access(typeof(SharedSkillSystem), Other = AccessPermissions.Read)]
 public sealed partial class SkillsetComponent : Component
 {
     [DataField, AutoNetworkedField]

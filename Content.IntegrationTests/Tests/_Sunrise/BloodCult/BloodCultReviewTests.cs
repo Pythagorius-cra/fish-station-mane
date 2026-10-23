@@ -258,14 +258,17 @@ public sealed class BloodCultReviewTests
 
         await server.WaitPost(() =>
         {
-            // Пустой CultTargets → TargetsKill() == true (All на пустой коллекции).
+            // Fish-edit: нужен хотя бы один убитый таргет — пустой список больше не проходит TargetsKill().
             var rule = server.EntMan.Spawn("Paper", map.MapCoords);
-            server.EntMan.EnsureComponent<BloodCultRuleComponent>(rule);
+            var ruleComp = server.EntMan.EnsureComponent<BloodCultRuleComponent>(rule);
             server.EntMan.EnsureComponent<GameRuleComponent>(rule);
 
             user = server.EntMan.Spawn("MobHuman", map.MapCoords);
             server.EntMan.EnsureComponent<BloodCultistComponent>(user);
             server.EntMan.EnsureComponent<DoAfterComponent>(user);
+
+            var victim = server.EntMan.Spawn("MobHuman", map.MapCoords);
+            ruleComp.CultTargets[victim] = true;
 
             rune = server.EntMan.Spawn("ApocalypseRune", map.MapCoords);
             var apoc = server.EntMan.GetComponent<CultRuneApocalypseComponent>(rune);

@@ -3,23 +3,27 @@ using Robust.Shared.Serialization;
 namespace Content.Shared._Fish.Skills;
 
 /// <summary>
-/// Запись навыка для EUI состояния. BUI-контракт навыков удалён — интерфейс идёт через EUI.
+/// Запись навыка для EUI. Нужен пустой конструктор для сетевой десериализации.
 /// </summary>
 [Serializable, NetSerializable]
 public sealed class SkillUiEntry
 {
-    public readonly string SkillId;
-    public readonly string Name;
-    public readonly string Description;
-    public readonly string Category;
-    public readonly int CurrentLevel;
-    public readonly int MinLevel;
-    public readonly int MaxLevel;
-    public readonly int NextLevelCost;
-    public readonly bool CanIncrease;
-    public readonly bool CanDecrease;
-    public readonly string? BlockReason;
-    public readonly string? EffectHint;
+    public string SkillId = string.Empty;
+    public string Name = string.Empty;
+    public string Description = string.Empty;
+    public string Category = string.Empty;
+    public int CurrentLevel;
+    public int MinLevel;
+    public int MaxLevel;
+    public int NextLevelCost;
+    public bool CanIncrease;
+    public bool CanDecrease;
+    public string? BlockReason;
+    public string? EffectHint;
+
+    public SkillUiEntry()
+    {
+    }
 
     public SkillUiEntry(
         string skillId,
