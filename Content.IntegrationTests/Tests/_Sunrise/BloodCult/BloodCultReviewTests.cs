@@ -268,7 +268,10 @@ public sealed class BloodCultReviewTests
             server.EntMan.EnsureComponent<DoAfterComponent>(user);
 
             var victim = server.EntMan.Spawn("MobHuman", map.MapCoords);
-            ruleComp.CultTargets[victim] = true;
+            // Fish-edit: запись в CultTargets только через BloodCultRuleSystem (RA0002 Access).
+            var cultRule = server.System<BloodCultRuleSystem>();
+            Assert.That(cultRule.AddSpecificCultTarget(victim, ruleComp), Is.True);
+            Assert.That(cultRule.MarkCultTargetKilled(victim, ruleComp), Is.True);
 
             rune = server.EntMan.Spawn("ApocalypseRune", map.MapCoords);
             var apoc = server.EntMan.GetComponent<CultRuneApocalypseComponent>(rune);

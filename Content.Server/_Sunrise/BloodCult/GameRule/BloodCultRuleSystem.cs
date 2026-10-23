@@ -172,6 +172,20 @@ public sealed partial class BloodCultRuleSystem : GameRuleSystem<BloodCultRuleCo
         return true;
     }
 
+    // Fish-start: публичный API для тестов/админки — без прямой записи в CultTargets извне Access.
+    /// <summary>
+    /// Пометить цель культа как убитую/принесённую в жертву.
+    /// </summary>
+    public bool MarkCultTargetKilled(EntityUid target, BloodCultRuleComponent rule)
+    {
+        if (!rule.CultTargets.ContainsKey(target))
+            return false;
+
+        rule.CultTargets[target] = true;
+        return true;
+    }
+    // Fish-end
+
     /// <summary>
     /// Manually remove a specific entity as a cult target.
     /// </summary>

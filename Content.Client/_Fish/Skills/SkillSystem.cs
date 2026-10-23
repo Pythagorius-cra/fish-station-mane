@@ -3,9 +3,9 @@ using Robust.Client.Player;
 
 namespace Content.Client._Fish.Skills;
 
-public sealed class SkillSystem : SharedSkillSystem
+public sealed partial class SkillSystem : SharedSkillSystem
 {
-    [Dependency] private readonly IPlayerManager _players = default!;
+    [Dependency] private IPlayerManager _players = default!;
 
     public void RequestOpenSkillsUi()
     {
