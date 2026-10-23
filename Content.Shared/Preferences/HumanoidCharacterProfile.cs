@@ -233,6 +233,9 @@ namespace Content.Shared.Preferences
                 Sex = sex.Value,
                 Appearance = HumanoidCharacterAppearance.DefaultWithSpecies(species.Value, sex.Value),
                 SunriseProfile = SunriseCharacterProfile.DefaultForSpecies(species.Value, sex.Value), // Sunrise-Edit
+                // Fish-start - защита от целей антагов включена по умолчанию
+                _traitPreferences = new HashSet<ProtoId<TraitPrototype>> { "FishAntagTargetProtection" },
+                // Fish-end
             };
         }
 

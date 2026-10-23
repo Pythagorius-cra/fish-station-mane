@@ -62,6 +62,18 @@
     sound:
       path: /Audio/_Sunrise/Items/Handling/cloth_drop.ogg
   # Sunrise end
+  # Fish-start - слот медали на форме
+  - type: ItemSlots
+    allowSmartEquip: true
+    slots:
+      medal:
+        name: fish-clothing-slot-medal
+        insertOnInteract: true
+        whitelist:
+          tags:
+          - Medal
+  - type: MedalHolder
+  # Fish-end
 
 - type: entity
   abstract: true

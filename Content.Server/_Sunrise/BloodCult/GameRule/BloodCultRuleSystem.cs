@@ -481,12 +481,20 @@ public sealed partial class BloodCultRuleSystem : GameRuleSystem<BloodCultRuleCo
     private List<EntityUid> FindPotentialTargets()
     {
         var potentialTargets = new List<EntityUid>();
+        // Fish-start - исключаем защищённых от целей антагов
+        var protection = EntityManager.System<Content.Shared._Fish.Antag.SharedAntagTargetingProtectionSystem>();
+        // Fish-end
 
         var query = EntityQueryEnumerator<MindContainerComponent, AntagTargetComponent, HumanoidProfileComponent>();
         while (query.MoveNext(out var uid, out var mind, out _, out _))
         {
             if (mind.Mind == null || HasComp<BloodCultistComponent>(uid))
                 continue;
+
+            // Fish-start
+            if (protection.IsBodyProtected(uid, mind.Mind))
+                continue;
+            // Fish-end
 
             potentialTargets.Add(uid);
         }
