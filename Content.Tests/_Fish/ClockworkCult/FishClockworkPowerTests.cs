@@ -29,15 +29,8 @@ public sealed class FishClockworkPowerTests
     [Test]
     public void ArkPrepMinutes_ClampsToMax()
     {
-        // ark_time = min(35, 30 + players/5)
-        static int Calc(int players) =>
-            Math.Min(
-                FishClockworkCultConstants.ArkMaxPrepMinutes,
-                FishClockworkCultConstants.ArkBasePrepMinutes +
-                players / FishClockworkCultConstants.ArkPlayersPerExtraMinute);
-
-        Assert.That(Calc(0), Is.EqualTo(30));
-        Assert.That(Calc(25), Is.EqualTo(35));
-        Assert.That(Calc(100), Is.EqualTo(35));
+        Assert.That(FishClockworkCultConstants.CalculateArkPrepMinutes(0), Is.EqualTo(30));
+        Assert.That(FishClockworkCultConstants.CalculateArkPrepMinutes(25), Is.EqualTo(35));
+        Assert.That(FishClockworkCultConstants.CalculateArkPrepMinutes(100), Is.EqualTo(35));
     }
 }

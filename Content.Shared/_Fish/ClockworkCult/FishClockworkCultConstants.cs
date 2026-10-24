@@ -30,6 +30,12 @@ public static class FishClockworkCultConstants
     public const int ArkMaxPrepMinutes = 35;
     public const int ArkPlayersPerExtraMinute = 5;
 
+    /// <summary>
+    /// Длительность prep Ковчега: min(35, 30 + players/5).
+    /// </summary>
+    public static int CalculateArkPrepMinutes(int players) =>
+        Math.Min(ArkMaxPrepMinutes, ArkBasePrepMinutes + Math.Max(0, players) / ArkPlayersPerExtraMinute);
+
     public const float IntegrationCogDrainWattsPerSecond = 5f;
     public const float StargazerPowerPerSecond = 5f;
     public const float VitalityReviveCost = 150f;

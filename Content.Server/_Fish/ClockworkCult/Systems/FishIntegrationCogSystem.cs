@@ -19,11 +19,13 @@ public sealed partial class FishIntegrationCogSystem : EntitySystem
     [Dependency] private SharedPopupSystem _popup = default!;
     [Dependency] private FishClockworkPowerSystem _power = default!;
     [Dependency] private FishClockworkServantSystem _servant = default!;
-    [Dependency] private SharedTransformSystem _transform = default!;
+
+    private EntityQuery<BatteryComponent> _batteryQuery;
 
     public override void Initialize()
     {
         base.Initialize();
+        _batteryQuery = GetEntityQuery<BatteryComponent>();
         SubscribeLocalEvent<FishIntegrationCogComponent, AfterInteractEvent>(OnAfterInteract);
     }
 
@@ -31,15 +33,13 @@ public sealed partial class FishIntegrationCogSystem : EntitySystem
     {
         base.Update(frameTime);
 
-        var query = EntityQueryEnumerator<FishIntegrationCogComponent>();
-        while (query.MoveNext(out var uid, out var cog))
+        // Fish-edit: drain на APC-хосте после удаления предмета-шестерни.
+        var query = EntityQueryEnumerator<FishIntegrationCogHostComponent>();
+        while (query.MoveNext(out var uid, out var host))
         {
-            if (!cog.Installed || cog.HostApc == null || !Exists(cog.HostApc.Value))
-                continue;
-
-            var drain = cog.DrainWattsPerSecond * frameTime;
-            if (TryComp(cog.HostApc.Value, out BatteryComponent? battery) &&
-                _battery.TryUseCharge((cog.HostApc.Value, battery), drain))
+            var drain = host.DrainWattsPerSecond * frameTime;
+            if (_batteryQuery.TryComp(uid, out var battery) &&
+                _battery.TryUseCharge((uid, battery), drain))
             {
                 _power.TryAdjustPower(drain, quiet: true);
             }
@@ -79,22 +79,28 @@ public sealed partial class FishIntegrationCogSystem : EntitySystem
             return false;
         }
 
+        if (HasComp<FishIntegrationCogHostComponent>(target))
+        {
+            if (!quiet)
+                _popup.PopupEntity(Loc.GetString("fish-clockwork-cog-installed"), user, user);
+            return false;
+        }
+
         return true;
     }
 
     private void DoInstall(Entity<FishIntegrationCogComponent> cog, EntityUid user, EntityUid apc)
     {
-        cog.Comp.Installed = true;
-        cog.Comp.HostApc = apc;
-        Dirty(cog);
-
-        // «Прячем» шестерёнку в APC — прикрепляем координаты к APC.
-        _transform.SetCoordinates(cog.Owner, Transform(apc).Coordinates);
+        var host = EnsureComp<FishIntegrationCogHostComponent>(apc);
+        host.DrainWattsPerSecond = cog.Comp.DrainWattsPerSecond;
+        Dirty(apc, host);
 
         _audio.PlayPvs(
             new SoundPathSpecifier("/Audio/_Fish/ClockworkCult/machines/clockcult/integration_cog_install.ogg"),
             apc);
         _popup.PopupEntity(Loc.GetString("fish-clockwork-cog-installed"), user, user);
+
+        // Fish-edit: удаляем предмет, чтобы нельзя было поднять установленную шестерню.
+        QueueDel(cog.Owner);
     }
 }
-

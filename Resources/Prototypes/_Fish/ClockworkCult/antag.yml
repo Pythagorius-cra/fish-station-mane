@@ -17,7 +17,7 @@
   parent: BaseAntagSpecifier
   id: FishClockworkServant
   prefRoles: [ FishClockworkServant ]
-  spawnerPrototype: FishSpawnPointClockworkServant
+  spawnerPrototype: FishSpawnPointGhostClockworkServant # Fish-edit: BaseAntagSpawner для ghost roles
   startingGear: FishClockworkServantGear
   blacklist:
     components:

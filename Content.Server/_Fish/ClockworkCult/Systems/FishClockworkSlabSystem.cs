@@ -5,6 +5,8 @@ using Content.Shared._Fish.ClockworkCult.Events;
 using Content.Shared._Fish.ClockworkCult.Prototypes;
 using Content.Shared._Fish.ClockworkCult.UI;
 using Content.Shared.DoAfter;
+using Content.Shared.Mobs.Components;
+using Content.Shared.Mobs.Systems;
 using Content.Shared.Popups;
 using Content.Shared.UserInterface;
 using Robust.Server.GameObjects;
@@ -18,6 +20,7 @@ namespace Content.Server._Fish.ClockworkCult.Systems;
 public sealed partial class FishClockworkSlabSystem : EntitySystem
 {
     [Dependency] private DoAfterSystem _doAfter = default!;
+    [Dependency] private MobStateSystem _mobState = default!;
     [Dependency] private SharedPopupSystem _popup = default!;
     [Dependency] private FishClockworkPowerSystem _power = default!;
     [Dependency] private IPrototypeManager _prototypes = default!;
@@ -106,10 +109,14 @@ public sealed partial class FishClockworkSlabSystem : EntitySystem
         if (proto.InvokersRequired > 1)
         {
             var nearby = 0;
-            var query = EntityQueryEnumerator<FishClockworkServantComponent, TransformComponent>();
+            // Fish-edit: только живые слуги считаются инвокерами.
+            var query = EntityQueryEnumerator<FishClockworkServantComponent, MobStateComponent, TransformComponent>();
             var origin = Transform(user).Coordinates;
-            while (query.MoveNext(out var servant, out _, out var xform))
+            while (query.MoveNext(out var servant, out _, out var mob, out var xform))
             {
+                if (!_mobState.IsAlive(servant, mob))
+                    continue;
+
                 if (xform.Coordinates.TryDistance(EntityManager, origin, out var dist) && dist <= 1.5f)
                     nearby++;
             }
@@ -159,9 +166,12 @@ public sealed partial class FishClockworkSlabSystem : EntitySystem
         while (arkQuery.MoveNext(out _, out var ark))
         {
             arkPhase = ark.Phase;
+            // Fish-edit: Prep с отрицательным таймером → null (--:--), не 00:00.
             arkRemaining = ark.Phase switch
             {
-                FishClockworkArkPhase.Prep => TimeSpan.FromSeconds(Math.Max(0, ark.SecondsUntilActivation)),
+                FishClockworkArkPhase.Prep => ark.SecondsUntilActivation < 0
+                    ? null
+                    : TimeSpan.FromSeconds(Math.Max(0, ark.SecondsUntilActivation)),
                 FishClockworkArkPhase.Grace => TimeSpan.FromSeconds(Math.Max(0, ark.GracePeriodRemaining)),
                 FishClockworkArkPhase.Defense => TimeSpan.FromSeconds(Math.Max(0, FishClockworkCultConstants.GatewayRatvarArrival - ark.ProgressSeconds)),
                 _ => null,
@@ -170,7 +180,18 @@ public sealed partial class FishClockworkSlabSystem : EntitySystem
         }
 
         var scriptures = new List<FishClockworkScriptureEntry>();
-        foreach (var proto in _prototypes.EnumeratePrototypes<FishClockworkScripturePrototype>())
+        // Fish-edit: сортировка по Tier / SortPriority / ID из прототипа.
+        var protos = new List<FishClockworkScripturePrototype>(_prototypes.EnumeratePrototypes<FishClockworkScripturePrototype>());
+        protos.Sort((a, b) =>
+        {
+            var tier = a.Tier.CompareTo(b.Tier);
+            if (tier != 0)
+                return tier;
+            var priority = a.SortPriority.CompareTo(b.SortPriority);
+            return priority != 0 ? priority : string.Compare(a.ID, b.ID, StringComparison.Ordinal);
+        });
+
+        foreach (var proto in protos)
         {
             var available = true;
             string? reason = null;
@@ -202,12 +223,6 @@ public sealed partial class FishClockworkSlabSystem : EntitySystem
                 available,
                 reason));
         }
-
-        scriptures.Sort((a, b) =>
-        {
-            var tier = a.Tier.CompareTo(b.Tier);
-            return tier != 0 ? tier : string.Compare(a.Name, b.Name, StringComparison.Ordinal);
-        });
 
         var state = new FishClockworkSlabBoundUserInterfaceState(
             power?.Power ?? 0f,

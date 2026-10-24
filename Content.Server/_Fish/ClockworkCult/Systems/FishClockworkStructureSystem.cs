@@ -17,6 +17,7 @@ using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
+using Robust.Shared.Maths;
 using Robust.Shared.Physics;
 using Robust.Shared.Physics.Components;
 using Robust.Shared.Physics.Systems;
@@ -140,12 +141,16 @@ public sealed partial class FishClockworkStructureSystem : EntitySystem
         var query = EntityQueryEnumerator<FishStargazerComponent, TransformComponent>();
         while (query.MoveNext(out var uid, out var gazer, out var xform))
         {
-            if (!HasStarlight(xform))
-                continue;
-
             gazer.Accumulator += frameTime;
             if (gazer.Accumulator < 1f)
                 continue;
+
+            // Fish-edit: сначала accumulator, потом дорогая проверка starlight.
+            if (!HasStarlight(xform))
+            {
+                gazer.Accumulator = 0f;
+                continue;
+            }
 
             gazer.Accumulator = 0f;
             _power.TryAdjustPower(gazer.PowerPerSecond);
@@ -154,15 +159,24 @@ public sealed partial class FishClockworkStructureSystem : EntitySystem
 
     private bool HasStarlight(TransformComponent xform)
     {
-        // Упрощение tg «starlight»: рядом с космосом (нет MapGrid) или у края грида.
+        // Упрощение tg «starlight»: нет грида или соседний тайл пуст (край / космос).
         if (xform.GridUid == null)
             return true;
 
         if (!TryComp<MapGridComponent>(xform.GridUid.Value, out var grid))
             return true;
 
-        var tile = _maps.GetTileRef(xform.GridUid.Value, grid, xform.Coordinates);
-        return tile.Tile.IsEmpty;
+        var indices = _maps.TileIndicesFor(xform.GridUid.Value, grid, xform.Coordinates);
+        // Fish-start: проверяем 4 соседа — собственный тайл структуры почти всегда заполнен.
+        foreach (var offset in new[] { new Vector2i(1, 0), new Vector2i(-1, 0), new Vector2i(0, 1), new Vector2i(0, -1) })
+        {
+            var neighbor = _maps.GetTileRef(xform.GridUid.Value, grid, indices + offset);
+            if (neighbor.Tile.IsEmpty)
+                return true;
+        }
+        // Fish-end
+
+        return false;
     }
 
     private void OnHeraldActivate(Entity<FishHeraldBeaconComponent> ent, ref ActivateInWorldEvent args)
@@ -333,13 +347,7 @@ public sealed partial class FishClockworkStructureSystem : EntitySystem
             return;
         }
 
-        if (!_power.TrySpendPower(ent.Comp.GatewayPowerCost))
-        {
-            _popup.PopupEntity(Loc.GetString("fish-clockwork-not-enough-power"), user, user);
-            return;
-        }
-
-        // Цель — ближайший живой слуга (не пользователь) или Reebe marker.
+        // Fish-start: сначала цель, потом списание — без refund/эксплойта HeraldCostMultiplier.
         EntityCoordinates? dest = null;
         var query = EntityQueryEnumerator<FishClockworkServantComponent, MobStateComponent, TransformComponent>();
         while (query.MoveNext(out var servant, out _, out var mob, out var xform))
@@ -366,9 +374,15 @@ public sealed partial class FishClockworkStructureSystem : EntitySystem
         if (dest == null)
         {
             _popup.PopupEntity(Loc.GetString("fish-clockwork-gateway-no-targets"), user, user);
-            _power.TryAdjustPower(ent.Comp.GatewayPowerCost, quiet: true); // refund
             return;
         }
+
+        if (!_power.TrySpendPower(ent.Comp.GatewayPowerCost))
+        {
+            _popup.PopupEntity(Loc.GetString("fish-clockwork-not-enough-power"), user, user);
+            return;
+        }
+        // Fish-end
 
         var portal = Spawn("FishSpatialGatewayPortal", Transform(ent).Coordinates);
         var rift = EnsureComp<FishCityOfCogsRiftComponent>(portal);
@@ -434,7 +448,10 @@ public sealed partial class FishClockworkStructureSystem : EntitySystem
 
         foreach (var hit in args.HitEntities)
         {
-            if (_servant.IsServant(hit))
+            // Fish-edit: vitality только за живых мобов, не за стены/трупы.
+            if (_servant.IsServant(hit) ||
+                !TryComp<MobStateComponent>(hit, out var mob) ||
+                !_mobState.IsAlive(hit, mob))
                 continue;
             _power.AdjustVitality(ent.Comp.VitalityPerHit);
         }

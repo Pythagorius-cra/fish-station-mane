@@ -26,6 +26,15 @@ public sealed partial class FishReplicaFabricatorSystem : EntitySystem
 
     private static readonly EntProtoId SheetBrass = "SheetBrass1";
 
+    // Fish-start: whitelist обычных металлических стен (не reinforced/rock/wood).
+    private static readonly HashSet<string> ConvertibleWalls = new(StringComparer.Ordinal)
+    {
+        "WallSolid",
+        "WallSolidDiagonal",
+        "WallSolidRust",
+    };
+    // Fish-end
+
     public override void Initialize()
     {
         base.Initialize();
@@ -39,7 +48,7 @@ public sealed partial class FishReplicaFabricatorSystem : EntitySystem
             return;
 
         var cost = FishClockworkCultConstants.BrassSheetCreateCost;
-        if (!SpendFabricatorPower(ent, cost))
+        if (!_power.TrySpendPower(cost))
         {
             _popup.PopupEntity(Loc.GetString("fish-clockwork-not-enough-power"), args.User, args.User);
             return;
@@ -58,6 +67,10 @@ public sealed partial class FishReplicaFabricatorSystem : EntitySystem
         if (args.Handled || !_servant.IsServant(args.User))
             return;
 
+        // Fish-edit: CanReach до любых действий (в т.ч. поглощения листов).
+        if (!args.CanReach)
+            return;
+
         if (args.Target != null && TryComp<StackComponent>(args.Target.Value, out var stack))
         {
             if (TryConsumeSheets(ent, args.User, args.Target.Value, stack))
@@ -67,16 +80,14 @@ public sealed partial class FishReplicaFabricatorSystem : EntitySystem
             }
         }
 
-        if (!args.CanReach)
-            return;
-
-        if (TryConvertFloor(ent, args.User, args.ClickLocation))
+        // Fish-edit: сначала стена, иначе пол под стеной «съедает» клик.
+        if (args.Target != null && TryConvertWall(ent, args.User, args.Target.Value))
         {
             args.Handled = true;
             return;
         }
 
-        if (args.Target != null && TryConvertWall(ent, args.User, args.Target.Value))
+        if (TryConvertFloor(ent, args.User, args.ClickLocation))
             args.Handled = true;
     }
 
@@ -95,10 +106,8 @@ public sealed partial class FishReplicaFabricatorSystem : EntitySystem
         if (!_stack.TryUse((stackUid, stack), amount))
             return false;
 
-        fab.Comp.StoredPower += gained;
-        // Полная отдача в глобальный пул (как POWER_METAL на tg).
+        // Fish-edit: только глобальный пул — без двойного учёта через StoredPower.
         _power.TryAdjustPower(gained, quiet: true);
-        Dirty(fab);
         _popup.PopupEntity(Loc.GetString("fish-clockwork-fabricator-absorb", ("amount", amount)), user, user);
         return true;
     }
@@ -123,20 +132,21 @@ public sealed partial class FishReplicaFabricatorSystem : EntitySystem
         if (!_turf.TryGetTileRef(coords, out var tile) || tile.Value.Tile.IsEmpty)
             return false;
 
-        if (!_power.HasPower(fab.Comp.FloorCost) && fab.Comp.StoredPower < fab.Comp.FloorCost)
+        if (!_tiles.TryGetDefinition("FloorBrassFilled", out var brassTile))
+            return false;
+
+        // Fish-edit: не списывать мощность за уже латунный пол.
+        if (tile.Value.Tile.TypeId == brassTile.TileId)
+            return false;
+
+        if (!_power.TrySpendPower(fab.Comp.FloorCost))
         {
             _popup.PopupEntity(Loc.GetString("fish-clockwork-not-enough-power"), user, user);
             return false;
         }
 
-        if (!_tiles.TryGetDefinition("FloorBrassFilled", out var brassTile))
-            return false;
-
         var gridUid = tile.Value.GridUid;
         if (!TryComp<MapGridComponent>(gridUid, out var grid))
-            return false;
-
-        if (!SpendFabricatorPower(fab, fab.Comp.FloorCost))
             return false;
 
         _map.SetTile(gridUid, grid, tile.Value.GridIndices, new Tile(brassTile.TileId));
@@ -147,19 +157,11 @@ public sealed partial class FishReplicaFabricatorSystem : EntitySystem
     private bool TryConvertWall(Entity<FishReplicaFabricatorComponent> fab, EntityUid user, EntityUid target)
     {
         var proto = MetaData(target).EntityPrototype?.ID ?? string.Empty;
-        if (!proto.Contains("Wall", StringComparison.Ordinal) ||
-            proto.Contains("Brass", StringComparison.Ordinal) ||
-            proto.Contains("Clockwork", StringComparison.Ordinal))
+        // Fish-edit: явный whitelist вместо StartsWith("Wall").
+        if (!ConvertibleWalls.Contains(proto))
             return false;
 
-        // Только обычные металлические/стальные стены.
-        if (!proto.Contains("Steel", StringComparison.Ordinal) &&
-            !proto.Contains("Solid", StringComparison.Ordinal) &&
-            proto != "WallSolid" &&
-            !proto.StartsWith("Wall", StringComparison.Ordinal))
-            return false;
-
-        if (!SpendFabricatorPower(fab, fab.Comp.WallCost))
+        if (!_power.TrySpendPower(fab.Comp.WallCost))
         {
             _popup.PopupEntity(Loc.GetString("fish-clockwork-not-enough-power"), user, user);
             return false;
@@ -171,17 +173,5 @@ public sealed partial class FishReplicaFabricatorSystem : EntitySystem
         Spawn(SheetBrass, coords);
         _popup.PopupEntity(Loc.GetString("fish-clockwork-fabricator-wall"), user, user);
         return true;
-    }
-
-    private bool SpendFabricatorPower(Entity<FishReplicaFabricatorComponent> fab, float cost)
-    {
-        if (fab.Comp.StoredPower >= cost)
-        {
-            fab.Comp.StoredPower -= cost;
-            Dirty(fab);
-            return true;
-        }
-
-        return _power.TrySpendPower(cost);
     }
 }

@@ -1,4 +1,5 @@
-﻿- type: entity
+﻿# Маркер на карте Reebe для AntagGridSpawnPoint (не ghost-role spawner).
+- type: entity
   parent: MarkerBase
   id: FishSpawnPointClockworkServant
   name: clockwork servant spawn
@@ -12,6 +13,29 @@
     servantSpawn: true
     abscondTarget: true
   - type: Sprite
+    layers:
+    - state: green
+    - sprite: _Fish/ClockworkCult/objects.rsi
+      state: dread_ipad
+
+# Ghost-role antag spawner для AntagSelection (нужен GhostRoleAntagSpawner).
+- type: entity
+  categories: [ HideSpawnMenu, Spawner ]
+  parent: BaseAntagSpawner
+  id: FishSpawnPointGhostClockworkServant
+  name: clockwork servant ghost role
+  suffix: Fish
+  components:
+  - type: GhostRole
+    name: roles-antag-fish-clockwork-servant-name
+    description: roles-antag-fish-clockwork-servant-objective
+    rules: ghost-role-information-rules-default-team-antagonist
+    raffle:
+      settings: default
+    mindRoles:
+    - FishMindRoleClockworkServant
+  - type: Sprite
+    sprite: Markers/jobs.rsi
     layers:
     - state: green
     - sprite: _Fish/ClockworkCult/objects.rsi

@@ -160,9 +160,10 @@ public sealed partial class FishClockworkTrapSystem : EntitySystem
         MarkTriggered(ent);
 
         // Минимальный эффект: дым + popup (блокировка видимости упрощена).
+        // Fish-edit: длительность из компонента, а не литерал.
         Spawn("Smoke", Transform(ent).Coordinates);
         _popup.PopupEntity(Loc.GetString("fish-clockwork-trap-steam"), victim, PopupType.MediumCaution);
-        _stun.TryKnockdown(victim, TimeSpan.FromSeconds(1.5f), refresh: true);
+        _stun.TryKnockdown(victim, TimeSpan.FromSeconds(ent.Comp.SteamDurationSeconds), refresh: true);
     }
 }
 

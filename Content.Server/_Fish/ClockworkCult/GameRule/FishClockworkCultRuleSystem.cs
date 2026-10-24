@@ -50,9 +50,7 @@ public sealed partial class FishClockworkCultRuleSystem : GameRuleSystem<FishClo
         Dirty(uid, power);
 
         var players = Math.Max(1, _player.PlayerCount);
-        var arkMinutes = Math.Min(
-            FishClockworkCultConstants.ArkMaxPrepMinutes,
-            FishClockworkCultConstants.ArkBasePrepMinutes + players / FishClockworkCultConstants.ArkPlayersPerExtraMinute);
+        var arkMinutes = FishClockworkCultConstants.CalculateArkPrepMinutes(players);
 
         // Привязка таймера к уже заспавненному Ark (LoadMapRule грузит карту раньше).
         var arkQuery = EntityQueryEnumerator<FishClockworkArkComponent>();

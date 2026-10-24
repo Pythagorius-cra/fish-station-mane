@@ -5,7 +5,8 @@ namespace Content.Shared._Fish.ClockworkCult.Components;
 /// <summary>
 /// Wraith Spectacles — true sight с постепенным уроном носителю.
 /// </summary>
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+// Fish-edit: без AutoGenerateComponentState — накопленный урон только серверный.
+[RegisterComponent]
 public sealed partial class FishWraithSpectaclesComponent : Component
 {
     [DataField]
@@ -15,9 +16,9 @@ public sealed partial class FishWraithSpectaclesComponent : Component
     public float HealPerSecondUnequipped = 0.25f;
 
     /// <summary>
-    /// Накопленный «глазной» урон (лечится при снятии).
+    /// Накопленный «глазной» урон (лечится при снятии). Только сервер.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField]
     public float AccumulatedEyeDamage;
 
     [ViewVariables]

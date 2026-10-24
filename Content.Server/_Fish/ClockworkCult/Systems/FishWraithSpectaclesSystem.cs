@@ -29,6 +29,8 @@ public sealed partial class FishWraithSpectaclesSystem : EntitySystem
     {
         base.Update(frameTime);
 
+        // Fish-edit: IsHeralded один раз за тик; без Dirty каждый кадр.
+        var heralded = _power.IsHeralded();
         var query = EntityQueryEnumerator<FishWraithSpectaclesComponent>();
         while (query.MoveNext(out var uid, out var specs))
         {
@@ -36,16 +38,13 @@ public sealed partial class FishWraithSpectaclesSystem : EntitySystem
             {
                 // Не надеты — постепенно «лечим» накопленный урон (метаданные).
                 if (specs.AccumulatedEyeDamage > 0f)
-                {
                     specs.AccumulatedEyeDamage = MathF.Max(0f, specs.AccumulatedEyeDamage - specs.HealPerSecondUnequipped * frameTime);
-                    Dirty(uid, specs);
-                }
 
                 continue;
             }
 
             // Heralded — без урона глазам (как на tg после herald).
-            if (_power.IsHeralded())
+            if (heralded)
                 continue;
 
             var amount = specs.EyeDamagePerSecond * frameTime;
@@ -55,17 +54,13 @@ public sealed partial class FishWraithSpectaclesSystem : EntitySystem
             var dmg = new DamageSpecifier();
             dmg.DamageDict[BluntDamage] = amount;
             if (_damageable.TryChangeDamage(wearer, dmg, origin: uid))
-            {
                 specs.AccumulatedEyeDamage += amount;
-                Dirty(uid, specs);
-            }
         }
     }
 
     private void OnEquipped(Entity<FishWraithSpectaclesComponent> ent, ref ClothingGotEquippedEvent args)
     {
         ent.Comp.Wearer = args.Wearer;
-        Dirty(ent);
     }
 
     private void OnUnequipped(Entity<FishWraithSpectaclesComponent> ent, ref ClothingGotUnequippedEvent args)
@@ -81,6 +76,5 @@ public sealed partial class FishWraithSpectaclesSystem : EntitySystem
         }
 
         ent.Comp.Wearer = null;
-        Dirty(ent);
     }
 }
