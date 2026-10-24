@@ -162,10 +162,10 @@ public sealed partial class FishComplexCritSystem : SharedFishComplexCritSystem
         MobStateComponent mobState)
     {
         var critScaleHealth = GetCritScaleHealth(uid, crit, damageable);
-        var oxy = GetDamage(damageable, Asphyxiation);
-        var brute = GetDamage(damageable, Blunt) + GetDamage(damageable, Slash) + GetDamage(damageable, Piercing);
-        var burn = GetDamage(damageable, Heat) + GetDamage(damageable, Shock);
-        var brain = GetDamage(damageable, Cellular);
+        var oxy = GetDamage(uid, Asphyxiation);
+        var brute = GetDamage(uid, Blunt) + GetDamage(uid, Slash) + GetDamage(uid, Piercing);
+        var burn = GetDamage(uid, Heat) + GetDamage(uid, Shock);
+        var brain = GetDamage(uid, Cellular);
 
         // guaranteed_death_threshold = health + oxy*0.5 - fire*0.67 - brute*0.67
         var guaranteedDeath = critScaleHealth + oxy * 0.5f - burn * 0.67f - brute * 0.67f;
@@ -364,7 +364,7 @@ public sealed partial class FishComplexCritSystem : SharedFishComplexCritSystem
             return;
 
         // Corazone / аналоги не портированы — только наличие сердца через компонент.
-        var oxy = GetDamage(damageable, Asphyxiation);
+        var oxy = GetDamage(uid, Asphyxiation);
         if (oxy > 0f)
             ApplyCellular(uid, 3f);
         else if (_random.Prob(0.10f))
@@ -457,10 +457,13 @@ public sealed partial class FishComplexCritSystem : SharedFishComplexCritSystem
         _stutter.DoStutter(uid, duration, refresh: false);
     }
 
-    private static float GetDamage(DamageableComponent damageable, ProtoId<DamageTypePrototype> type)
+    private float GetDamage(EntityUid uid, ProtoId<DamageTypePrototype> type)
     {
-        // Avoid DamageableSystem.GetAllDamage — it Clone()s the full specifier on every call.
-        return damageable.Damage.DamageDict.TryGetValue(type, out var val) ? (float)val : 0f;
+        // Fish-edit: DamageableComponent.Damage — AccessPermissions.None (RA0002); только через DamageableSystem.
+#pragma warning disable CS0618
+        var all = Damageable.GetAllDamage(uid);
+#pragma warning restore CS0618
+        return all.DamageDict.TryGetValue(type, out var val) ? (float)val : 0f;
     }
 
     private bool IsHungerAboveHypoglycemia(EntityUid uid)
