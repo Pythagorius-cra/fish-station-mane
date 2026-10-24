@@ -44,9 +44,9 @@
   suffix: Fish
   components:
   - type: Sprite
-    sprite: Clothing/Hands/Gloves/color.rsi
+    sprite: Clothing/Hands/Gloves/combat.rsi
   - type: Clothing
-    sprite: Clothing/Hands/Gloves/color.rsi
+    sprite: Clothing/Hands/Gloves/combat.rsi
 
 - type: entity
   parent: ClothingShoesBase
