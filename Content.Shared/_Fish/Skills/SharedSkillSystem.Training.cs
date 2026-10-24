@@ -121,6 +121,13 @@ public abstract partial class SharedSkillSystem
         failLoc = null;
         var skill = manual.Comp.Skill;
 
+        // Учебники только после Confirm — иначе бесплатные уровни можно вернуть в очки через TrySetLevel/Reset.
+        if (!skillset.Locked)
+        {
+            failLoc = "skills-error-not-confirmed";
+            return false;
+        }
+
         if (manual.Comp.TargetLevel > SkillMath.BookTrainingMaxLevel)
         {
             failLoc = "skills-manual-error-master-locked";

@@ -263,6 +263,9 @@ public sealed partial class SkillSystem : SharedSkillSystem
         foreach (var skill in Prototypes.EnumeratePrototypes<SkillPrototype>())
             skillset.Skills[skill.ID] = GetMinSkill(jobId, skill.ID);
 
+        // Сброс до Confirm должен снова разрешать изучение тех же учебников.
+        skillset.CompletedTrainings.Clear();
+
         Dirty(uid, skillset);
     }
 

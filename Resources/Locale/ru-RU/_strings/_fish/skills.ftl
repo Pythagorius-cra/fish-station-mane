@@ -14,6 +14,7 @@ skills-popup-budget-granted = OOC: Вам доступно очков навык
 skills-popup-confirmed = Распределение навыков подтверждено.
 
 skills-error-locked = Распределение уже подтверждено или недоступно.
+skills-error-not-confirmed = Сначала подтвердите распределение очков, затем изучайте учебники.
 skills-error-unknown-skill = Неизвестный навык.
 skills-error-prerequisites = Не выполнены предварительные требования.
 skills-error-no-points = Недостаточно очков навыков.

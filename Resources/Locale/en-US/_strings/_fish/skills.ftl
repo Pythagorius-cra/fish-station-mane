@@ -14,6 +14,7 @@ skills-popup-budget-granted = OOC: You have { $points } skill points. Open Skill
 skills-popup-confirmed = Skill allocation confirmed.
 
 skills-error-locked = Allocation is locked or unavailable.
+skills-error-not-confirmed = Confirm skill allocation before studying manuals.
 skills-error-unknown-skill = Unknown skill.
 skills-error-prerequisites = Prerequisites are not met.
 skills-error-no-points = Not enough skill points.
