@@ -16,10 +16,10 @@ using Robust.Shared.Prototypes;
 namespace Content.IntegrationTests.Tests._Fish.Crit;
 
 /// <summary>
-/// Интеграционные тесты переноса SS1984 Crit.
+/// Интеграционные тесты расширенного Crit.
 /// </summary>
-[TestOf(typeof(FishSs1984CritSystem))]
-public sealed class FishSs1984CritTests : InteractionTest
+[TestOf(typeof(FishComplexCritSystem))]
+public sealed class FishComplexCritTests : InteractionTest
 {
     protected override string PlayerPrototype => "MobHuman";
 
@@ -32,13 +32,13 @@ public sealed class FishSs1984CritTests : InteractionTest
     {
         var damageableSystem = SEntMan.System<DamageableSystem>();
         var mobThresholds = SEntMan.System<MobThresholdSystem>();
-        var critSystem = SEntMan.System<SharedFishSs1984CritSystem>();
+        var critSystem = SEntMan.System<SharedFishComplexCritSystem>();
 
         await AddAtmosphere();
         await SpawnTarget(TargetProtoId);
 
-        Assert.That(SEntMan.HasComponent<FishSs1984CritComponent>(STarget!.Value), Is.True,
-            "MobHuman должен иметь FishSs1984Crit");
+        Assert.That(SEntMan.HasComponent<FishComplexCritComponent>(STarget!.Value), Is.True,
+            "MobHuman должен иметь FishComplexCrit");
 
         var critThreshold = mobThresholds.GetThresholdForState(STarget.Value, MobState.Critical);
         var damage = new DamageSpecifier(ProtoMan.Index(BluntDamageTypeId), critThreshold);
@@ -119,7 +119,7 @@ public sealed class FishSs1984CritTests : InteractionTest
     [Test]
     public async Task ClearCardiacArrestViaApi()
     {
-        var critSystem = SEntMan.System<SharedFishSs1984CritSystem>();
+        var critSystem = SEntMan.System<SharedFishComplexCritSystem>();
 
         await AddAtmosphere();
         await SpawnTarget(TargetProtoId);
@@ -140,7 +140,7 @@ public sealed class FishSs1984CritTests : InteractionTest
     {
         var damageableSystem = SEntMan.System<DamageableSystem>();
         var mobThresholds = SEntMan.System<MobThresholdSystem>();
-        var critSystem = SEntMan.System<SharedFishSs1984CritSystem>();
+        var critSystem = SEntMan.System<SharedFishComplexCritSystem>();
 
         await AddAtmosphere();
         await SpawnTarget(TargetProtoId);
@@ -169,7 +169,7 @@ public sealed class FishSs1984CritTests : InteractionTest
         await AddAtmosphere();
         await SpawnTarget(TargetProtoId);
 
-        Assert.That(SEntMan.TryGetComponent<FishSs1984CritComponent>(STarget!.Value, out var crit), Is.True);
+        Assert.That(SEntMan.TryGetComponent<FishComplexCritComponent>(STarget!.Value, out var crit), Is.True);
         var dead = mobThresholds.GetThresholdForState(STarget.Value, MobState.Dead);
 
         // Dead остаётся ванильным (~200), иначе SetDamage(600) гибает сущность (Gib@Blunt400).

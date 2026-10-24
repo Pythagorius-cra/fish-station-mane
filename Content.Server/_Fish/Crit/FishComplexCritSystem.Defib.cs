@@ -5,17 +5,17 @@ using Content.Shared.Popups;
 
 namespace Content.Server._Fish.Crit;
 
-public sealed partial class FishSs1984CritSystem
+public sealed partial class FishComplexCritSystem
 {
     private void InitializeDefib()
     {
-        SubscribeLocalEvent<FishSs1984CritComponent, TargetDefibrillatedEvent>(OnDefibrillated);
+        SubscribeLocalEvent<FishComplexCritComponent, TargetDefibrillatedEvent>(OnDefibrillated);
     }
 
     /// <summary>
-    /// Дефибриллятор снимает остановку сердца (Paradise set_heartattack(FALSE)).
+    /// Дефибриллятор снимает остановку сердца (set_heartattack(FALSE)).
     /// </summary>
-    private void OnDefibrillated(Entity<FishSs1984CritComponent> ent, ref TargetDefibrillatedEvent args)
+    private void OnDefibrillated(Entity<FishComplexCritComponent> ent, ref TargetDefibrillatedEvent args)
     {
         if (IsUndergoingCardiacArrest(ent))
         {

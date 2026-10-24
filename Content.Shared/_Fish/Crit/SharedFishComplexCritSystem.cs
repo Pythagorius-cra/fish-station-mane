@@ -2,19 +2,23 @@ using Content.Shared._Fish.Reactions;
 using Content.Shared.ActionBlocker;
 using Content.Shared.Damage.Components;
 using Content.Shared.Damage.Systems;
+using Content.Shared.Jittering;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
 using Content.Shared.Standing;
+using Content.Shared.Sunrise.Eye;
+using Robust.Shared.Audio;
+using Robust.Shared.Audio.Systems;
 using Robust.Shared.Timing;
 using MobStateEnum = Content.Shared.Mobs.MobState;
 
 namespace Content.Shared._Fish.Crit;
 
 /// <summary>
-/// Shared API и soft-crit переопределения для SS1984 Crit.
+/// Shared API и soft-crit переопределения для Crit.
 /// </summary>
-public abstract partial class SharedFishSs1984CritSystem : EntitySystem
+public abstract partial class SharedFishComplexCritSystem : EntitySystem
 {
     [Dependency] protected DamageableSystem Damageable = default!;
     [Dependency] protected MobStateSystem MobStateSys = default!;
@@ -22,20 +26,31 @@ public abstract partial class SharedFishSs1984CritSystem : EntitySystem
     [Dependency] protected StandingStateSystem Standing = default!;
     [Dependency] protected IGameTiming Timing = default!;
     [Dependency] private ActionBlockerSystem _blocker = default!;
+    [Dependency] private SharedAudioSystem _audio = default!;
+    [Dependency] private SharedJitteringSystem _jitter = default!;
+    [Dependency] private SharedDarkenedVisionSystem _darkenedVision = default!;
+
+    private static readonly SoundSpecifier FallSound =
+        new SoundCollectionSpecifier("FishCritFall", AudioParams.Default.WithVolume(-2f));
+
+    /// <summary>Доп. затемнение экрана в Crit (тайлы от края).</summary>
+    private const float CritVisionDarkening = 3.5f;
+    private const float DeepCritVisionDarkening = 6f;
 
     public override void Initialize()
     {
         base.Initialize();
 
-        SubscribeLocalEvent<FishSs1984CritComponent, MapInitEvent>(OnMapInit);
-        SubscribeLocalEvent<FishSs1984CritComponent, ComponentShutdown>(OnShutdown);
-        SubscribeLocalEvent<FishSs1984CritComponent, MobStateChangedEvent>(OnMobStateChanged);
+        SubscribeLocalEvent<FishComplexCritComponent, MapInitEvent>(OnMapInit);
+        SubscribeLocalEvent<FishComplexCritComponent, ComponentShutdown>(OnShutdown);
+        SubscribeLocalEvent<FishComplexCritComponent, MobStateChangedEvent>(OnMobStateChanged);
+        SubscribeLocalEvent<FishComplexCritComponent, GetVisionDarkeningEvent>(OnGetVisionDarkening);
     }
 
-    private void OnMapInit(Entity<FishSs1984CritComponent> ent, ref MapInitEvent args)
+    private void OnMapInit(Entity<FishComplexCritComponent> ent, ref MapInitEvent args)
     {
         // Dead-порог НЕ поднимаем: GibBehavior срабатывает при Blunt 400,
-        // а Paradise complex-crit глубже -100 маппится на Critical 100–200 + documented deviation.
+        // а глубокий Crit маппится на Critical 100–200 без сдвига Death.
         if (TryComp<MobThresholdsComponent>(ent, out var thresholds) &&
             MobThreshold.TryGetThresholdForState(ent, MobStateEnum.Dead, out var dead, thresholds) &&
             dead != null)
@@ -48,7 +63,7 @@ public abstract partial class SharedFishSs1984CritSystem : EntitySystem
         Dirty(ent);
     }
 
-    private void OnShutdown(Entity<FishSs1984CritComponent> ent, ref ComponentShutdown args)
+    private void OnShutdown(Entity<FishComplexCritComponent> ent, ref ComponentShutdown args)
     {
         RemCompDeferred<FishCritShockComponent>(ent);
         RemCompDeferred<FishHeartFailureComponent>(ent);
@@ -57,8 +72,21 @@ public abstract partial class SharedFishSs1984CritSystem : EntitySystem
         RemCompDeferred<FishCritUnconsciousComponent>(ent);
     }
 
-    private void OnMobStateChanged(Entity<FishSs1984CritComponent> ent, ref MobStateChangedEvent args)
+    private void OnMobStateChanged(Entity<FishComplexCritComponent> ent, ref MobStateChangedEvent args)
     {
+        if (args.NewMobState == MobStateEnum.Critical || args.OldMobState == MobStateEnum.Critical)
+            _darkenedVision.UpdateVisionDarkening(ent.Owner);
+
+        if (args.NewMobState == MobStateEnum.Critical && args.OldMobState != MobStateEnum.Critical)
+        {
+            // Звук падения + дрожь при входе в Crit.
+            if (Timing.IsFirstTimePredicted)
+            {
+                _audio.PlayPvs(FallSound, ent);
+                _jitter.DoJitter(ent, TimeSpan.FromSeconds(2.5), refresh: true, amplitude: 12f, frequency: 5f);
+            }
+        }
+
         // Soft-crit: после входа в Critical сразу поднимаем, если нет полной бессознательности / огня.
         if (args.NewMobState != MobStateEnum.Critical)
             return;
@@ -70,21 +98,36 @@ public abstract partial class SharedFishSs1984CritSystem : EntitySystem
         _blocker.UpdateCanMove(ent.Owner);
     }
 
+    private void OnGetVisionDarkening(Entity<FishComplexCritComponent> ent, ref GetVisionDarkeningEvent args)
+    {
+        if (!MobStateSys.IsCritical(ent))
+            return;
+
+        var health = GetCritScaleHealth(ent);
+        args.Strength += health <= -50f ? DeepCritVisionDarkening : CritVisionDarkening;
+    }
+
+    /// <summary>Обновить затемнение (глубина Crit меняется без смены MobState).</summary>
+    protected void RefreshCritVision(EntityUid uid)
+    {
+        _darkenedVision.UpdateVisionDarkening(uid);
+    }
+
     /// <summary>
-    /// Paradise health = CritThreshold - TotalDamage (при CritThreshold=100).
+    /// health = CritThreshold - TotalDamage (при CritThreshold=100).
     /// </summary>
-    public float GetParadiseHealth(EntityUid uid, FishSs1984CritComponent? crit = null, DamageableComponent? damageable = null)
+    public float GetCritScaleHealth(EntityUid uid, FishComplexCritComponent? crit = null, DamageableComponent? damageable = null)
     {
         if (!Resolve(uid, ref crit, false) || !Resolve(uid, ref damageable, false))
             return 100f;
 
-#pragma warning disable CS0618 // GetTotalDamage нужен для маппинга шкалы Paradise
+#pragma warning disable CS0618 // GetTotalDamage нужен для маппинга шкалы CritScaleHealth
         var total = Damageable.GetTotalDamage((uid, damageable));
 #pragma warning restore CS0618
         return crit.CritDamageThreshold - (float)total;
     }
 
-    public bool IsInCritZone(EntityUid uid, FishSs1984CritComponent? crit = null, DamageableComponent? damageable = null)
+    public bool IsInCritZone(EntityUid uid, FishComplexCritComponent? crit = null, DamageableComponent? damageable = null)
     {
         if (!Resolve(uid, ref crit, false) || !Resolve(uid, ref damageable, false))
             return false;
@@ -106,7 +149,7 @@ public abstract partial class SharedFishSs1984CritSystem : EntitySystem
         if (state != MobStateEnum.Critical)
             return false;
 
-        if (!entMan.HasComponent<FishSs1984CritComponent>(uid))
+        if (!entMan.HasComponent<FishComplexCritComponent>(uid))
             return false;
 
         if (SharedFishCharacterReactionsSystem.ShouldSuppressSoftCritStand(entMan, uid))

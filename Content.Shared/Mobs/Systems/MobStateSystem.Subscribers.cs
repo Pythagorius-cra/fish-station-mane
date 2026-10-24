@@ -22,8 +22,7 @@ using Content.Shared.Throwing;
 using Content.Shared.Tools.Systems;
 using System.Linq;
 using Content.Shared.Popups;
-using Content.Shared._Fish.Crit; // Fish-edit: soft-crit SS1984
-
+using Content.Shared._Fish.Crit; // Fish-edit: soft-crit
 namespace Content.Shared.Mobs.Systems;
 
 public partial class MobStateSystem
@@ -69,8 +68,8 @@ public partial class MobStateSystem
                 args.Cancelled = true;
                 break;
             case MobState.Critical:
-                // Fish-start: SS1984 soft-crit — сознание сохраняется без полной парализации
-                if (SharedFishSs1984CritSystem.AllowsSoftCritActions(EntityManager, ent.Owner, MobState.Critical))
+                // Fish-start: soft-crit — сознание сохраняется без полной парализации
+                if (SharedFishComplexCritSystem.AllowsSoftCritActions(EntityManager, ent.Owner, MobState.Critical))
                     break;
                 // Fish-end
                 args.Cancelled = true;
@@ -191,8 +190,8 @@ public partial class MobStateSystem
                 args.Cancel();
                 break;
             case MobState.Critical:
-                // Fish-start: SS1984 soft-crit — действия разрешены пока нет FishCritUnconscious
-                if (SharedFishSs1984CritSystem.AllowsSoftCritActions(EntityManager, target, MobState.Critical))
+                // Fish-start: soft-crit — действия разрешены пока нет FishCritUnconscious
+                if (SharedFishComplexCritSystem.AllowsSoftCritActions(EntityManager, target, MobState.Critical))
                     break;
                 // Fish-end
                 args.Cancel();

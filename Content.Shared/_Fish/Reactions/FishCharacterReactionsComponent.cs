@@ -1,3 +1,4 @@
+using Robust.Shared.Audio;
 using Robust.Shared.GameStates;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
 
@@ -5,13 +6,13 @@ namespace Content.Shared._Fish.Reactions;
 
 /// <summary>
 /// Включает набор физических реакций персонажа (боль, кровь, огонь, взрывы в руках)
-/// и их связку с SS1984 Crit.
+/// и их связку с Crit.
 /// </summary>
 [RegisterComponent, NetworkedComponent, AutoGenerateComponentState, AutoGenerateComponentPause]
 [Access(typeof(SharedFishCharacterReactionsSystem))]
 public sealed partial class FishCharacterReactionsComponent : Component
 {
-    /// <summary>TG: 15% шанс детонации гранаты в руке от пули.</summary>
+    /// <summary>15% шанс детонации гранаты в руке от пули.</summary>
     [DataField, AutoNetworkedField]
     public float HeldExplosiveDetonateChance = 0.15f;
 
@@ -19,7 +20,7 @@ public sealed partial class FishCharacterReactionsComponent : Component
     [DataField, AutoNetworkedField]
     public float HeldExplosiveMinDamage = 1f;
 
-    /// <summary>Кулдаун кровоточащего следа (сек).</summary>
+    /// <summary>Кулдаун кровоточащего следа.</summary>
     [DataField, AutoNetworkedField]
     public TimeSpan BleedTrailCooldown = TimeSpan.FromSeconds(0.75);
 
@@ -37,4 +38,22 @@ public sealed partial class FishCharacterReactionsComponent : Component
 
     [DataField, AutoNetworkedField]
     public TimeSpan PainEmoteCooldown = TimeSpan.FromSeconds(2.5);
+
+    [DataField, AutoNetworkedField]
+    public SoundSpecifier PainSound =
+        new SoundCollectionSpecifier("FishCritPain", AudioParams.Default.WithVolume(-3f).WithVariation(0.1f));
+
+    [DataField, AutoNetworkedField]
+    public SoundSpecifier BleedSound =
+        new SoundCollectionSpecifier("FishCritBleed", AudioParams.Default.WithVolume(-6f).WithVariation(0.15f));
+
+    [DataField, AutoNetworkedField]
+    public SoundSpecifier BurnSound =
+        new SoundCollectionSpecifier("FishCritBurn", AudioParams.Default.WithVolume(-4f));
+
+    [DataField, AutoNetworkedField]
+    public TimeSpan PainJitterDuration = TimeSpan.FromSeconds(1.25);
+
+    [DataField, AutoNetworkedField]
+    public float PainJitterAmplitude = 10f;
 }

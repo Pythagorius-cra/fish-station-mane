@@ -24,9 +24,9 @@ using MobStateEnum = Content.Shared.Mobs.MobState;
 namespace Content.Server._Fish.Crit;
 
 /// <summary>
-/// Порт SS1984 handle_critical_condition + diseases critical + handle_heartattack + CPR hooks.
+/// Серверная логика расширенного Crit: осложнения, CPR, дефиб.
 /// </summary>
-public sealed partial class FishSs1984CritSystem : SharedFishSs1984CritSystem
+public sealed partial class FishComplexCritSystem : SharedFishComplexCritSystem
 {
     [Dependency] private ChatSystem _chat = default!;
     [Dependency] private PopupSystem _popup = default!;
@@ -100,7 +100,7 @@ public sealed partial class FishSs1984CritSystem : SharedFishSs1984CritSystem
         base.Update(frameTime);
 
         var cur = Timing.CurTime;
-        var query = EntityQueryEnumerator<FishSs1984CritComponent, DamageableComponent, MobStateComponent>();
+        var query = EntityQueryEnumerator<FishComplexCritComponent, DamageableComponent, MobStateComponent>();
         while (query.MoveNext(out var uid, out var crit, out var damageable, out var mobState))
         {
             if (mobState.CurrentState == MobStateEnum.Dead)
@@ -119,6 +119,9 @@ public sealed partial class FishSs1984CritSystem : SharedFishSs1984CritSystem
             HandleCriticalCondition(uid, crit, damageable, mobState);
             HandleComplications(uid, crit, damageable);
             HandleCardiacArrestTick(uid, damageable);
+
+            if (mobState.CurrentState == MobStateEnum.Critical)
+                RefreshCritVision(uid);
         }
 
         // LoseBreath decay каждый кадр — Remaining в секундах wall-clock.
@@ -135,7 +138,7 @@ public sealed partial class FishSs1984CritSystem : SharedFishSs1984CritSystem
             if (lose.Remaining < TimeSpan.Zero)
                 lose.Remaining = TimeSpan.Zero;
 
-            // Раз в секунду гасп / кислородный урон при LoseBreath (приближение Paradise breathe).
+            // Раз в секунду гасп / кислородный урон при LoseBreath (приближение breathe).
             if (cur >= lose.NextOxyTick)
             {
                 lose.NextOxyTick = cur + TimeSpan.FromSeconds(2);
@@ -153,22 +156,22 @@ public sealed partial class FishSs1984CritSystem : SharedFishSs1984CritSystem
     }
 
     /// <summary>
-    /// Порт /mob/living/carbon/human/handle_critical_condition()
+    /// Тик критического состояния: окси-урон, эмоуты, шок/СН/остановка сердца.
     /// </summary>
     private void HandleCriticalCondition(
         EntityUid uid,
-        FishSs1984CritComponent crit,
+        FishComplexCritComponent crit,
         DamageableComponent damageable,
         MobStateComponent mobState)
     {
-        var paradiseHealth = GetParadiseHealth(uid, crit, damageable);
+        var critScaleHealth = GetCritScaleHealth(uid, crit, damageable);
         var oxy = GetDamage(uid, Asphyxiation);
         var brute = GetDamage(uid, Blunt) + GetDamage(uid, Slash) + GetDamage(uid, Piercing);
         var burn = GetDamage(uid, Heat) + GetDamage(uid, Shock);
         var brain = GetDamage(uid, Cellular);
 
         // guaranteed_death_threshold = health + oxy*0.5 - fire*0.67 - brute*0.67
-        var guaranteedDeath = paradiseHealth + oxy * 0.5f - burn * 0.67f - brute * 0.67f;
+        var guaranteedDeath = critScaleHealth + oxy * 0.5f - burn * 0.67f - brute * 0.67f;
 
         if (brain >= 120f || guaranteedDeath <= -500f)
         {
@@ -182,15 +185,12 @@ public sealed partial class FishSs1984CritSystem : SharedFishSs1984CritSystem
             ApplyWeaken(uid, TimeSpan.FromSeconds(60));
         }
 
-        // Отклонение от Paradise: MobState.Dead при damage>=DeadThreshold (обычно 200),
-        // а не probabilistic death при health<=-100 — иначе Dead=600 конфликтует с Gib@Blunt400.
-        // Эффекты зоны (-INF..-100] переносим на тяжёлый Critical (health <= -80 / damage >= 180).
+        // Dead остаётся на ~200 (иначе Gib@Blunt400). Глубокий Crit — внутри Critical (health <= -80).
 
-        if (paradiseHealth > 0f)
+        if (critScaleHealth > 0f)
             return;
 
-        // get_perceived_trauma(shock_reduction) <= 0 — без shock_reduction в крите всегда true
-        if (paradiseHealth <= 0f)
+        if (critScaleHealth <= 0f)
         {
             if (_random.Prob(0.05f))
                 TryEmote(uid, _random.Pick(CritEmotes));
@@ -204,15 +204,15 @@ public sealed partial class FishSs1984CritSystem : SharedFishSs1984CritSystem
                 ApplyParalyse(uid, TimeSpan.FromSeconds(4));
         }
 
-        switch (paradiseHealth)
+        switch (critScaleHealth)
         {
-            // Тяжёлый Critical: объединяет Paradise (-99..-80] и часть (-INF..-100]
+            // Тяжёлый Critical: объединяет (-99..-80] и часть (-INF..-100]
             case <= -80f:
                 ApplyOxy(uid, 1f);
                 // Из зоны <= -100: шанс остановки сердца / HF (на health≈-90 → ~9%/18%)
-                if (_random.Prob(Math.Clamp(-paradiseHealth * 0.001f, 0f, 0.15f)))
+                if (_random.Prob(Math.Clamp(-critScaleHealth * 0.001f, 0f, 0.15f)))
                     TrySetHeartAttack(uid, true);
-                if (_random.Prob(Math.Clamp(-paradiseHealth * 0.002f, 0f, 0.25f)))
+                if (_random.Prob(Math.Clamp(-critScaleHealth * 0.002f, 0f, 0.25f)))
                     TryContractHeartFailure(uid);
                 if (_random.Prob(0.04f))
                 {
@@ -228,7 +228,7 @@ public sealed partial class FishSs1984CritSystem : SharedFishSs1984CritSystem
                 ApplyOxy(uid, 1f);
                 if (_random.Prob(0.10f))
                     TryContractShock(uid);
-                if (_random.Prob(Math.Clamp(-paradiseHealth * 0.0008f, 0f, 1f)))
+                if (_random.Prob(Math.Clamp(-critScaleHealth * 0.0008f, 0f, 1f)))
                     TryContractHeartFailure(uid);
                 if (_random.Prob(0.06f))
                 {
@@ -252,7 +252,7 @@ public sealed partial class FishSs1984CritSystem : SharedFishSs1984CritSystem
         }
     }
 
-    private void HandleComplications(EntityUid uid, FishSs1984CritComponent crit, DamageableComponent damageable)
+    private void HandleComplications(EntityUid uid, FishComplexCritComponent crit, DamageableComponent damageable)
     {
         if (TryComp<FishCritShockComponent>(uid, out var shock))
             TickShock(uid, crit, damageable, shock);
@@ -261,14 +261,14 @@ public sealed partial class FishSs1984CritSystem : SharedFishSs1984CritSystem
             TickHeartFailure(uid, hf);
     }
 
-    /// <summary>Порт /datum/disease/critical/shock/stage_act</summary>
-    private void TickShock(EntityUid uid, FishSs1984CritComponent crit, DamageableComponent damageable, FishCritShockComponent shock)
+    /// <summary>Тик шока (3 стадии).</summary>
+    private void TickShock(EntityUid uid, FishComplexCritComponent crit, DamageableComponent damageable, FishCritShockComponent shock)
     {
-        var paradiseHealth = GetParadiseHealth(uid, crit, damageable);
+        var critScaleHealth = GetCritScaleHealth(uid, crit, damageable);
         var hungerOk = IsHungerAboveHypoglycemia(uid);
 
         // health >= 25 && nutrition >= HYPOGLYCEMIA → cure
-        if (paradiseHealth >= 25f && hungerOk)
+        if (critScaleHealth >= 25f && hungerOk)
         {
             _popup.PopupEntity(Loc.GetString("fish-crit-feel-better"), uid, uid, PopupType.Small);
             RemCompDeferred<FishCritShockComponent>(uid);
@@ -328,7 +328,7 @@ public sealed partial class FishSs1984CritSystem : SharedFishSs1984CritSystem
         Dirty(uid, shock);
     }
 
-    /// <summary>Порт /datum/disease/critical/heart_failure/stage_act</summary>
+    /// <summary>Тик сердечной недостаточности (3 стадии).</summary>
     private void TickHeartFailure(EntityUid uid, FishHeartFailureComponent hf)
     {
         if (_random.Prob(hf.StageProb))
@@ -385,7 +385,7 @@ public sealed partial class FishSs1984CritSystem : SharedFishSs1984CritSystem
         Dirty(uid, hf);
     }
 
-    /// <summary>Порт handle_heartattack()</summary>
+    /// <summary>Тик остановки сердца.</summary>
     private void HandleCardiacArrestTick(EntityUid uid, DamageableComponent damageable)
     {
         if (!IsUndergoingCardiacArrest(uid))
@@ -451,7 +451,7 @@ public sealed partial class FishSs1984CritSystem : SharedFishSs1984CritSystem
 
     private void ApplyConfused(EntityUid uid, TimeSpan duration)
     {
-        // Paradise AdjustConfused: отдельного Confused в SS14 нет — усиливаем stutter (документированное отклонение).
+        // AdjustConfused: отдельного Confused в SS14 нет — усиливаем stutter (документированное отклонение).
         _stutter.DoStutter(uid, duration, refresh: false);
     }
 
@@ -470,7 +470,7 @@ public sealed partial class FishSs1984CritSystem : SharedFishSs1984CritSystem
 
     private bool IsHungerAboveHypoglycemia(EntityUid uid)
     {
-        // Paradise NUTRITION_LEVEL_HYPOGLYCEMIA=100 при max~600 → 33 на шкале Fish (max 200).
+        // NUTRITION_LEVEL_HYPOGLYCEMIA=100 при max~600 → 33 на шкале Fish (max 200).
         if (!TryComp<SatiationComponent>(uid, out var sat))
             return true;
 

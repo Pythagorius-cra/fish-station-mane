@@ -31,7 +31,7 @@ public sealed class FishCharacterReactionsTests : InteractionTest
         Assert.Multiple(() =>
         {
             Assert.That(HasComp<FishCharacterReactionsComponent>(), Is.True);
-            Assert.That(HasComp<FishSs1984CritComponent>(), Is.True);
+            Assert.That(HasComp<FishComplexCritComponent>(), Is.True);
             Assert.That(HasComp<FlammableComponent>(), Is.True);
         });
     }

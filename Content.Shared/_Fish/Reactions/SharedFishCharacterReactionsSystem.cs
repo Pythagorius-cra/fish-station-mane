@@ -36,7 +36,7 @@ public abstract partial class SharedFishCharacterReactionsSystem : EntitySystem
         // После revive из Dead — убрать зависшие осложнения Crit/реакций, если урон уже ниже крита.
         if (args.OldMobState == MobStateEnum.Dead && args.NewMobState != MobStateEnum.Dead)
         {
-            // LoseBreath / unconscious сбрасываем; шок/HF оставляем — в оригинале HF сам не проходит.
+            // LoseBreath / unconscious сбрасываем; шок/HF оставляем — HF сам не проходит.
             RemCompDeferred<FishCritUnconsciousComponent>(ent);
             RemCompDeferred<FishLoseBreathComponent>(ent);
         }
@@ -54,9 +54,9 @@ public abstract partial class SharedFishCharacterReactionsSystem : EntitySystem
     {
         RemCompDeferred<FishCritUnconsciousComponent>(uid);
         RemCompDeferred<FishLoseBreathComponent>(uid);
-        // Шок снимается при смерти (как disease на трупе в Paradise stage_act early-out).
+        // Шок снимается при смерти.
         RemCompDeferred<FishCritShockComponent>(uid);
-        // HF и cardiac arrest не чистим здесь при простом Clear — только при смерти через OnMobStateChanged.
+        // HF и cardiac arrest — только при смерти.
         if (MobStateSys.IsDead(uid))
         {
             RemCompDeferred<FishHeartFailureComponent>(uid);

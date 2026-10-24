@@ -13,20 +13,20 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Server._Fish.Crit;
 
-public sealed partial class FishSs1984CritSystem
+public sealed partial class FishComplexCritSystem
 {
     [Dependency] private DoAfterSystem _doAfter = default!;
 
     private void InitializeCpr()
     {
-        SubscribeLocalEvent<FishSs1984CritComponent, InteractHandEvent>(OnCritInteractHand);
-        SubscribeLocalEvent<FishSs1984CritComponent, FishCritCprDoAfterEvent>(OnCprDoAfter);
+        SubscribeLocalEvent<FishComplexCritComponent, InteractHandEvent>(OnCritInteractHand);
+        SubscribeLocalEvent<FishComplexCritComponent, FishCritCprDoAfterEvent>(OnCprDoAfter);
     }
 
     /// <summary>
-    /// Порт /mob/living/carbon/human/proc/do_cpr — СЛР на цели в зоне крита.
+    /// СЛР на цели в зоне крита.
     /// </summary>
-    private void OnCritInteractHand(Entity<FishSs1984CritComponent> ent, ref InteractHandEvent args)
+    private void OnCritInteractHand(Entity<FishComplexCritComponent> ent, ref InteractHandEvent args)
     {
         if (args.Handled || args.User == ent.Owner)
             return;
@@ -65,7 +65,7 @@ public sealed partial class FishSs1984CritSystem
         });
     }
 
-    private void OnCprDoAfter(Entity<FishSs1984CritComponent> ent, ref FishCritCprDoAfterEvent args)
+    private void OnCprDoAfter(Entity<FishComplexCritComponent> ent, ref FishCritCprDoAfterEvent args)
     {
         RemCompDeferred<FishCritCprActiveComponent>(ent);
 
