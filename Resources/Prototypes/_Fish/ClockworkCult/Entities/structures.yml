@@ -135,6 +135,7 @@
   name: clockwork marauder
   description: A suit of thrumming brass armor awaiting a mind.
   suffix: Fish
+  save: false
   components:
   - type: Sprite
     drawdepth: Mobs
