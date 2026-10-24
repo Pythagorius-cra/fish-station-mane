@@ -127,6 +127,15 @@
         prototype: IpcSatiationHunger
       Thirst:
         prototype: IpcSatiationThirst
+  # Inherited Internals (BaseSpeciesMob) Resolve Respirator on gear equip; IPC does not breathe.
+  - type: Respirator
+    damage:
+      types:
+        Asphyxiation: 0
+    damageRecovery:
+      types:
+        Asphyxiation: 0
+  - type: RespiratorImmunity
   - type: FishIpc
     batteryPowered: true
     drainPerSecond: 1.5
