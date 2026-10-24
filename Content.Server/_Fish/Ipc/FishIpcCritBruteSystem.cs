@@ -22,7 +22,7 @@ public sealed partial class FishIpcCritBruteSystem : EntitySystem
         var query = EntityQueryEnumerator<FishIpcComponent, MobStateComponent>();
         while (query.MoveNext(out var uid, out _, out var mobState))
         {
-            if (!_mobState.IsCritical(uid, mobState))
+            if (TerminatingOrDeleted(uid) || !_mobState.IsCritical(uid, mobState))
                 continue;
 
             _damageable.TryChangeDamage(uid, CritDamage * frameTime, true, false);

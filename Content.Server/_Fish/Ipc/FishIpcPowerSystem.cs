@@ -47,7 +47,9 @@ public sealed partial class FishIpcPowerSystem : SharedFishIpcSystem
         var query = EntityQueryEnumerator<FishIpcComponent, PowerCellSlotComponent>();
         while (query.MoveNext(out var uid, out var ipc, out var slot))
         {
-            if (_mobState.IsDead(uid) || !ipc.BatteryPowered)
+            // Cell removal during RecursiveDeleteEntity raises empty/slot events and would
+            // EnsureComp StatusEffectContainer on a terminating MobIpc.
+            if (TerminatingOrDeleted(uid) || _mobState.IsDead(uid) || !ipc.BatteryPowered)
                 continue;
 
             // SSD не расходуют заряд и не получают предупреждения.
@@ -92,11 +94,17 @@ public sealed partial class FishIpcPowerSystem : SharedFishIpcSystem
 
     private void OnPowerCellEmpty(Entity<FishIpcComponent> ent, ref PowerCellSlotEmptyEvent args)
     {
+        if (TerminatingOrDeleted(ent.Owner))
+            return;
+
         UpdateChargeState(ent.Owner, ent.Comp, 0);
     }
 
     private void OnCellInserted(Entity<FishIpcComponent> ent, ref EntInsertedIntoContainerMessage args)
     {
+        if (TerminatingOrDeleted(ent.Owner))
+            return;
+
         if (!TryComp<PowerCellSlotComponent>(ent.Owner, out var slot) || args.Container.ID != slot.CellSlotId)
             return;
 
@@ -109,6 +117,9 @@ public sealed partial class FishIpcPowerSystem : SharedFishIpcSystem
 
     private void UpdateChargeState(EntityUid uid, FishIpcComponent ipc, short chargePercent)
     {
+        if (TerminatingOrDeleted(uid))
+            return;
+
         if (ipc.ChargeState != chargePercent)
         {
             RaiseLocalEvent(uid, new FishIpcChargeStateUpdateEvent(chargePercent));
@@ -123,6 +134,9 @@ public sealed partial class FishIpcPowerSystem : SharedFishIpcSystem
 
     private void PowerDown(EntityUid uid, FishIpcComponent ipc)
     {
+        if (TerminatingOrDeleted(uid))
+            return;
+
         ipc.PowerDown = true;
         Dirty(uid, ipc);
 
@@ -134,6 +148,9 @@ public sealed partial class FishIpcPowerSystem : SharedFishIpcSystem
 
     private void PowerUp(EntityUid uid, FishIpcComponent ipc)
     {
+        if (TerminatingOrDeleted(uid))
+            return;
+
         ipc.PowerDown = false;
         Dirty(uid, ipc);
         _statusEffects.TryRemoveStatusEffect(uid, SleepingSystem.StatusEffectForcedSleeping);

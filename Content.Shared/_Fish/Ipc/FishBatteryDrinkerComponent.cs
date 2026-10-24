@@ -39,5 +39,5 @@ public sealed partial class FishBatteryDrinkerSourceComponent : Component
     public float MaxAmount;
 
     [DataField]
-    public SoundSpecifier? DrinkSound = new SoundPathSpecifier("/Audio/Effects/lightning_shock.ogg");
+    public SoundSpecifier? DrinkSound = new SoundPathSpecifier("/Audio/Effects/Lightning/lightningshock.ogg");
 }
