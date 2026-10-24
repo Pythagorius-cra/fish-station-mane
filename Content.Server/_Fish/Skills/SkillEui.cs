@@ -7,13 +7,19 @@ namespace Content.Server._Fish.Skills;
 
 public sealed class SkillEui : BaseEui
 {
-    private readonly EntityUid _target;
+    private EntityUid _target;
     private readonly SkillSystem _skills;
 
     public SkillEui(EntityUid target, SkillSystem skills)
     {
         _target = target;
         _skills = skills;
+    }
+
+    public void Retarget(EntityUid target)
+    {
+        _target = target;
+        StateDirty();
     }
 
     public override EuiStateBase GetNewState()

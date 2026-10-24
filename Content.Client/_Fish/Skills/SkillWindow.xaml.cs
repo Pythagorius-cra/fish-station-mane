@@ -139,7 +139,9 @@ public sealed partial class SkillWindow : FancyWindow
 
         var inc = new Button
         {
-            Text = skill.NextLevelCost > 0 ? $"+ ({skill.NextLevelCost})" : "+",
+            Text = skill.NextLevelCost > 0
+                ? Loc.GetString("skills-window-increase-cost", ("cost", skill.NextLevelCost))
+                : "+",
             Disabled = !skill.CanIncrease,
             MinWidth = 64,
             ToolTip = Loc.GetString("skills-window-increase"),

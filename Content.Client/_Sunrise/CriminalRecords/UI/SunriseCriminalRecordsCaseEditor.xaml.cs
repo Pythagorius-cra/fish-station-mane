@@ -50,7 +50,7 @@ public sealed partial class SunriseCriminalRecordsCaseEditor : Control
     private uint? _lastCaseId;
     private int _savedSentence;
     private bool _isWarning;
-    // Fish-edit: preview sentence for quick print
+    // Fish-edit: срок для предпросмотра быстрой печати
     private int _previewSentence;
 
     private float _saveTimer;
@@ -510,8 +510,10 @@ public sealed partial class SunriseCriminalRecordsCaseEditor : Control
         }
 
         _stationLaw.GetEffectiveLawset(ConsoleEntity, out _, out _, out _, out var threshold);
+        // Fish-start: кэш срока/предупреждения для быстрой печати
         _previewSentence = total;
         _isWarning = isWarning;
+        // Fish-end
 
         if (isWarning)
         {

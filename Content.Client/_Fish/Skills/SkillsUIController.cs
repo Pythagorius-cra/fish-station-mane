@@ -56,6 +56,9 @@ public sealed partial class SkillsUIController : UIController, IOnStateEntered<G
 
     private void RequestOpen()
     {
+        if (SkillsButton is { } button)
+            button.Pressed = false;
+
         _skills.RequestOpenSkillsUi();
     }
 }

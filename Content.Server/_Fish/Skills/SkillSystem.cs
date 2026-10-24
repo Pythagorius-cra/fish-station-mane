@@ -129,10 +129,10 @@ public sealed partial class SkillSystem : SharedSkillSystem
         if (!HasComp<SkillsetComponent>(uid))
             return;
 
-        // Уже открыто — только обновить; иначе создать заново (после CloseEui).
+        // Уже открыто — привязать к актуальной сущности и обновить; иначе создать заново (после CloseEui).
         if (_openUis.TryGetValue(session, out var existing))
         {
-            existing.StateDirty();
+            existing.Retarget(uid);
             return;
         }
 

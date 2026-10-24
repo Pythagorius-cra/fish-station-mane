@@ -47,6 +47,14 @@ public abstract partial class SharedSurgerySystem
             return;
         }
 
+        // Fish-start: повторная проверка анатомии на завершении DoAfter
+        if (_skills.TryDenyMissingSkill(args.User, "FishSkillAnatomy", SkillLevels.Basic, "skills-surgery-need-anatomy"))
+        {
+            Dirty(ent);
+            return;
+        }
+        // Fish-end
+
         if (!_random.Prob(args.SuccessRate))
         {
             if (_net.IsClient) return;

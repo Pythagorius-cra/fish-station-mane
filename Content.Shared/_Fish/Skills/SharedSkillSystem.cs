@@ -31,14 +31,34 @@ public abstract partial class SharedSkillSystem : EntitySystem
         return skillset.Skills.GetValueOrDefault(skill, SkillLevels.Unskilled);
     }
 
+    /// <summary>
+    /// Уровень навыка для игровых эффектов. До Confirm (<see cref="SkillsetComponent.Locked"/>)
+    /// учитывается только минимум роли — provisional-распределение очков на действия не влияет.
+    /// </summary>
+    public int GetEffectiveSkillValue(EntityUid uid, ProtoId<SkillPrototype> skill, SkillsetComponent? skillset = null)
+    {
+        if (!Resolve(uid, ref skillset, false))
+            return SkillLevels.Baseline;
+
+        if (!skillset.Locked)
+        {
+            if (skillset.JobId is { } jobId)
+                return GetMinSkill(jobId, skill);
+
+            return SkillLevels.Unskilled;
+        }
+
+        return skillset.Skills.GetValueOrDefault(skill, SkillLevels.Unskilled);
+    }
+
     public bool SkillCheck(EntityUid uid, ProtoId<SkillPrototype> skill, int needed, SkillsetComponent? skillset = null)
     {
-        return GetSkillValue(uid, skill, skillset) >= needed;
+        return GetEffectiveSkillValue(uid, skill, skillset) >= needed;
     }
 
     public float GetSkillDelayMultiplier(EntityUid uid, ProtoId<SkillPrototype> skill, float? factorOverride = null, SkillsetComponent? skillset = null)
     {
-        var points = GetSkillValue(uid, skill, skillset);
+        var points = GetEffectiveSkillValue(uid, skill, skillset);
 
         if (Prototypes.TryIndex(skill, out SkillPrototype? proto))
         {
@@ -55,7 +75,7 @@ public abstract partial class SharedSkillSystem : EntitySystem
 
     public float GetSkillQualityMultiplier(EntityUid uid, ProtoId<SkillPrototype> skill, SkillsetComponent? skillset = null)
     {
-        var points = GetSkillValue(uid, skill, skillset);
+        var points = GetEffectiveSkillValue(uid, skill, skillset);
 
         if (Prototypes.TryIndex(skill, out SkillPrototype? proto))
             return proto.GetQualityMultiplierForLevel(points);

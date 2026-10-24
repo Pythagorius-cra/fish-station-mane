@@ -6,7 +6,8 @@
   description: skills-construction-desc
   category: engineering
   difficulty: 2
-  defaultMax: 5
+  # defaultMax: потолок без явной записи в maxSkills бюджета роли (Trained).
+  defaultMax: 3
   delayFactor: 0.3
   durationMultipliers:
     1: 1.5
@@ -21,7 +22,7 @@
   description: skills-electrical-desc
   category: engineering
   difficulty: 2
-  defaultMax: 5
+  defaultMax: 3
   delayFactor: 0.3
   durationMultipliers:
     1: 1.5
@@ -36,7 +37,7 @@
   description: skills-atmos-desc
   category: engineering
   difficulty: 2
-  defaultMax: 5
+  defaultMax: 3
   delayFactor: 0.3
   durationMultipliers:
     1: 1.5
@@ -51,7 +52,7 @@
   description: skills-medical-desc
   category: medical
   difficulty: 4
-  defaultMax: 5
+  defaultMax: 3
   delayFactor: 0.3
   qualityFactor: 0.15
   durationMultipliers:
@@ -73,7 +74,7 @@
   description: skills-anatomy-desc
   category: medical
   difficulty: 4
-  defaultMax: 5
+  defaultMax: 3
   delayFactor: 0.3
   qualityFactor: 0.15
   prerequisites:
@@ -97,7 +98,10 @@
   description: skills-chemistry-desc
   category: medical
   difficulty: 4
-  defaultMax: 5
+  defaultMax: 3
+  # Нет игровых потребителей — нейтральные факторы, чтобы UI не показывал ложные эффекты.
+  delayFactor: 0
+  qualityFactor: 0
 
 - type: skill
   id: FishSkillWeapons
@@ -105,7 +109,9 @@
   description: skills-weapons-desc
   category: security
   difficulty: 2
-  defaultMax: 5
+  defaultMax: 3
+  delayFactor: 0
+  qualityFactor: 0
 
 - type: skill
   id: FishSkillComputer
@@ -113,7 +119,9 @@
   description: skills-computer-desc
   category: general
   difficulty: 1
-  defaultMax: 5
+  defaultMax: 3
+  delayFactor: 0
+  qualityFactor: 0
 
 - type: skill
   id: FishSkillAthletics
@@ -121,5 +129,7 @@
   description: skills-athletics-desc
   category: general
   difficulty: 1
-  defaultMax: 5
+  defaultMax: 3
+  delayFactor: 0
+  qualityFactor: 0
 

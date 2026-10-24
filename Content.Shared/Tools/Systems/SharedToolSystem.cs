@@ -9,7 +9,6 @@ using Content.Shared.Localizations;
 using Content.Shared.Maps;
 using Content.Shared.Popups;
 using Content.Shared.Tools.Components;
-using Content.Shared._Fish.Skills; // Fish-edit: РЅР°РІС‹РєРё РёРЅСЃС‚СЂСѓРјРµРЅС‚РѕРІ
 using JetBrains.Annotations;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Map;
@@ -36,16 +35,9 @@ public abstract partial class SharedToolSystem : EntitySystem
     [Dependency] private SharedTransformSystem _transformSystem = default!;
     [Dependency] private TileSystem _tiles = default!;
     [Dependency] private TurfSystem _turfs = default!;
-    [Dependency] private SharedSkillSystem _skills = default!; // Fish-edit: РЅР°РІС‹РєРё РёРЅСЃС‚СЂСѓРјРµРЅС‚РѕРІ
 
     public const string CutQuality = "Cutting";
     public const string PulseQuality = "Pulsing";
-    // Fish-start: РєР°С‡РµСЃС‚РІР° в†’ РЅР°РІС‹РєРё СЃС‚СЂРѕРёС‚РµР»СЊСЃС‚РІР° / СЌР»РµРєС‚СЂРёРєРё
-    private static readonly ProtoId<ToolQualityPrototype> WeldingQuality = "Welding";
-    private static readonly ProtoId<ToolQualityPrototype> AnchoringQuality = "Anchoring";
-    private static readonly ProtoId<SkillPrototype> ConstructionSkill = "FishSkillConstruction";
-    private static readonly ProtoId<SkillPrototype> ElectricalSkill = "FishSkillElectrical";
-    // Fish-end
 
     public override void Initialize()
     {
@@ -182,7 +174,7 @@ public abstract partial class SharedToolSystem : EntitySystem
         else
             examineText = Loc.GetString("tool-component-doafter-examine", ("quality", qualitiesText));
 
-        // Fish-start: РјРЅРѕР¶РёС‚РµР»СЊ РЅР°РІС‹РєР° РґР»СЏ СЂРµР»РµРІР°РЅС‚РЅС‹С… РєР°С‡РµСЃС‚РІ РёРЅСЃС‚СЂСѓРјРµРЅС‚Р°
+        // Fish-start: множитель навыка для релевантных качеств инструмента
         var skillDelayMult = GetToolSkillDelayMultiplier(user, toolQualitiesNeeded);
         var adjustedDelay = delay / toolComponent.SpeedModifier * skillDelayMult;
         // Fish-end
@@ -201,26 +193,6 @@ public abstract partial class SharedToolSystem : EntitySystem
         _doAfterSystem.TryStartDoAfter(doAfterArgs, out id);
         return true;
     }
-
-    // Fish-start: РІС‹Р±РѕСЂ РЅР°РІС‹РєР° РїРѕ С‚СЂРµР±СѓРµРјРѕРјСѓ РєР°С‡РµСЃС‚РІСѓ РёРЅСЃС‚СЂСѓРјРµРЅС‚Р°
-    private float GetToolSkillDelayMultiplier(EntityUid user, IEnumerable<ProtoId<ToolQualityPrototype>> qualities)
-    {
-        float? worst = null;
-        foreach (var quality in qualities)
-        {
-            float? skillMult = null;
-            if (quality == WeldingQuality || quality == AnchoringQuality)
-                skillMult = _skills.GetSkillDelayMultiplier(user, ConstructionSkill);
-            else if (quality == PulseQuality)
-                skillMult = _skills.GetSkillDelayMultiplier(user, ElectricalSkill);
-
-            if (skillMult is { } m)
-                worst = worst is { } w ? Math.Max(w, m) : m;
-        }
-
-        return worst ?? 1f;
-    }
-    // Fish-end
 
     /// <summary>
     ///     Attempts to use a tool on some entity, which will start a DoAfter. Returns true if an interaction occurred.
