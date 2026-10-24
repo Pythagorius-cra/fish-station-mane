@@ -1,4 +1,4 @@
-﻿using Content.Shared._Fish.ClockworkCult.Components;
+using Content.Shared._Fish.ClockworkCult.Components;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.Damage.Systems;
@@ -13,7 +13,7 @@ using Robust.Shared.Timing;
 namespace Content.Server._Fish.ClockworkCult.Systems;
 
 /// <summary>
-/// РњРёРЅРёРјР°Р»СЊРЅС‹Рµ clockwork-Р»РѕРІСѓС€РєРё: skewer, steam vent, pressure sensor, lever, repeater.
+/// Минимальные clockwork-ловушки: skewer, steam vent, pressure sensor, lever, repeater.
 /// </summary>
 public sealed partial class FishClockworkTrapSystem : EntitySystem
 {
@@ -114,7 +114,7 @@ public sealed partial class FishClockworkTrapSystem : EntitySystem
             switch (trap.Comp.Kind)
             {
                 case FishClockworkTrapKind.BrassSkewer:
-                    // РђРєС‚РёРІРёСЂСѓРµРј skewer В«РІ РІРѕР·РґСѓС…В» вЂ” Р±СЊС‘С‚ Р±Р»РёР¶Р°Р№С€РµРіРѕ РЅРµСЃР»СѓРіСѓ РІ СЂР°РґРёСѓСЃРµ.
+                    // Активируем skewer «в воздух» — бьёт ближайшего неслугу в радиусе.
                     foreach (var mob in _lookup.GetEntitiesInRange<MobStateComponent>(Transform(trap).Coordinates, 0.75f))
                     {
                         if (!_servant.IsServant(mob.Owner))
@@ -159,7 +159,7 @@ public sealed partial class FishClockworkTrapSystem : EntitySystem
 
         MarkTriggered(ent);
 
-        // РњРёРЅРёРјР°Р»СЊРЅС‹Р№ СЌС„С„РµРєС‚: РґС‹Рј + popup (Р±Р»РѕРєРёСЂРѕРІРєР° РІРёРґРёРјРѕСЃС‚Рё СѓРїСЂРѕС‰РµРЅР°).
+        // Минимальный эффект: дым + popup (блокировка видимости упрощена).
         Spawn("Smoke", Transform(ent).Coordinates);
         _popup.PopupEntity(Loc.GetString("fish-clockwork-trap-steam"), victim, PopupType.MediumCaution);
         _stun.TryKnockdown(victim, TimeSpan.FromSeconds(1.5f), refresh: true);

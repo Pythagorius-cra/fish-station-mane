@@ -33,7 +33,7 @@
 - type: entity
   parent: FishBaseClockworkStructure
   id: FishClockworkArk
-  name: Ark of the Clockwork Justiciar
+  name: clockwork ark
   description: A massive amalgamation of brass and steam power. It must be defended.
   components:
   - type: Sprite

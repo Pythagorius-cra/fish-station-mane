@@ -121,5 +121,3 @@
   - type: FishCityOfCogsRift
     lifetimeSeconds: 4
     isSpatialGateway: true
-  - type: TimedDespawn
-    lifetime: 4

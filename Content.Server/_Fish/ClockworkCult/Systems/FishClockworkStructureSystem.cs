@@ -1,4 +1,4 @@
-﻿using Content.Server.Chat.Systems;
+using Content.Server.Chat.Systems;
 using Content.Shared._Fish.ClockworkCult;
 using Content.Shared._Fish.ClockworkCult.Components;
 using Content.Shared._Fish.ClockworkCult.Events;
@@ -28,7 +28,7 @@ using Timer = Robust.Shared.Timing.Timer;
 namespace Content.Server._Fish.ClockworkCult.Systems;
 
 /// <summary>
-/// РЎС‚СЂСѓРєС‚СѓСЂС‹: Ocular Warden, Mania Motor, Stargazer, Herald Beacon, Obelisk, Eminence Spire.
+/// Структуры: Ocular Warden, Mania Motor, Stargazer, Herald Beacon, Obelisk, Eminence Spire.
 /// </summary>
 public sealed partial class FishClockworkStructureSystem : EntitySystem
 {
@@ -93,7 +93,7 @@ public sealed partial class FishClockworkStructureSystem : EntitySystem
                 dmg.DamageDict[HeatDamage] = warden.DamagePerTick;
                 _damageable.TryChangeDamage(target.Owner, dmg, origin: uid);
                 _audio.PlayPvs(warden.AttackSound, uid);
-                break; // РѕРґРЅР° С†РµР»СЊ Р·Р° С‚РёРє
+                break; // одна цель за тик
             }
         }
     }
@@ -154,7 +154,7 @@ public sealed partial class FishClockworkStructureSystem : EntitySystem
 
     private bool HasStarlight(TransformComponent xform)
     {
-        // РЈРїСЂРѕС‰РµРЅРёРµ tg В«starlightВ»: СЂСЏРґРѕРј СЃ РєРѕСЃРјРѕСЃРѕРј (РЅРµС‚ MapGrid) РёР»Рё Сѓ РєСЂР°СЏ РіСЂРёРґР°.
+        // Упрощение tg «starlight»: рядом с космосом (нет MapGrid) или у края грида.
         if (xform.GridUid == null)
             return true;
 

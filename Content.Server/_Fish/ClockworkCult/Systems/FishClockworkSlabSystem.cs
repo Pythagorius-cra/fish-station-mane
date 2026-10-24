@@ -1,4 +1,4 @@
-﻿using Content.Server.DoAfter;
+using Content.Server.DoAfter;
 using Content.Shared._Fish.ClockworkCult;
 using Content.Shared._Fish.ClockworkCult.Components;
 using Content.Shared._Fish.ClockworkCult.Events;
@@ -13,7 +13,7 @@ using Robust.Shared.Prototypes;
 namespace Content.Server._Fish.ClockworkCult.Systems;
 
 /// <summary>
-/// BUI СЃР»СЌР±Р° Рё С‡С‚РµРЅРёРµ РїРёСЃР°РЅРёР№ С‡РµСЂРµР· DoAfter.
+/// BUI слэба и чтение писаний через DoAfter.
 /// </summary>
 public sealed partial class FishClockworkSlabSystem : EntitySystem
 {

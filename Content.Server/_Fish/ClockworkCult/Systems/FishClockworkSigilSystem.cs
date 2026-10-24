@@ -1,4 +1,4 @@
-﻿using Content.Shared._Fish.ClockworkCult;
+using Content.Shared._Fish.ClockworkCult;
 using Content.Shared._Fish.ClockworkCult.Components;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
@@ -16,7 +16,7 @@ using Robust.Shared.Timing;
 namespace Content.Server._Fish.ClockworkCult.Systems;
 
 /// <summary>
-/// РўСЂРёРіРіРµСЂС‹ СЃРёРіРёР»РѕРІ: Transgression, Submission, Vitality, Transmission.
+/// Триггеры сигилов: Transgression, Submission, Vitality, Transmission.
 /// </summary>
 public sealed partial class FishClockworkSigilSystem : EntitySystem
 {
@@ -36,7 +36,14 @@ public sealed partial class FishClockworkSigilSystem : EntitySystem
 
         SubscribeLocalEvent<FishClockworkSigilComponent, StartCollideEvent>(OnStartCollide);
         SubscribeLocalEvent<FishClockworkSigilComponent, EndCollideEvent>(OnEndCollide);
+        SubscribeLocalEvent<FishCityOfCogsRiftComponent, ComponentInit>(OnRiftInit);
         SubscribeLocalEvent<FishCityOfCogsRiftComponent, StartCollideEvent>(OnRiftCollide);
+    }
+
+    private void OnRiftInit(Entity<FishCityOfCogsRiftComponent> ent, ref ComponentInit args)
+    {
+        // Берём срок жизни из прототипа; не дублируем с TimedDespawn.
+        ent.Comp.RemainingLifetime = ent.Comp.LifetimeSeconds;
     }
 
     public override void Update(float frameTime)
@@ -60,6 +67,7 @@ public sealed partial class FishClockworkSigilSystem : EntitySystem
             }
         }
 
+        // RemainingLifetime — единственный механизм удаления (TimedDespawn с gateway снят).
         var riftQuery = EntityQueryEnumerator<FishCityOfCogsRiftComponent>();
         while (riftQuery.MoveNext(out var riftUid, out var rift))
         {
@@ -98,9 +106,7 @@ public sealed partial class FishClockworkSigilSystem : EntitySystem
         _stun.TryUpdateParalyzeDuration(target, TimeSpan.FromSeconds(3));
         _popup.PopupEntity(Loc.GetString("fish-clockwork-sigil-transgression"), target, PopupType.MediumCaution);
 
-        if (TryComp<FishClockworkTrapComponent>(ent.Owner, out var trap) && trap.ConsumedOnTrigger)
-            QueueDel(ent.Owner);
-        else
+        if (!TryComp<FishClockworkTrapComponent>(ent.Owner, out var trap) || trap.ConsumedOnTrigger)
             QueueDel(ent.Owner);
     }
 
@@ -132,8 +138,6 @@ public sealed partial class FishClockworkSigilSystem : EntitySystem
                 continue;
 
             _power.TryAdjustPower(FishClockworkCultConstants.TransmissionSigilPowerPerSecond * frameTime, quiet: true);
-            ent.Comp.StoredPower += FishClockworkCultConstants.TransmissionSigilPowerPerSecond * frameTime;
-            Dirty(ent);
             return; // один слуга достаточно
         }
     }
@@ -189,7 +193,7 @@ public sealed partial class FishClockworkSigilSystem : EntitySystem
 
         EntityCoordinates? destCoords = ent.Comp.Destination;
 
-        // Stationв†’Reebe rifts Р±РµР· СЏРІРЅРѕРіРѕ Destination вЂ” РёС‰РµРј marker/Ark.
+        // Station→Reebe rifts без явного Destination — ищем marker/Ark.
         if (destCoords == null && !ent.Comp.IsSpatialGateway)
         {
             var markerQuery = EntityQueryEnumerator<FishClockworkReebeMarkerComponent, TransformComponent>();

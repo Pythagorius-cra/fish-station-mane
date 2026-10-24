@@ -1,4 +1,4 @@
-﻿using Content.Server.Power.Components;
+using Content.Server.Power.Components;
 using Content.Shared._Fish.ClockworkCult.Components;
 using Content.Shared.Interaction;
 using Content.Shared.Popups;
@@ -10,7 +10,7 @@ using Robust.Shared.Audio.Systems;
 namespace Content.Server._Fish.ClockworkCult.Systems;
 
 /// <summary>
-/// Integration Cog: РІСЃС‚Р°РІРєР° РІ APC Рё РїР°СЃСЃРёРІРЅС‹Р№ drain ~5 W/s РІ РїСѓР» РєСѓР»СЊС‚Р°.
+/// Integration Cog: вставка в APC и пассивный drain ~5 W/s в пул культа.
 /// </summary>
 public sealed partial class FishIntegrationCogSystem : EntitySystem
 {
@@ -88,7 +88,7 @@ public sealed partial class FishIntegrationCogSystem : EntitySystem
         cog.Comp.HostApc = apc;
         Dirty(cog);
 
-        // В«РџСЂСЏС‡РµРјВ» С€РµСЃС‚РµСЂС‘РЅРєСѓ РІ APC вЂ” РїСЂРёРєСЂРµРїР»СЏРµРј РєРѕРѕСЂРґРёРЅР°С‚С‹ Рє APC.
+        // «Прячем» шестерёнку в APC — прикрепляем координаты к APC.
         _transform.SetCoordinates(cog.Owner, Transform(apc).Coordinates);
 
         _audio.PlayPvs(

@@ -1,4 +1,4 @@
-﻿using Content.Shared._Fish.ClockworkCult;
+using Content.Shared._Fish.ClockworkCult;
 using Content.Shared._Fish.ClockworkCult.Components;
 using Content.Shared._Fish.ClockworkCult.Prototypes;
 using Content.Shared.Cuffs;
@@ -7,7 +7,9 @@ using Content.Shared.Damage;
 using Content.Shared.Damage.Components;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.Damage.Systems;
+using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Interaction;
+using Content.Shared.Inventory;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
@@ -22,13 +24,16 @@ using Robust.Shared.Timing;
 namespace Content.Server._Fish.ClockworkCult.Systems;
 
 /// <summary>
-/// Р­С„С„РµРєС‚С‹ РїРёСЃР°РЅРёР№ Clockwork Cult.
+/// Эффекты писаний Clockwork Cult.
 /// </summary>
 public sealed partial class FishClockworkScriptureSystem : EntitySystem
 {
     [Dependency] private SharedAudioSystem _audio = default!;
     [Dependency] private SharedCuffableSystem _cuffs = default!;
     [Dependency] private DamageableSystem _damageable = default!;
+    [Dependency] private SharedHandsSystem _hands = default!;
+    [Dependency] private InventorySystem _inventory = default!;
+    [Dependency] private EntityLookupSystem _lookup = default!;
     [Dependency] private MobStateSystem _mobState = default!;
     [Dependency] private SharedPopupSystem _popup = default!;
     [Dependency] private FishClockworkServantSystem _servant = default!;
@@ -49,6 +54,9 @@ public sealed partial class FishClockworkScriptureSystem : EntitySystem
 
     public bool CanInvoke(EntityUid user, FishClockworkScripturePrototype proto, bool quiet = false)
     {
+        if (!CanPlaceOnePerTile(user, proto, quiet))
+            return false;
+
         return proto.ScriptureId switch
         {
             "ocular_warden" => CanPlaceWarden(user, quiet),
@@ -59,6 +67,26 @@ public sealed partial class FishClockworkScriptureSystem : EntitySystem
             "spatial_gateway" => CanSpatialGateway(user, quiet),
             _ => true,
         };
+    }
+
+    private bool CanPlaceOnePerTile(EntityUid user, FishClockworkScripturePrototype proto, bool quiet)
+    {
+        if (!proto.OnePerTile || proto.SpawnPrototype == null)
+            return true;
+
+        var coords = _transform.GetMoverCoordinates(user);
+        var spawnId = proto.SpawnPrototype.Value.Id;
+        foreach (var nearby in _lookup.GetEntitiesInRange(coords, 0.75f))
+        {
+            if (MetaData(nearby).EntityPrototype?.ID != spawnId)
+                continue;
+
+            if (!quiet)
+                _popup.PopupEntity(Loc.GetString("fish-clockwork-one-per-tile"), user, user);
+            return false;
+        }
+
+        return true;
     }
 
     public bool TryInvoke(EntityUid slab, EntityUid user, FishClockworkScripturePrototype proto)
@@ -164,7 +192,7 @@ public sealed partial class FishClockworkScriptureSystem : EntitySystem
 
     private bool CanAbscond(EntityUid user, bool quiet)
     {
-        // РќРµР»СЊР·СЏ Abscond СѓР¶Рµ РЅР° Reebe (СЂСЏРґРѕРј СЃ Ark).
+        // Нельзя Abscond уже на Reebe (рядом с Ark).
         if (TryComp(user, out TransformComponent? xform) &&
             xform.GridUid != null &&
             HasComp<FishClockworkArkComponent>(GetArkOnSameGrid(xform.GridUid.Value)))
@@ -260,7 +288,7 @@ public sealed partial class FishClockworkScriptureSystem : EntitySystem
         _audio.PlayPvs(new SoundPathSpecifier("/Audio/_Fish/ClockworkCult/magic/clockwork/fellowship_armory.ogg"), user);
         _popup.PopupEntity(Loc.GetString("fish-clockwork-armaments-bound"), user, user);
 
-        // РЎСЂР°Р·Сѓ СЌРєРёРїРёСЂСѓРµРј Р±СЂРѕРЅСЋ РїСЂРё РїРµСЂРІРѕРј С‡С‚РµРЅРёРё.
+        // Сразу экипируем броню при первом чтении.
         TryEquipArmaments(user);
         return true;
     }
@@ -278,10 +306,10 @@ public sealed partial class FishClockworkScriptureSystem : EntitySystem
             return false;
         }
 
-        SpawnAndTryPickup(armaments.HelmetPrototype, user);
-        SpawnAndTryPickup(armaments.ArmorPrototype, user);
-        SpawnAndTryPickup(armaments.GlovesPrototype, user);
-        SpawnAndTryPickup(armaments.ShoesPrototype, user);
+        SpawnAndTryEquip(armaments.HelmetPrototype, user, "head");
+        SpawnAndTryEquip(armaments.ArmorPrototype, user, "outerClothing");
+        SpawnAndTryEquip(armaments.GlovesPrototype, user, "gloves");
+        SpawnAndTryEquip(armaments.ShoesPrototype, user, "shoes");
 
         if (servant != null)
         {
@@ -317,11 +345,18 @@ public sealed partial class FishClockworkScriptureSystem : EntitySystem
         return true;
     }
 
+    private void SpawnAndTryEquip(EntProtoId proto, EntityUid user, string slot)
+    {
+        var ent = Spawn(proto, Transform(user).Coordinates);
+        // При неудаче экипировки предмет остаётся на полу (fallback).
+        _inventory.TryEquip(user, ent, slot, silent: true, force: true);
+    }
+
     private void SpawnAndTryPickup(EntProtoId proto, EntityUid user)
     {
         var ent = Spawn(proto, Transform(user).Coordinates);
-        // РРіСЂРѕРє РїРѕРґР±РµСЂС‘С‚ РІСЂСѓС‡РЅСѓСЋ / С‡РµСЂРµР· Hands вЂ” РґРѕСЃС‚Р°С‚РѕС‡РЅРѕ СЃРїР°РІРЅР° Сѓ РЅРѕРі.
-        _ = ent;
+        // При неудаче подбора предмет остаётся на полу (fallback).
+        _hands.TryPickupAnyHand(user, ent);
     }
 
     private bool CanSpatialGateway(EntityUid user, bool quiet)
@@ -352,7 +387,7 @@ public sealed partial class FishClockworkScriptureSystem : EntitySystem
 
     private bool DoSpatialGateway(EntityUid user)
     {
-        // РћС‚РєСЂС‹РІР°РµРј РѕРґРЅРѕСЃС‚РѕСЂРѕРЅРЅРёР№ РїРѕСЂС‚Р°Р» Рє Р±Р»РёР¶Р°Р№С€РµРјСѓ Р¶РёРІРѕРјСѓ СЃР»СѓРіРµ РёР»Рё РѕР±РµР»РёСЃРєСѓ.
+        // Открываем односторонний портал к ближайшему живому слуге или обелиску.
         EntityCoordinates? dest = null;
         var query = EntityQueryEnumerator<FishClockworkServantComponent, MobStateComponent, TransformComponent>();
         while (query.MoveNext(out var uid, out _, out var mob, out var xform))
@@ -428,6 +463,9 @@ public sealed partial class FishClockworkScriptureSystem : EntitySystem
         if (args.Handled || !args.CanReach || args.Target == null)
             return;
 
+        if (!_servant.IsServant(args.User))
+            return;
+
         if (ent.Comp.ActiveChargeScriptureId == null)
             return;
 
@@ -473,7 +511,9 @@ public sealed partial class FishClockworkScriptureSystem : EntitySystem
             dist > charge.Range)
             return false;
 
-        _stun.TryUpdateParalyzeDuration(target, TimeSpan.FromSeconds(charge.StunSeconds));
+        if (!_stun.TryUpdateParalyzeDuration(target, TimeSpan.FromSeconds(charge.StunSeconds)))
+            return false;
+
         _popup.PopupEntity(Loc.GetString("fish-clockwork-kindle-hit"), target, PopupType.MediumCaution);
         return true;
     }
@@ -487,13 +527,19 @@ public sealed partial class FishClockworkScriptureSystem : EntitySystem
             return false;
 
         var cuffs = Spawn(ZiptiePrototype, Transform(target).Coordinates);
-        if (!TryComp<HandcuffComponent>(cuffs, out var handcuff))
+        if (!TryComp<HandcuffComponent>(cuffs, out _))
         {
             QueueDel(cuffs);
             return false;
         }
 
-        return _cuffs.TryAddNewCuffs(target, user, cuffs, cuffable);
+        if (!_cuffs.TryAddNewCuffs(target, user, cuffs, cuffable))
+        {
+            QueueDel(cuffs);
+            return false;
+        }
+
+        return true;
     }
 
     private bool TryCompromiseTarget(EntityUid user, EntityUid target)
@@ -501,7 +547,7 @@ public sealed partial class FishClockworkScriptureSystem : EntitySystem
         if (!_servant.IsServant(target) && target != user)
             return false;
 
-        // РљРѕРЅРІРµСЂС‚РёСЂСѓРµРј brute/burn/airloss РІ РїРѕР»РѕРІРёРЅСѓ toxin С‡РµСЂРµР· API DamageableSystem (Р±РµР· РїСЂСЏРјРѕРіРѕ С‡С‚РµРЅРёСЏ Damage).
+        // Конвертируем brute/burn/airloss в половину toxin через API DamageableSystem (без прямого чтения Damage).
         var heal = new DamageSpecifier();
         heal.DamageDict["Blunt"] = -200;
         heal.DamageDict["Slash"] = -200;
@@ -511,7 +557,7 @@ public sealed partial class FishClockworkScriptureSystem : EntitySystem
         if (!_damageable.TryChangeDamage(target, heal, out var dealt, interruptsDoAfters: false, origin: user))
             return false;
 
-        // Heal РґР°С‘С‚ РѕС‚СЂРёС†Р°С‚РµР»СЊРЅС‹Р№ delta вЂ” Р±РµСЂС‘Рј РјРѕРґСѓР»СЊ С„Р°РєС‚РёС‡РµСЃРєРё СЃРЅСЏС‚РѕРіРѕ СѓСЂРѕРЅР°.
+        // Heal даёт отрицательный delta — берём модуль фактически снятого урона.
         var healed = -dealt.GetTotal().Float();
         if (healed <= 0.01f)
             return false;

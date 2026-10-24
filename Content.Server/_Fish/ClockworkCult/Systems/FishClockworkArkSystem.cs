@@ -1,8 +1,9 @@
-﻿using Content.Server._Fish.ClockworkCult.GameRule;
+using Content.Server._Fish.ClockworkCult.GameRule;
 using Content.Server.Chat.Systems;
+using Content.Server.Spawners.Components;
+using Content.Server.Station.Systems;
 using Content.Shared._Fish.ClockworkCult;
 using Content.Shared._Fish.ClockworkCult.Components;
-using Content.Server.Spawners.Components;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Systems;
 using Content.Shared.Destructible;
@@ -17,7 +18,7 @@ using Robust.Shared.Timing;
 namespace Content.Server._Fish.ClockworkCult.Systems;
 
 /// <summary>
-/// Р¤Р°Р·С‹ Ark: prep в†’ activation в†’ grace в†’ defense в†’ Ratvar.
+/// Фазы Ark: prep → activation → grace → defense → Ratvar.
 /// </summary>
 public sealed partial class FishClockworkArkSystem : EntitySystem
 {
@@ -27,8 +28,10 @@ public sealed partial class FishClockworkArkSystem : EntitySystem
     [Dependency] private MobStateSystem _mobState = default!;
     [Dependency] private FishClockworkPowerSystem _power = default!;
     [Dependency] private IRobustRandom _random = default!;
+    [Dependency] private StationSystem _station = default!;
     [Dependency] private IGameTiming _timing = default!;
     [Dependency] private SharedTransformSystem _transform = default!;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -52,7 +55,7 @@ public sealed partial class FishClockworkArkSystem : EntitySystem
     {
         var ark = ent.Comp;
 
-        // РџР°СЃСЃРёРІРЅР°СЏ РіРµРЅРµСЂР°С†РёСЏ РјРѕС‰РЅРѕСЃС‚Рё РљРѕРІС‡РµРіРѕРј РІРѕ РІСЃРµС… Р°РєС‚РёРІРЅС‹С… С„Р°Р·Р°С….
+        // Пассивная генерация мощности Ковчегом во всех активных фазах.
         if (ark.Phase is FishClockworkArkPhase.Prep
             or FishClockworkArkPhase.Activating
             or FishClockworkArkPhase.Grace
@@ -70,7 +73,7 @@ public sealed partial class FishClockworkArkSystem : EntitySystem
                 var prevSeconds = ark.SecondsUntilActivation;
                 ark.SecondsUntilActivation -= frameTime;
 
-                // РќР° РїРѕР»РѕРІРёРЅРµ prep вЂ” unlock Script (РєР°Рє Ark halfway РЅР° tg).
+                // На половине prep — unlock Script (как Ark halfway на tg).
                 if (ark.InitialActivationDelay > 0f)
                 {
                     var halfway = ark.InitialActivationDelay * 0.5f;
@@ -78,21 +81,18 @@ public sealed partial class FishClockworkArkSystem : EntitySystem
                         _power.UnlockScript();
                 }
 
+                // Только предупреждение за 30 секунд; активация — по истечении таймера.
                 if (ark.SecondsUntilActivation <= 30f && prevSeconds > 30f)
-                {
                     _power.HierophantAnnounce(Loc.GetString("fish-clockwork-ark-activating-soon"));
+
+                if (ark.SecondsUntilActivation <= 0f)
                     BeginActivation(ent);
-                }
-                else if (ark.SecondsUntilActivation <= 0f)
-                {
-                    BeginActivation(ent);
-                }
 
                 Dirty(ent);
                 break;
 
             case FishClockworkArkPhase.Activating:
-                // РљРѕСЂРѕС‚РєР°СЏ С„Р°Р·Р° Р°РЅРёРјР°С†РёРё вЂ” СЃСЂР°Р·Сѓ РІ grace.
+                // Короткая фаза анимации — сразу в grace.
                 ActivateArk(ent);
                 break;
 
@@ -103,15 +103,16 @@ public sealed partial class FishClockworkArkSystem : EntitySystem
                     ark.Phase = FishClockworkArkPhase.Defense;
                     ark.ProgressSeconds = 0f;
                     _power.HierophantAnnounce(Loc.GetString("fish-clockwork-ark-defense-begin"));
-                    SpawnStationRifts();
+                    SpawnStationRifts(ent);
                 }
 
                 Dirty(ent);
                 break;
 
             case FishClockworkArkPhase.Defense:
+                var prevProgress = ark.ProgressSeconds;
                 ark.ProgressSeconds += frameTime;
-                AnnounceDefenseThresholds(ent);
+                AnnounceDefenseThresholds(ent, prevProgress, ark.ProgressSeconds);
 
                 if (ark.ProgressSeconds >= FishClockworkCultConstants.GatewayRatvarArrival)
                 {
@@ -146,17 +147,20 @@ public sealed partial class FishClockworkArkSystem : EntitySystem
             announcementSound: ent.Comp.ActivationSound,
             colorOverride: Color.FromHex("#BE8700"));
 
-        MassRecall(ent);
+        // Активация Ковчега телепортирует слуг без расхода RecallsRemaining.
+        TeleportServantsToArk(ent);
         _power.HierophantAnnounce(Loc.GetString("fish-clockwork-ark-activated", ("minutes", (int)(ent.Comp.GracePeriodRemaining / 60f))));
     }
 
-    private void AnnounceDefenseThresholds(Entity<FishClockworkArkComponent> ent)
+    private void AnnounceDefenseThresholds(Entity<FishClockworkArkComponent> ent, float previousProgress, float currentProgress)
     {
-        var p = ent.Comp.ProgressSeconds;
-        // РћРґРЅРѕСЂР°Р·РѕРІС‹Рµ РїРѕСЂРѕРіРё С‡РµСЂРµР· РЅРµР±РѕР»СЊС€РёРµ РѕРєРЅР°.
-        if (p >= FishClockworkCultConstants.GatewayReebeFound && p - 1f < FishClockworkCultConstants.GatewayReebeFound)
+        // Объявляем порог один раз при пересечении границы (устойчиво к большому frameTime).
+        if (previousProgress < FishClockworkCultConstants.GatewayReebeFound &&
+            currentProgress >= FishClockworkCultConstants.GatewayReebeFound)
             _power.HierophantAnnounce(Loc.GetString("fish-clockwork-ark-reebe-found"));
-        if (p >= FishClockworkCultConstants.GatewayRatvarComing && p - 1f < FishClockworkCultConstants.GatewayRatvarComing)
+
+        if (previousProgress < FishClockworkCultConstants.GatewayRatvarComing &&
+            currentProgress >= FishClockworkCultConstants.GatewayRatvarComing)
             _power.HierophantAnnounce(Loc.GetString("fish-clockwork-ark-ratvar-coming"));
     }
 
@@ -182,7 +186,7 @@ public sealed partial class FishClockworkArkSystem : EntitySystem
         var query = EntityQueryEnumerator<FishClockworkArkComponent>();
         while (query.MoveNext(out var uid, out var ark))
         {
-            if (ark.Recalling || ark.RecallsRemaining <= 0)
+            if (ark.RecallsRemaining <= 0)
                 continue;
 
             MassRecall((uid, ark));
@@ -192,15 +196,28 @@ public sealed partial class FishClockworkArkSystem : EntitySystem
         return false;
     }
 
+    /// <summary>
+    /// Mass recall Эминенции: телепорт + расход RecallsRemaining.
+    /// </summary>
     public void MassRecall(Entity<FishClockworkArkComponent> ent)
     {
-        if (ent.Comp.Recalling || ent.Comp.RecallsRemaining <= 0)
+        if (ent.Comp.RecallsRemaining <= 0)
             return;
 
-        ent.Comp.Recalling = true;
         _audio.PlayGlobal(ent.Comp.RecallSound, Filter.Broadcast(), true);
         _power.HierophantAnnounce(Loc.GetString("fish-clockwork-ark-mass-recall"));
 
+        TeleportServantsToArk(ent);
+
+        ent.Comp.RecallsRemaining--;
+        Dirty(ent);
+    }
+
+    /// <summary>
+    /// Телепорт живых слуг к Ковчегу без расхода счётчика отзывов.
+    /// </summary>
+    private void TeleportServantsToArk(Entity<FishClockworkArkComponent> ent)
+    {
         var dest = Transform(ent).Coordinates;
         var query = EntityQueryEnumerator<FishClockworkServantComponent, MobStateComponent>();
         while (query.MoveNext(out var servant, out _, out var mob))
@@ -209,15 +226,11 @@ public sealed partial class FishClockworkArkSystem : EntitySystem
                 continue;
             _transform.SetCoordinates(servant, dest);
         }
-
-        ent.Comp.RecallsRemaining--;
-        ent.Comp.Recalling = false;
-        Dirty(ent);
     }
 
-    private void SpawnStationRifts()
+    private void SpawnStationRifts(Entity<FishClockworkArkComponent> ent)
     {
-        // РЎРїР°РІРЅРёРј РЅРµСЃРєРѕР»СЊРєРѕ СЂРёС„С‚РѕРІ РЅР° СЃС‚Р°РЅС†РёРё (РіСЂРёРґС‹ Р±РµР· Ark).
+        // Спавним несколько рифтов на станции (гриды без Ark).
         var arkGrids = new HashSet<EntityUid>();
         var arkQuery = EntityQueryEnumerator<FishClockworkArkComponent, TransformComponent>();
         while (arkQuery.MoveNext(out _, out _, out var axform))
@@ -227,14 +240,17 @@ public sealed partial class FishClockworkArkSystem : EntitySystem
         }
 
         var candidates = new List<EntityCoordinates>();
-        var spawnQuery = EntityQueryEnumerator<TransformComponent>();
-        // Р‘РµСЂС‘Рј СЃР»СѓС‡Р°Р№РЅС‹Рµ РєРѕРѕСЂРґРёРЅР°С‚С‹ СЃ station grids С‡РµСЂРµР· Marker / РїСЂРѕСЃС‚Рѕ interior tiles СЃР»РѕР¶РЅРѕ вЂ”
-        // РёСЃРїРѕР»СЊР·СѓРµРј СЃСѓС‰РµСЃС‚РІСѓСЋС‰РёРµ SpawnPoint-С‹ СЃС‚Р°РЅС†РёРё РєР°Рє СЏРєРѕСЂСЏ.
+        // Берём случайные координаты с station grids через SpawnPoint-ы станции как якоря.
         var markerQuery = EntityQueryEnumerator<SpawnPointComponent, TransformComponent>();
-        while (markerQuery.MoveNext(out _, out _, out var xform))
+        while (markerQuery.MoveNext(out var spawnUid, out _, out var xform))
         {
             if (xform.GridUid == null || arkGrids.Contains(xform.GridUid.Value))
                 continue;
+
+            // Только точки на станционных гридах.
+            if (_station.GetOwningStation(spawnUid, xform) == null)
+                continue;
+
             candidates.Add(xform.Coordinates);
         }
 
@@ -266,7 +282,7 @@ public sealed partial class FishClockworkArkSystem : EntitySystem
         for (var i = 0; i < count; i++)
         {
             var coords = _random.Pick(candidates);
-            var rift = Spawn("FishCityOfCogsRift", coords);
+            var rift = Spawn(ent.Comp.RiftPrototype, coords);
             if (reebeDest != null && TryComp(rift, out FishCityOfCogsRiftComponent? riftComp))
             {
                 riftComp.Destination = reebeDest;
@@ -303,4 +319,3 @@ public sealed partial class FishClockworkArkSystem : EntitySystem
         _cultRule.NotifyArkDestroyed();
     }
 }
-

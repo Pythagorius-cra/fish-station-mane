@@ -1,25 +1,26 @@
-﻿using Content.Server._Fish.ClockworkCult.Systems;
+using Content.Server._Fish.ClockworkCult.Systems;
 using Content.Server.Antag;
 using Content.Server.Chat.Systems;
 using Content.Server.GameTicking;
 using Content.Server.GameTicking.Rules;
+using Content.Server.RoundEnd;
 using Content.Shared._Fish.ClockworkCult;
 using Content.Shared._Fish.ClockworkCult.Components;
 using Content.Shared._Fish.ClockworkCult.Events;
 using Content.Shared.GameTicking.Components;
 using Robust.Shared.Player;
-using Timer = Robust.Shared.Timing.Timer;
 
 namespace Content.Server._Fish.ClockworkCult.GameRule;
 
 /// <summary>
-/// Game rule Clockwork Cult: СЃС‚Р°СЂС‚, С‚СЂРµРєРёРЅРі СЃР»СѓРі, win/loss РїРѕ Ark / Ratvar.
+/// Game rule Clockwork Cult: старт, трекинг слуг, win/loss по Ark / Ratvar.
 /// </summary>
 public sealed partial class FishClockworkCultRuleSystem : GameRuleSystem<FishClockworkCultRuleComponent>
 {
     [Dependency] private ChatSystem _chat = default!;
     [Dependency] private ISharedPlayerManager _player = default!;
     [Dependency] private FishClockworkPowerSystem _power = default!;
+    [Dependency] private RoundEndSystem _roundEnd = default!;
     [Dependency] private FishClockworkServantSystem _servant = default!;
 
     public override void Initialize()
@@ -53,7 +54,7 @@ public sealed partial class FishClockworkCultRuleSystem : GameRuleSystem<FishClo
             FishClockworkCultConstants.ArkMaxPrepMinutes,
             FishClockworkCultConstants.ArkBasePrepMinutes + players / FishClockworkCultConstants.ArkPlayersPerExtraMinute);
 
-        // РџСЂРёРІСЏР·РєР° С‚Р°Р№РјРµСЂР° Рє СѓР¶Рµ Р·Р°СЃРїР°РІРЅРµРЅРЅРѕРјСѓ Ark (LoadMapRule РіСЂСѓР·РёС‚ РєР°СЂС‚Сѓ СЂР°РЅСЊС€Рµ).
+        // Привязка таймера к уже заспавненному Ark (LoadMapRule грузит карту раньше).
         var arkQuery = EntityQueryEnumerator<FishClockworkArkComponent>();
         while (arkQuery.MoveNext(out var arkUid, out var ark))
         {
@@ -140,15 +141,9 @@ public sealed partial class FishClockworkCultRuleSystem : GameRuleSystem<FishClo
             playDefault: true,
             colorOverride: Color.FromHex("#BE8700"));
 
-        var endText = condition switch
-        {
-            FishClockworkWinCondition.CultWin => Loc.GetString("fish-clockwork-round-end-win"),
-            FishClockworkWinCondition.CultFailure => Loc.GetString("fish-clockwork-round-end-loss"),
-            _ => Loc.GetString("fish-clockwork-round-end-stalemate"),
-        };
-
-        GameTicker.EndRound(endText);
-        Timer.Spawn(rule.RoundEndDelay, () => GameTicker.RestartRound());
+        // Как Nukeops/BloodCult: RoundEndSystem завершает раунд и сам планирует restart
+        // (без дублирования текста из AppendRoundEndText и без гонки Timer.Spawn + RestartRound).
+        _roundEnd.EndRound(rule.RoundEndDelay);
     }
 
     public void NotifyArkDestroyed()
