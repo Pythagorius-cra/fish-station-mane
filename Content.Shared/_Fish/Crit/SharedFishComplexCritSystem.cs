@@ -6,7 +6,10 @@ using Content.Shared.Jittering;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
+using Content.Shared.Movement.Systems;
+using Content.Shared.Popups;
 using Content.Shared.Standing;
+using Content.Shared.Stunnable;
 using Content.Shared.Sunrise.Eye;
 using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
@@ -16,7 +19,7 @@ using MobStateEnum = Content.Shared.Mobs.MobState;
 namespace Content.Shared._Fish.Crit;
 
 /// <summary>
-/// Shared API и soft-crit переопределения для Crit.
+/// Shared API и soft-crit: ползание медленнее, вставание долгое (не сбрасывать прогресс).
 /// </summary>
 public abstract partial class SharedFishComplexCritSystem : EntitySystem
 {
@@ -28,13 +31,19 @@ public abstract partial class SharedFishComplexCritSystem : EntitySystem
     [Dependency] private SharedAudioSystem _audio = default!;
     [Dependency] private SharedJitteringSystem _jitter = default!;
     [Dependency] private SharedDarkenedVisionSystem _darkenedVision = default!;
+    [Dependency] private MovementSpeedModifierSystem _movement = default!;
 
     private static readonly SoundSpecifier FallSound =
         new SoundCollectionSpecifier("FishCritFall", AudioParams.Default.WithVolume(-2f));
 
-    /// <summary>Доп. затемнение экрана в Crit (тайлы от края).</summary>
     private const float CritVisionDarkening = 3.5f;
     private const float DeepCritVisionDarkening = 6f;
+
+    /// <summary>Базовый множитель в Crit (поверх crawl ~0.6 → ~0.13; травма замедляет ещё).</summary>
+    public const float CritCrawlSpeedMultiplier = 0.22f; // Fish-edit: медленное ползание; травма замедляет ещё
+
+    /// <summary>Вставание в Crit в N раз дольше.</summary>
+    public const float CritStandTimeMultiplier = 3.5f;
 
     public override void Initialize()
     {
@@ -44,14 +53,13 @@ public abstract partial class SharedFishComplexCritSystem : EntitySystem
         SubscribeLocalEvent<FishComplexCritComponent, ComponentShutdown>(OnShutdown);
         SubscribeLocalEvent<FishComplexCritComponent, MobStateChangedEvent>(OnMobStateChanged);
         SubscribeLocalEvent<FishComplexCritComponent, GetVisionDarkeningEvent>(OnGetVisionDarkening);
-        // Soft-crit = crawl: блокируем вставание, даже если soft-crit разрешает прочие действия.
-        SubscribeLocalEvent<FishComplexCritComponent, StandAttemptEvent>(OnStandAttempt);
+        SubscribeLocalEvent<FishComplexCritComponent, GetStandUpTimeEvent>(OnGetStandUpTime);
+        SubscribeLocalEvent<FishComplexCritComponent, StandUpAttemptEvent>(OnStandUpAttempt);
+        SubscribeLocalEvent<FishComplexCritComponent, RefreshMovementSpeedModifiersEvent>(OnRefreshSpeed);
     }
 
     private void OnMapInit(Entity<FishComplexCritComponent> ent, ref MapInitEvent args)
     {
-        // Dead-порог НЕ поднимаем: GibBehavior срабатывает при Blunt 400,
-        // а глубокий Crit маппится на Critical 100–200 без сдвига Death.
         if (TryComp<MobThresholdsComponent>(ent, out var thresholds) &&
             MobThreshold.TryGetThresholdForState(ent, MobStateEnum.Dead, out var dead, thresholds) &&
             dead != null)
@@ -71,24 +79,26 @@ public abstract partial class SharedFishComplexCritSystem : EntitySystem
         RemCompDeferred<FishCardiacArrestComponent>(ent);
         RemCompDeferred<FishLoseBreathComponent>(ent);
         RemCompDeferred<FishCritUnconsciousComponent>(ent);
+        _movement.RefreshMovementSpeedModifiers(ent.Owner);
     }
 
     private void OnMobStateChanged(Entity<FishComplexCritComponent> ent, ref MobStateChangedEvent args)
     {
         if (args.NewMobState == MobStateEnum.Critical || args.OldMobState == MobStateEnum.Critical)
+        {
             _darkenedVision.UpdateVisionDarkening(ent.Owner);
+            _movement.RefreshMovementSpeedModifiers(ent.Owner);
+        }
 
         if (args.NewMobState != MobStateEnum.Critical)
             return;
 
         if (args.OldMobState != MobStateEnum.Critical && Timing.IsFirstTimePredicted)
         {
-            // Звук падения + дрожь при входе в Crit. Soft-crit — ползание, без Stand.
             _audio.PlayPvs(FallSound, ent);
             _jitter.DoJitter(ent, TimeSpan.FromSeconds(2.5), refresh: true, amplitude: 12f, frequency: 5f);
         }
 
-        // Остаёмся вниз (crawl). Только обновляем CanMove для soft-crit.
         if (SharedFishCharacterReactionsSystem.ShouldSuppressSoftCritStand(EntityManager, ent.Owner))
             return;
 
@@ -104,30 +114,53 @@ public abstract partial class SharedFishComplexCritSystem : EntitySystem
         args.Strength += health <= -50f ? DeepCritVisionDarkening : CritVisionDarkening;
     }
 
-    private void OnStandAttempt(Entity<FishComplexCritComponent> ent, ref StandAttemptEvent args)
+    /// <summary>
+    /// Soft-crit: вставать можно, но долго. Не отменяем StandAttempt —
+    /// иначе do-after «встать» завершается в никуда / прогресс сбрасывается.
+    /// </summary>
+    private void OnGetStandUpTime(Entity<FishComplexCritComponent> ent, ref GetStandUpTimeEvent args)
     {
         if (!MobStateSys.IsCritical(ent))
             return;
 
-        // Ползание в Crit: не встаём (в т.ч. после окончания Knockdown AutoStand).
-        args.Cancel();
+        args.DoAfterTime *= CritStandTimeMultiplier;
     }
 
-    /// <summary>Обновить затемнение (глубина Crit меняется без смены MobState).</summary>
+    private void OnStandUpAttempt(Entity<FishComplexCritComponent> ent, ref StandUpAttemptEvent args)
+    {
+        if (!MobStateSys.IsCritical(ent))
+            return;
+
+        if (HasComp<FishCritUnconsciousComponent>(ent))
+        {
+            args.Cancelled = true;
+            args.Message = (Loc.GetString("fish-crit-cant-stand-unconscious"), PopupType.SmallCaution);
+            return;
+        }
+
+        args.Message = (Loc.GetString("fish-crit-stand-struggle"), PopupType.Small);
+    }
+
+    private void OnRefreshSpeed(Entity<FishComplexCritComponent> ent, ref RefreshMovementSpeedModifiersEvent args)
+    {
+        if (!MobStateSys.IsCritical(ent))
+            return;
+
+        // Медленное ползание в Crit.
+        args.ModifySpeed(CritCrawlSpeedMultiplier);
+    }
+
     protected void RefreshCritVision(EntityUid uid)
     {
         _darkenedVision.UpdateVisionDarkening(uid);
     }
 
-    /// <summary>
-    /// health = CritThreshold - TotalDamage (при CritThreshold=100).
-    /// </summary>
     public float GetCritScaleHealth(EntityUid uid, FishComplexCritComponent? crit = null, DamageableComponent? damageable = null)
     {
         if (!Resolve(uid, ref crit, false) || !Resolve(uid, ref damageable, false))
             return 100f;
 
-#pragma warning disable CS0618 // GetTotalDamage нужен для маппинга шкалы CritScaleHealth
+#pragma warning disable CS0618
         var total = Damageable.GetTotalDamage((uid, damageable));
 #pragma warning restore CS0618
         return crit.CritDamageThreshold - (float)total;
@@ -146,10 +179,6 @@ public abstract partial class SharedFishComplexCritSystem : EntitySystem
 #pragma warning restore CS0618
     }
 
-    /// <summary>
-    /// Soft-crit: в Critical без FishCritUnconscious действия не блокируются полностью.
-    /// Вызывается из Fish-хука в MobStateSystem.
-    /// </summary>
     public static bool AllowsSoftCritActions(IEntityManager entMan, EntityUid uid, MobStateEnum state)
     {
         if (state != MobStateEnum.Critical)
@@ -214,5 +243,11 @@ public abstract partial class SharedFishComplexCritSystem : EntitySystem
     public bool IsUndergoingCardiacArrest(EntityUid uid)
     {
         return TryComp<FishCardiacArrestComponent>(uid, out var arrest) && arrest.Active;
+    }
+
+    /// <summary>Идёт do-after вставания — не рвём его knockdown/oxy.</summary>
+    public static bool IsTryingToStand(IEntityManager entMan, EntityUid uid)
+    {
+        return entMan.TryGetComponent<KnockedDownComponent>(uid, out var kd) && kd.DoAfterId != null;
     }
 }

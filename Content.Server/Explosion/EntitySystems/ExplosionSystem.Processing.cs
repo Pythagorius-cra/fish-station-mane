@@ -481,13 +481,22 @@ public sealed partial class ExplosionSystem
             || throwForce <= 0
             || EntityManager.IsQueuedForDeletion(uid)
             || !_physicsQuery.TryGetComponent(uid, out var physics)
-            || physics.BodyType != BodyType.Dynamic)
+            // Fish-edit: игроки = KinematicController, не только Dynamic
+            || (physics.BodyType != BodyType.Dynamic && physics.BodyType != BodyType.KinematicController))
             return;
 
         var pos = _transformSystem.GetWorldPosition(xform);
         var dir = pos - epicenter.Position;
         if (dir.IsLengthZero())
             dir = _robustRandom.NextVector2().Normalized();
+
+        // Fish-start: маркер blast-trauma (удар о стену / контузия)
+        var blasted = EnsureComp<Content.Shared._Fish.Reactions.FishBlastedComponent>(uid);
+        blasted.ThrowSpeed = throwForce;
+        blasted.Expires = _timing.CurTime + TimeSpan.FromSeconds(4);
+        Dirty(uid, blasted);
+        // Fish-end
+
         _throwingSystem.TryThrow(
             uid,
             dir,

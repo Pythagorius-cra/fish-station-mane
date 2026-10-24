@@ -130,8 +130,8 @@ public sealed partial class FishComplexCritSystem : SharedFishComplexCritSystem
             if (cur >= lose.NextOxyTick)
             {
                 lose.NextOxyTick = cur + TimeSpan.FromSeconds(2);
-
-                // Пока LoseBreath > 0 — персонаж не дышит нормально; доп. окси-урон даёт arrest / crit ranges.
+                // Fish-edit: LoseBreath — доп. asphyx
+                ApplyOxy(uid, 1f);
             }
 
             Dirty(uid, lose);
@@ -382,6 +382,10 @@ public sealed partial class FishComplexCritSystem : SharedFishComplexCritSystem
 
     private void ApplyOxy(EntityUid uid, float amount)
     {
+        // Не рвём do-after вставания (BreakOnDamage на TryStanding).
+        if (IsTryingToStand(EntityManager, uid))
+            return;
+
         var spec = new DamageSpecifier(_proto.Index(Asphyxiation), FixedPoint2.New(amount));
         Damageable.TryChangeDamage(uid, spec, ignoreResistances: true, interruptsDoAfters: false);
     }
@@ -402,12 +406,18 @@ public sealed partial class FishComplexCritSystem : SharedFishComplexCritSystem
 
     private void ApplyWeaken(EntityUid uid, TimeSpan duration)
     {
-        // autoStand: false — soft-crit crawl, без авто-вставания после knockdown.
+        // Не сбрасываем прогресс «встать» повторным knockdown.
+        if (IsTryingToStand(EntityManager, uid))
+            return;
+
         _stun.TryKnockdown(uid, duration, refresh: true, autoStand: false, drop: true);
     }
 
     private void ApplyKnockdown(EntityUid uid, TimeSpan duration)
     {
+        if (IsTryingToStand(EntityManager, uid))
+            return;
+
         _stun.TryKnockdown(uid, duration, refresh: true, autoStand: false, drop: false);
     }
 

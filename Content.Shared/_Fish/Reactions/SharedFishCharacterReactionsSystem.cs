@@ -20,8 +20,15 @@ public abstract partial class SharedFishCharacterReactionsSystem : EntitySystem
     public override void Initialize()
     {
         base.Initialize();
+        SubscribeLocalEvent<FishCharacterReactionsComponent, MapInitEvent>(OnReactionsMapInit);
         SubscribeLocalEvent<FishCharacterReactionsComponent, MobStateChangedEvent>(OnMobStateChanged);
         SubscribeLocalEvent<FishCharacterReactionsComponent, ComponentShutdown>(OnShutdown);
+    }
+
+    private void OnReactionsMapInit(Entity<FishCharacterReactionsComponent> ent, ref MapInitEvent args)
+    {
+        // Единый хаб травмы на всех organic с Reactions.
+        EnsureComp<FishTraumaStatusComponent>(ent.Owner);
     }
 
     private void OnMobStateChanged(Entity<FishCharacterReactionsComponent> ent, ref MobStateChangedEvent args)
@@ -53,6 +60,22 @@ public abstract partial class SharedFishCharacterReactionsSystem : EntitySystem
         RemCompDeferred<FishCritUnconsciousComponent>(uid);
         RemCompDeferred<FishLoseBreathComponent>(uid);
         RemCompDeferred<FishCritShockComponent>(uid);
+        RemCompDeferred<FishBlastedComponent>(uid);
+        if (TryComp<FishTraumaStatusComponent>(uid, out var trauma))
+        {
+            // Смерть / удаление — сброс временных травм; компонент оставляем на живых.
+            trauma.ShockFactor = 0f;
+            trauma.LegImpairment = 0f;
+            trauma.ConcussionSeverity = 0f;
+            trauma.ConcussionUntil = TimeSpan.Zero;
+            trauma.TinnitusUntil = TimeSpan.Zero;
+            trauma.DisorientUntil = TimeSpan.Zero;
+            trauma.ChestTraumaUntil = TimeSpan.Zero;
+            trauma.ChestTraumaSeverity = 0f;
+            trauma.LastBlastForce = 0f;
+            Dirty(uid, trauma);
+        }
+
         if (MobStateSys.IsDead(uid))
         {
             RemCompDeferred<FishHeartFailureComponent>(uid);

@@ -16,7 +16,10 @@ using Content.Shared.FixedPoint;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Humanoid;
 using Content.Shared.Jittering;
+using Content.Server.Chat.Systems;
+using Content.Shared.Chat.Prototypes;
 using Content.Shared.Popups;
+using Content.Shared.Speech.Components;
 using Content.Shared.Standing;
 using Content.Shared.Trigger.Components.Effects;
 using Content.Shared.Trigger.Systems;
@@ -42,6 +45,8 @@ public sealed partial class FishCharacterReactionsSystem : SharedFishCharacterRe
     [Dependency] private SharedAudioSystem _audio = default!;
     [Dependency] private SharedJitteringSystem _jitter = default!;
     [Dependency] private StandingStateSystem _standing = default!;
+    [Dependency] private ChatSystem _chat = default!;
+    [Dependency] private IPrototypeManager _proto = default!;
 
     private static readonly ProtoId<DamageTypePrototype> HeatDamage = "Heat";
     private static readonly ProtoId<DamageTypePrototype> SlashDamage = "Slash";
@@ -61,6 +66,7 @@ public sealed partial class FishCharacterReactionsSystem : SharedFishCharacterRe
         SubscribeLocalEvent<FishCharacterReactionsComponent, IgnitedEvent>(OnIgnited);
         SubscribeLocalEvent<FishCharacterReactionsComponent, MoveEvent>(OnMove);
         SubscribeLocalEvent<FishCharacterReactionsComponent, FishGotHitByProjectileEvent>(OnGotHitByProjectile);
+        InitializeBlast();
     }
 
     private void OnDamageChanged(Entity<FishCharacterReactionsComponent> ent, ref DamageChangedEvent args)
@@ -73,6 +79,7 @@ public sealed partial class FishCharacterReactionsSystem : SharedFishCharacterRe
 
         TryBloodOnHit(ent, args);
         TryPainSound(ent, args);
+        TryApplyDamageTrauma(ent, args);
     }
 
     private void OnGotHitByProjectile(Entity<FishCharacterReactionsComponent> ent, ref FishGotHitByProjectileEvent args)
@@ -206,10 +213,24 @@ public sealed partial class FishCharacterReactionsSystem : SharedFishCharacterRe
         Dirty(ent);
     }
 
+    /// <summary>
+    /// Реальный scream-аудио из голоса персонажа (Vocal EmoteSounds), без chat-эмоута.
+    /// </summary>
     private void PlayPainSound(Entity<FishCharacterReactionsComponent> ent)
     {
+        // Голос персонажа (MaleScreams / FemaleScreams из EmoteSounds) — как у эмоута Scream, но без текста в чат.
+        if (TryComp<VocalComponent>(ent, out var vocal) &&
+            vocal.EmoteSounds is { } soundsId &&
+            _proto.TryIndex(soundsId, out var sounds) &&
+            _chat.TryPlayEmoteSound(ent.Owner, sounds, vocal.ScreamId,
+                AudioParams.Default.WithVolume(4f).WithVariation(0.05f)))
+        {
+            return;
+        }
+
         var female = TryComp<HumanoidProfileComponent>(ent, out var profile) && profile.Sex == Sex.Female;
-        _audio.PlayPvs(female ? ent.Comp.FemalePainSound : ent.Comp.MalePainSound, ent);
+        var sound = female ? ent.Comp.FemalePainSound : ent.Comp.MalePainSound;
+        _audio.PlayPvs(sound, ent, AudioParams.Default.WithVolume(4f).WithVariation(0.08f));
     }
 
     /// <summary>

@@ -34,5 +34,8 @@ fish-crit-cpr-air = You feel a rush of fresh air enter your lungs.
 
 fish-crit-defib-arrhythmia-cleared = Cardiac arrhythmia cleared.
 
+fish-crit-stand-struggle = You struggle to get up...
+fish-crit-cant-stand-unconscious = You can't get up — consciousness fades.
+
 reagent-name-fish-atropine = atropine
 reagent-desc-fish-atropine = A cardiac alkaloid used to treat heart failure complications.

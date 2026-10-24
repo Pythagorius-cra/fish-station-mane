@@ -32,8 +32,50 @@ public sealed class FishCharacterReactionsTests : InteractionTest
         {
             Assert.That(HasComp<FishCharacterReactionsComponent>(), Is.True);
             Assert.That(HasComp<FishComplexCritComponent>(), Is.True);
+            Assert.That(HasComp<FishTraumaStatusComponent>(), Is.True);
             Assert.That(HasComp<FlammableComponent>(), Is.True);
         });
+    }
+
+    [Test]
+    public async Task SevereLegImpairmentBlocksStand()
+    {
+        var traumaSys = SEntMan.System<SharedFishTraumaSystem>();
+
+        await AddAtmosphere();
+        await SpawnTarget(TargetProtoId);
+
+        await Server.WaitPost(() =>
+        {
+            traumaSys.ApplyLegImpairment(STarget!.Value, 0.95f);
+        });
+        await RunTicks(2);
+
+        var trauma = Comp<FishTraumaStatusComponent>();
+        Assert.That(traumaSys.CanAttemptStand((STarget!.Value, trauma), out var reason), Is.False);
+        Assert.That(reason, Is.EqualTo("fish-trauma-cant-stand-legs"));
+    }
+
+    [Test]
+    public async Task BlastMarkerAppliesConcussion()
+    {
+        var traumaSys = SEntMan.System<SharedFishTraumaSystem>();
+
+        await AddAtmosphere();
+        await SpawnTarget(TargetProtoId);
+
+        await Server.WaitPost(() =>
+        {
+            var blasted = SEntMan.EnsureComponent<FishBlastedComponent>(STarget!.Value);
+            blasted.ThrowSpeed = 10f;
+            blasted.Expires = TimeSpan.FromSeconds(9999); // не истекает за время теста
+        });
+        await RunTicks(5);
+
+        var trauma = Comp<FishTraumaStatusComponent>();
+        Assert.That(trauma.ConcussionSeverity, Is.GreaterThan(0f), "Primary blast должен дать контузию");
+        Assert.That(trauma.LastBlastForce, Is.GreaterThan(0f));
+        Assert.That(traumaSys.CanAttemptStand((STarget!.Value, trauma), out _), Is.True);
     }
 
     [Test]

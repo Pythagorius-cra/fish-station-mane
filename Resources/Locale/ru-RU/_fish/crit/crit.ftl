@@ -34,5 +34,8 @@ fish-crit-cpr-air = Вы чувствуете поток свежего возд
 
 fish-crit-defib-arrhythmia-cleared = Сердечная аритмия устранена.
 
+fish-crit-stand-struggle = Вы с трудом пытаетесь подняться...
+fish-crit-cant-stand-unconscious = Вы не можете встать — сознание плывёт.
+
 reagent-name-fish-atropine = атропин
 reagent-desc-fish-atropine = Сердечный алкалоид для лечения сердечной недостаточности.

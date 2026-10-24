@@ -1,3 +1,4 @@
+using Content.Shared._Fish.Crit;
 using Content.Shared.Alert;
 using Content.Shared.Buckle.Components;
 using Content.Shared.CCVar;
@@ -9,6 +10,7 @@ using Content.Shared.Gravity;
 using Content.Shared.Hands;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Input;
+using Content.Shared.Mobs.Components;
 using Content.Shared.Movement.Events;
 using Content.Shared.Movement.Systems;
 using Content.Shared.Popups;
@@ -270,6 +272,15 @@ public abstract partial class SharedStunSystem
         var stand = !entity.Comp2.DoAfterId.HasValue;
         SetAutoStand((entity, entity.Comp2), stand);
 
+        // Fish-start: soft-crit — повторное нажатие иконки не сбрасывает прогресс вставания
+        if (!stand &&
+            TryComp<MobStateComponent>(entity.Owner, out var mobState) &&
+            SharedFishComplexCritSystem.AllowsSoftCritActions(EntityManager, entity.Owner, mobState.CurrentState))
+        {
+            return;
+        }
+        // Fish-end
+
         if (!stand || !TryStanding((entity, entity.Comp2)))
             CancelKnockdownDoAfter((entity, entity.Comp2));
     }
@@ -299,13 +310,19 @@ public abstract partial class SharedStunSystem
         var ev = new GetStandUpTimeEvent(crawler.StandTime);
         RaiseLocalEvent(entity, ref ev);
 
+        // Fish-start: soft-crit — длинное вставание не рвём микро-уроном / дубликатом
+        var softCritStand = TryComp<MobStateComponent>(entity.Owner, out var standMob) &&
+            SharedFishComplexCritSystem.AllowsSoftCritActions(EntityManager, entity.Owner, standMob.CurrentState);
+        // Fish-end
+
         var doAfterArgs = new DoAfterArgs(EntityManager, entity, ev.DoAfterTime, new TryStandDoAfterEvent(), entity, entity)
         {
-            BreakOnDamage = true,
+            // Fish-edit: soft-crit — BreakOnDamage off, иначе oxy/тик сбрасывает прогресс
+            BreakOnDamage = !softCritStand,
             DamageThreshold = 5,
             CancelDuplicate = true,
             RequireCanInteract = false,
-            BreakOnHandChange = true
+            BreakOnHandChange = !softCritStand // Fish-edit: в crit руки дёргаются — не отменять
         };
 
         // If we try standing don't try standing again
