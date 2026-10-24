@@ -10,6 +10,7 @@ using Content.Shared.Damage.Systems;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Interaction;
 using Content.Shared.Inventory;
+using Content.Shared.Maps;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
@@ -40,6 +41,7 @@ public sealed partial class FishClockworkScriptureSystem : EntitySystem
     [Dependency] private SharedStunSystem _stun = default!;
     [Dependency] private SharedTransformSystem _transform = default!;
     [Dependency] private IGameTiming _timing = default!;
+    [Dependency] private TurfSystem _turf = default!;
 
     private static readonly ProtoId<DamageTypePrototype> HeatDamage = "Heat";
     private static readonly ProtoId<DamageTypePrototype> PoisonDamage = "Poison";
@@ -75,10 +77,22 @@ public sealed partial class FishClockworkScriptureSystem : EntitySystem
             return true;
 
         var coords = _transform.GetMoverCoordinates(user);
+        if (!_turf.TryGetTileRef(coords, out var userTile))
+            return true;
+
         var spawnId = proto.SpawnPrototype.Value.Id;
-        foreach (var nearby in _lookup.GetEntitiesInRange(coords, 0.75f))
+        // Range covers a full tile diagonal so same-tile entities are always candidates;
+        // occupancy is decided by grid+indices, not distance (CodeRabbit OnePerTile).
+        foreach (var nearby in _lookup.GetEntitiesInRange(coords, 1.5f))
         {
             if (MetaData(nearby).EntityPrototype?.ID != spawnId)
+                continue;
+
+            if (!_turf.TryGetTileRef(_transform.GetMoverCoordinates(nearby), out var nearbyTile))
+                continue;
+
+            if (nearbyTile.Value.GridUid != userTile.Value.GridUid ||
+                nearbyTile.Value.GridIndices != userTile.Value.GridIndices)
                 continue;
 
             if (!quiet)

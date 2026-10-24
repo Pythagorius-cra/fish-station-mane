@@ -10,6 +10,10 @@
   - type: RuleGrids
   - type: LoadMapRule
     gridPath: /Maps/_Fish/Nonstations/reebe.yml
+  # PrePlayerSpawn picks lobby sessions with no AttachedEntity; without this
+  # AntagSelectEntityEvent never spawns a humanoid and assignment fails.
+  - type: AntagLoadProfileRule
+    speciesOverride: Human
   - type: AntagSelection
     selectionTime: PrePlayerSpawn
     agentName: fish-clockwork-round-end-agent-name
