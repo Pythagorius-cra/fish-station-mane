@@ -73,7 +73,8 @@
   components:
   - type: Sprite
     sprite: _Fish/Mobs/Species/Ipc/organs.rsi
-    state: microcell
+    layers:
+    - state: microcell
   - type: Organ
 
 - type: entity

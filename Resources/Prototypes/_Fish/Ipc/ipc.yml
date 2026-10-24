@@ -43,7 +43,7 @@
   - type: Damageable
     damageModifierSet: Ipc
   - type: Injurable
-    damageContainer: Synth
+    damageContainer: Ipc
   - type: DamageVisuals
     damageOverlayGroups:
       Brute:
