@@ -2,6 +2,7 @@ using Content.Shared._Fish.Reactions;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Systems;
 using Content.Shared.Drunk;
+using Robust.Shared.Random;
 
 namespace Content.Server._Fish.Reactions;
 
@@ -45,6 +46,13 @@ public sealed partial class FishCharacterReactionsSystem
             _trauma.ApplyChestTrauma(ent.Owner, chestSev, TimeSpan.FromSeconds(10 + chestSev * 15));
             if (chestSev >= 0.45f)
                 _crit.AdjustLoseBreath(ent.Owner, TimeSpan.FromSeconds(3 + chestSev * 8));
+
+            if (Timing.CurTime >= ent.Comp.NextPainSound && _random.Prob(0.4f))
+            {
+                PlayPainSound(ent, chestSev >= 0.7f ? FishPainSoundKind.Cough : FishPainSoundKind.Gasp);
+                ent.Comp.NextPainSound = Timing.CurTime + TimeSpan.FromSeconds(3);
+                Dirty(ent);
+            }
         }
 
         // Электротравма: краткая потеря координации.

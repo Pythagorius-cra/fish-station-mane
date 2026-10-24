@@ -86,13 +86,20 @@ public sealed partial class FishCharacterReactionsSystem
                 interruptsDoAfters: false,
                 origin: null);
             _crit.AdjustLoseBreath(ent.Owner, TimeSpan.FromSeconds(4 + severity * 10));
+
+            if (TryComp<FishCharacterReactionsComponent>(ent, out var gaspReact))
+                PlayPainSound((ent.Owner, gaspReact), FishPainSoundKind.Gasp);
         }
 
         _stutter.DoStutter(ent.Owner, TimeSpan.FromSeconds(8 + severity * 8), refresh: true);
         _jitter.DoJitter(ent.Owner, TimeSpan.FromSeconds(3), refresh: true, amplitude: 16f, frequency: 7f);
 
         if (TryComp<FishCharacterReactionsComponent>(ent, out var reactions))
-            PlayPainSound((ent.Owner, reactions));
+        {
+            PlayPainSound((ent.Owner, reactions), FishPainSoundKind.Panic);
+            reactions.NextPainSound = Timing.CurTime + reactions.PainSoundCooldown;
+            Dirty(ent.Owner, reactions);
+        }
 
         _popup.PopupEntity(Loc.GetString("fish-reactions-blast-wave"), ent.Owner, ent.Owner, PopupType.LargeCaution);
     }
@@ -143,7 +150,11 @@ public sealed partial class FishCharacterReactionsSystem
         _jitter.DoJitter(ent.Owner, TimeSpan.FromSeconds(2.5), refresh: true, amplitude: 20f, frequency: 8f);
 
         if (TryComp<FishCharacterReactionsComponent>(ent, out var reactions))
-            PlayPainSound((ent.Owner, reactions));
+        {
+            PlayPainSound((ent.Owner, reactions), FishPainSoundKind.Long);
+            reactions.NextPainSound = Timing.CurTime + TimeSpan.FromSeconds(2);
+            Dirty(ent.Owner, reactions);
+        }
 
         _popup.PopupEntity(Loc.GetString("fish-reactions-blast-wall"), ent.Owner, ent.Owner, PopupType.LargeCaution);
         _audio.PlayPvs(new SoundCollectionSpecifier("FishCritFall"), ent.Owner);

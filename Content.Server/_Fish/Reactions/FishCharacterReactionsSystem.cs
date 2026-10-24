@@ -67,6 +67,7 @@ public sealed partial class FishCharacterReactionsSystem : SharedFishCharacterRe
         SubscribeLocalEvent<FishCharacterReactionsComponent, MoveEvent>(OnMove);
         SubscribeLocalEvent<FishCharacterReactionsComponent, FishGotHitByProjectileEvent>(OnGotHitByProjectile);
         InitializeBlast();
+        InitializePainAudio();
     }
 
     private void OnDamageChanged(Entity<FishCharacterReactionsComponent> ent, ref DamageChangedEvent args)
@@ -104,7 +105,7 @@ public sealed partial class FishCharacterReactionsSystem : SharedFishCharacterRe
         if (Timing.CurTime < ent.Comp.NextPainSound)
             return;
 
-        PlayPainSound(ent);
+        PlayPainSound(ent, FishPainSoundKind.Burn);
         _audio.PlayPvs(ent.Comp.BurnSound, ent);
         _jitter.DoJitter(ent, TimeSpan.FromSeconds(2), refresh: true, amplitude: 14f, frequency: 6f);
         ent.Comp.NextPainSound = Timing.CurTime + ent.Comp.PainSoundCooldown;
@@ -180,57 +181,6 @@ public sealed partial class FishCharacterReactionsSystem : SharedFishCharacterRe
         var surfaceAmount = FixedPoint2.New(ent.Comp.HitBloodOnSurface * scale);
         AddBloodToSurface(ent.Owner, emitter, blood, surfaceAmount, standingPreferFoots: true);
         _audio.PlayPvs(ent.Comp.BleedSound, ent);
-    }
-
-    private void TryPainSound(Entity<FishCharacterReactionsComponent> ent, DamageChangedEvent args)
-    {
-        if (Timing.CurTime < ent.Comp.NextPainSound)
-            return;
-
-        if (args.DamageDelta == null)
-            return;
-
-        var pain = GetPainDamage(args.DamageDelta);
-        if (pain < ent.Comp.PainMinDamage)
-            return;
-
-        if (!_random.Prob(0.55f))
-            return;
-
-        var heat = args.DamageDelta.DamageDict.TryGetValue(HeatDamage, out var h) && h > 0;
-        PlayPainSound(ent);
-        if (heat)
-            _audio.PlayPvs(ent.Comp.BurnSound, ent);
-
-        _jitter.DoJitter(
-            ent,
-            ent.Comp.PainJitterDuration,
-            refresh: true,
-            amplitude: heat ? ent.Comp.PainJitterAmplitude * 1.4f : ent.Comp.PainJitterAmplitude,
-            frequency: heat ? 6f : 4f);
-
-        ent.Comp.NextPainSound = Timing.CurTime + ent.Comp.PainSoundCooldown;
-        Dirty(ent);
-    }
-
-    /// <summary>
-    /// Реальный scream-аудио из голоса персонажа (Vocal EmoteSounds), без chat-эмоута.
-    /// </summary>
-    private void PlayPainSound(Entity<FishCharacterReactionsComponent> ent)
-    {
-        // Голос персонажа (MaleScreams / FemaleScreams из EmoteSounds) — как у эмоута Scream, но без текста в чат.
-        if (TryComp<VocalComponent>(ent, out var vocal) &&
-            vocal.EmoteSounds is { } soundsId &&
-            _proto.TryIndex(soundsId, out var sounds) &&
-            _chat.TryPlayEmoteSound(ent.Owner, sounds, vocal.ScreamId,
-                AudioParams.Default.WithVolume(4f).WithVariation(0.05f)))
-        {
-            return;
-        }
-
-        var female = TryComp<HumanoidProfileComponent>(ent, out var profile) && profile.Sex == Sex.Female;
-        var sound = female ? ent.Comp.FemalePainSound : ent.Comp.MalePainSound;
-        _audio.PlayPvs(sound, ent, AudioParams.Default.WithVolume(4f).WithVariation(0.08f));
     }
 
     /// <summary>

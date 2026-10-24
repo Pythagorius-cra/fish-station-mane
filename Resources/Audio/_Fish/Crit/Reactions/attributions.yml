@@ -1,0 +1,56 @@
+# Реальные человеческие вокалы для Crit/Reactions (только CC0 / public domain).
+# Все файлы нормализованы в mono OGG Vorbis 44.1 kHz (ffmpeg: silenceremove + dynaudnorm).
+
+- files: ["sharp_male/*.ogg", "stand_male/stand_m_01.ogg", "stand_male/stand_m_05.ogg", "panic_male/panic_m_01.ogg", "panic_male/panic_m_02.ogg", "panic_male/panic_m_03.ogg", "panic_male/panic_m_04.ogg"]
+  license: "CC0-1.0"
+  copyright: "qubodup"
+  source: "https://opengameart.org/content/15-vocal-male-strainhurtpainjump-sounds"
+  notes: "Processed/split from slightscreams.7z (CC0 since 2024-08-30)."
+
+- files: ["sharp_male/*.ogg", "moan_male/*.ogg", "burn_male/*.ogg", "panic_male/*.ogg"]
+  license: "CC0-1.0"
+  copyright: "Lasse Bührmann (EmoPreben)"
+  source: "https://opengameart.org/content/pain-sounds-by-emopreben"
+  notes: "From painsounds.zip; mixed into sharp/moan/burn/panic collections."
+
+- files: ["sharp_female/*.ogg", "moan_female/*.ogg"]
+  license: "CC0-1.0"
+  copyright: "AuraVoice / Nocturnal_Vanguard"
+  source: "https://opengameart.org/content/female-hurt-grunts-groans"
+  notes: "Split from female_hurt_grunts_groans_1.ogg by silence."
+
+- files: ["sharp_male/*.ogg", "burn_male/*.ogg"]
+  license: "CC0-1.0"
+  copyright: "EZduzziteh"
+  source: "https://opengameart.org/content/hurt-sound-effects"
+  notes: "hurt_01..06.mp3 converted/normalized."
+
+- files: ["moan_male/*.ogg", "long_male/*.ogg", "fall_male/*.ogg", "death_male/*.ogg", "stand_male/*.ogg"]
+  license: "CC0-1.0"
+  copyright: "Exewin"
+  source: "https://opengameart.org/content/death-sounds-0"
+  notes: "From exewinDeathSoundsPack.zip."
+
+- files: ["fall_male/*.ogg", "death_male/*.ogg", "sharp_male/*.ogg"]
+  license: "CC0-1.0"
+  copyright: "TinyWorlds"
+  source: "https://opengameart.org/content/5-hit-sounds-dying"
+  notes: "From 5Hit_Sounds.zip (ogg)."
+
+- files: ["long_male/*.ogg", "moan_male/*.ogg", "fall_male/*.ogg", "panic_male/*.ogg", "death_male/*.ogg", "burn_male/*.ogg", "stand_male/*.ogg"]
+  license: "CC0-1.0"
+  copyright: "thebardofblasphemy"
+  source: "https://opengameart.org/content/grunts-male-death-and-pain"
+  notes: "Split from death pain grunts.wav by silence detection."
+
+- files: ["gasp/gasp_01.ogg", "gasp/gasp_02.ogg", "gasp/gasp_03.ogg"]
+  license: "CC0-1.0"
+  copyright: "primbal"
+  source: "https://opengameart.org/content/horror-breathing"
+  notes: "Trimmed segments from horrorbreathing.ogg."
+
+- files: ["gasp/gasp_04.ogg"]
+  license: "CC0-1.0"
+  copyright: "mikeask"
+  source: "https://opengameart.org/content/breathing-tired"
+  notes: "Converted from breathing tired.wav."
