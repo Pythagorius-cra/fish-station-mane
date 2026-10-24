@@ -80,12 +80,10 @@
                        "name":  "brass_filaments"
                    },
                    {
-                       "name":  "ocular_warden",
-                       "directions":  4
+                       "name":  "ocular_warden"
                    },
                    {
-                       "name":  "ocular_warden_unwrenched",
-                       "directions":  4
+                       "name":  "ocular_warden_unwrenched"
                    },
                    {
                        "name":  "blind_eye"

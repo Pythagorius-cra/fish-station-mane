@@ -65,8 +65,7 @@
                        "name":  "ratvarwindowglow"
                    },
                    {
-                       "name":  "ratvarwindowglow_s",
-                       "directions":  4
+                       "name":  "ratvarwindowglow_s"
                    },
                    {
                        "name":  "ratvargrilleglow"
@@ -75,8 +74,7 @@
                        "name":  "ratvarbrokengrilleglow"
                    },
                    {
-                       "name":  "ratvarwindoorglow",
-                       "directions":  4
+                       "name":  "ratvarwindoorglow"
                    },
                    {
                        "name":  "warden_gaze"
@@ -88,8 +86,7 @@
                        "name":  "mending_mantra"
                    },
                    {
-                       "name":  "servant_blocker",
-                       "directions":  4
+                       "name":  "servant_blocker"
                    },
                    {
                        "name":  "eminence"

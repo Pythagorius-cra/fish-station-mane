@@ -11,8 +11,7 @@
                        "name":  "anime_fragment"
                    },
                    {
-                       "name":  "clockwork_marauder",
-                       "directions":  4
+                       "name":  "clockwork_marauder"
                    },
                    {
                        "name":  "marauder_emerge"
@@ -27,44 +26,34 @@
                        "name":  "aiframe"
                    },
                    {
-                       "name":  "eye1",
-                       "directions":  4
+                       "name":  "eye1"
                    },
                    {
-                       "name":  "eye2",
-                       "directions":  4
+                       "name":  "eye2"
                    },
                    {
-                       "name":  "eye3",
-                       "directions":  4
+                       "name":  "eye3"
                    },
                    {
-                       "name":  "eye4",
-                       "directions":  4
+                       "name":  "eye4"
                    },
                    {
-                       "name":  "eye5",
-                       "directions":  4
+                       "name":  "eye5"
                    },
                    {
-                       "name":  "eye6",
-                       "directions":  4
+                       "name":  "eye6"
                    },
                    {
-                       "name":  "eye7",
-                       "directions":  4
+                       "name":  "eye7"
                    },
                    {
-                       "name":  "eye8",
-                       "directions":  4
+                       "name":  "eye8"
                    },
                    {
-                       "name":  "eye9",
-                       "directions":  4
+                       "name":  "eye9"
                    },
                    {
-                       "name":  "eye10",
-                       "directions":  4
+                       "name":  "eye10"
                    }
                ]
 }
