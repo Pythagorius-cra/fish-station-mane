@@ -46,7 +46,6 @@ public sealed partial class FishCharacterReactionsSystem : SharedFishCharacterRe
     [Dependency] private SharedAudioSystem _audio = default!;
     [Dependency] private SharedJitteringSystem _jitter = default!;
     [Dependency] private StandingStateSystem _standing = default!;
-    [Dependency] private SharedStunSystem _stun = default!;
     [Dependency] private ChatSystem _chat = default!;
     [Dependency] private IPrototypeManager _proto = default!;
 
