@@ -103,9 +103,12 @@ public abstract partial class SharedFishComplexCritSystem : EntitySystem
         if (args.NewMobState != MobStateEnum.Critical)
             return;
 
-        // Звук падения — только на сервере (иначе predicted + PlayPvs = двойной звук).
         if (args.OldMobState != MobStateEnum.Critical && Timing.IsFirstTimePredicted)
+        {
             _jitter.DoJitter(ent, TimeSpan.FromSeconds(2.5), refresh: true, amplitude: 12f, frequency: 5f);
+            // Server override — один Subscribe на MobStateChanged (без дубля в FishComplexCritSystem).
+            PlayCritFallSound(ent);
+        }
 
         // Снять двуручный хват при входе в Crit.
         _wieldable.UnwieldAll(ent.Owner, force: true);
@@ -196,6 +199,9 @@ public abstract partial class SharedFishComplexCritSystem : EntitySystem
     {
         _darkenedVision.UpdateVisionDarkening(uid);
     }
+
+    /// <summary>Звук падения в Crit — только на сервере (см. FishComplexCritSystem).</summary>
+    protected virtual void PlayCritFallSound(Entity<FishComplexCritComponent> ent) { }
 
     public float GetCritScaleHealth(EntityUid uid, FishComplexCritComponent? crit = null, DamageableComponent? damageable = null)
     {

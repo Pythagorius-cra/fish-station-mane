@@ -88,17 +88,10 @@ public sealed partial class FishComplexCritSystem : SharedFishComplexCritSystem
         base.Initialize();
         InitializeCpr();
         InitializeDefib();
-        SubscribeLocalEvent<FishComplexCritComponent, MobStateChangedEvent>(OnServerMobStateChanged);
     }
 
-    /// <summary>
-    /// Fall sound only on server — Shared DoJitter stays predicted; PlayPvs here avoids double audio.
-    /// </summary>
-    private void OnServerMobStateChanged(Entity<FishComplexCritComponent> ent, ref MobStateChangedEvent args)
+    protected override void PlayCritFallSound(Entity<FishComplexCritComponent> ent)
     {
-        if (args.NewMobState != MobStateEnum.Critical || args.OldMobState == MobStateEnum.Critical)
-            return;
-
         _audio.PlayPvs(FallSound, ent);
     }
 
