@@ -107,13 +107,14 @@ public sealed partial class FishCardiacArrestComponent : Component
 [Access(typeof(SharedFishComplexCritSystem), typeof(Content.Shared._Fish.Reactions.SharedFishCharacterReactionsSystem))]
 public sealed partial class FishLoseBreathComponent : Component
 {
-    [DataField, AutoNetworkedField]
+    /// <summary>Серверный таймер оставшегося LoseBreath (не сетевой каждый кадр).</summary>
+    [DataField]
     public TimeSpan Remaining;
 
     [DataField, AutoNetworkedField]
     public TimeSpan MaxRemaining = TimeSpan.FromSeconds(50);
 
     [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
-    [AutoNetworkedField, AutoPausedField]
+    [AutoPausedField]
     public TimeSpan NextOxyTick;
 }

@@ -126,15 +126,14 @@ public sealed partial class FishComplexCritSystem : SharedFishComplexCritSystem
             if (lose.Remaining < TimeSpan.Zero)
                 lose.Remaining = TimeSpan.Zero;
 
-            // Раз в секунду гасп / кислородный урон при LoseBreath (приближение breathe).
+            // Раз в ~2 с гасп / кислородный урон; Dirty только здесь (Remaining не networked).
             if (cur >= lose.NextOxyTick)
             {
                 lose.NextOxyTick = cur + TimeSpan.FromSeconds(2);
                 // Fish-edit: LoseBreath — доп. asphyx
                 ApplyOxy(uid, 1f);
+                Dirty(uid, lose);
             }
-
-            Dirty(uid, lose);
 
             if (lose.Remaining <= TimeSpan.Zero)
                 RemCompDeferred<FishLoseBreathComponent>(uid);

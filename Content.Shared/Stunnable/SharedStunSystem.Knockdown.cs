@@ -310,6 +310,10 @@ public abstract partial class SharedStunSystem
         if (!Resolve(entity, ref entity.Comp, false))
             return true;
 
+        // Fish-edit: повтор «встать» не должен CancelDuplicate сбрасывать текущий do-after
+        if (entity.Comp.DoAfterId != null)
+            return true;
+
         if (!KnockdownOver((entity, entity.Comp)))
             return false;
 
