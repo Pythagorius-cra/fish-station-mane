@@ -1,384 +1,70 @@
-{
-  "version": 1,
-  "license": "CC-BY-SA-3.0",
-  "copyright": "tgstation Clockwork Cult assets (commit f42d5a43ca9c7e2201878566c37162ccaea3a34d). CC-BY-SA-3.0. Artists: SkowronX, FuryMcFlurry, Xhuis and tgstation contributors.",
-  "size": {
-    "x": 32,
-    "y": 32
-  },
-  "states": [
-    {
-      "name": "anime_fragment",
-      "delays": [
-        [
-          0.07,
-          0.07,
-          0.07,
-          0.07,
-          0.07,
-          0.07,
-          0.07,
-          0.07
-        ]
-      ]
-    },
-    {
-      "name": "clockwork_marauder",
-      "directions": 4,
-      "delays": [
-        [
-          0.07,
-          0.07,
-          0.07,
-          0.07,
-          0.07,
-          0.07,
-          0.07,
-          0.07
-        ],
-        [
-          0.07,
-          0.07,
-          0.07,
-          0.07,
-          0.07,
-          0.07,
-          0.07,
-          0.07
-        ],
-        [
-          0.07,
-          0.07,
-          0.07,
-          0.07,
-          0.07,
-          0.07,
-          0.07,
-          0.07
-        ],
-        [
-          0.07,
-          0.07,
-          0.07,
-          0.07,
-          0.07,
-          0.07,
-          0.07,
-          0.07
-        ]
-      ]
-    },
-    {
-      "name": "marauder_emerge"
-    },
-    {
-      "name": "bg_gear"
-    },
-    {
-      "name": "bg_clock"
-    },
-    {
-      "name": "aiframe"
-    },
-    {
-      "name": "eye1",
-      "directions": 4,
-      "delays": [
-        [
-          0.1,
-          0.1,
-          0.1,
-          0.1
-        ],
-        [
-          0.1,
-          0.1,
-          0.1,
-          0.1
-        ],
-        [
-          0.1,
-          0.1,
-          0.1,
-          0.1
-        ],
-        [
-          0.1,
-          0.1,
-          0.1,
-          0.1
-        ]
-      ]
-    },
-    {
-      "name": "eye2",
-      "directions": 4,
-      "delays": [
-        [
-          0.1,
-          0.1,
-          0.1,
-          0.1
-        ],
-        [
-          0.1,
-          0.1,
-          0.1,
-          0.1
-        ],
-        [
-          0.1,
-          0.1,
-          0.1,
-          0.1
-        ],
-        [
-          0.1,
-          0.1,
-          0.1,
-          0.1
-        ]
-      ]
-    },
-    {
-      "name": "eye3",
-      "directions": 4,
-      "delays": [
-        [
-          0.3,
-          0.3,
-          0.3,
-          0.3
-        ],
-        [
-          0.3,
-          0.3,
-          0.3,
-          0.3
-        ],
-        [
-          0.3,
-          0.3,
-          0.3,
-          0.3
-        ],
-        [
-          0.3,
-          0.3,
-          0.3,
-          0.3
-        ]
-      ]
-    },
-    {
-      "name": "eye4",
-      "directions": 4,
-      "delays": [
-        [
-          0.4,
-          0.4,
-          0.4,
-          0.4
-        ],
-        [
-          0.4,
-          0.4,
-          0.4,
-          0.4
-        ],
-        [
-          0.4,
-          0.4,
-          0.4,
-          0.4
-        ],
-        [
-          0.4,
-          0.4,
-          0.4,
-          0.4
-        ]
-      ]
-    },
-    {
-      "name": "eye5",
-      "directions": 4,
-      "delays": [
-        [
-          0.5,
-          0.5,
-          0.5,
-          0.5
-        ],
-        [
-          0.5,
-          0.5,
-          0.5,
-          0.5
-        ],
-        [
-          0.5,
-          0.5,
-          0.5,
-          0.5
-        ],
-        [
-          0.5,
-          0.5,
-          0.5,
-          0.5
-        ]
-      ]
-    },
-    {
-      "name": "eye6",
-      "directions": 4,
-      "delays": [
-        [
-          0.6,
-          0.6,
-          0.6,
-          0.6
-        ],
-        [
-          0.6,
-          0.6,
-          0.6,
-          0.6
-        ],
-        [
-          0.6,
-          0.6,
-          0.6,
-          0.6
-        ],
-        [
-          0.6,
-          0.6,
-          0.6,
-          0.6
-        ]
-      ]
-    },
-    {
-      "name": "eye7",
-      "directions": 4,
-      "delays": [
-        [
-          0.7,
-          0.7,
-          0.7,
-          0.7
-        ],
-        [
-          0.7,
-          0.7,
-          0.7,
-          0.7
-        ],
-        [
-          0.7,
-          0.7,
-          0.7,
-          0.7
-        ],
-        [
-          0.7,
-          0.7,
-          0.7,
-          0.7
-        ]
-      ]
-    },
-    {
-      "name": "eye8",
-      "directions": 4,
-      "delays": [
-        [
-          0.8,
-          0.8,
-          0.8,
-          0.8
-        ],
-        [
-          0.8,
-          0.8,
-          0.8,
-          0.8
-        ],
-        [
-          0.8,
-          0.8,
-          0.8,
-          0.8
-        ],
-        [
-          0.8,
-          0.8,
-          0.8,
-          0.8
-        ]
-      ]
-    },
-    {
-      "name": "eye9",
-      "directions": 4,
-      "delays": [
-        [
-          0.9,
-          0.9,
-          0.9,
-          0.9
-        ],
-        [
-          0.9,
-          0.9,
-          0.9,
-          0.9
-        ],
-        [
-          0.9,
-          0.9,
-          0.9,
-          0.9
-        ],
-        [
-          0.9,
-          0.9,
-          0.9,
-          0.9
-        ]
-      ]
-    },
-    {
-      "name": "eye10",
-      "directions": 4,
-      "delays": [
-        [
-          1,
-          1,
-          1,
-          1
-        ],
-        [
-          1,
-          1,
-          1,
-          1
-        ],
-        [
-          1,
-          1,
-          1,
-          1
-        ],
-        [
-          1,
-          1,
-          1,
-          1
-        ]
-      ]
-    }
-  ]
+﻿{
+    "version":  1,
+    "license":  "CC-BY-SA-3.0",
+    "copyright":  "tgstation Clockwork Cult assets (commit f42d5a43ca9c7e2201878566c37162ccaea3a34d). CC-BY-SA-3.0. Artists: SkowronX, FuryMcFlurry, Xhuis and tgstation contributors.",
+    "size":  {
+                 "x":  32,
+                 "y":  32
+             },
+    "states":  [
+                   {
+                       "name":  "anime_fragment"
+                   },
+                   {
+                       "name":  "clockwork_marauder",
+                       "directions":  4
+                   },
+                   {
+                       "name":  "marauder_emerge"
+                   },
+                   {
+                       "name":  "bg_gear"
+                   },
+                   {
+                       "name":  "bg_clock"
+                   },
+                   {
+                       "name":  "aiframe"
+                   },
+                   {
+                       "name":  "eye1",
+                       "directions":  4
+                   },
+                   {
+                       "name":  "eye2",
+                       "directions":  4
+                   },
+                   {
+                       "name":  "eye3",
+                       "directions":  4
+                   },
+                   {
+                       "name":  "eye4",
+                       "directions":  4
+                   },
+                   {
+                       "name":  "eye5",
+                       "directions":  4
+                   },
+                   {
+                       "name":  "eye6",
+                       "directions":  4
+                   },
+                   {
+                       "name":  "eye7",
+                       "directions":  4
+                   },
+                   {
+                       "name":  "eye8",
+                       "directions":  4
+                   },
+                   {
+                       "name":  "eye9",
+                       "directions":  4
+                   },
+                   {
+                       "name":  "eye10",
+                       "directions":  4
+                   }
+               ]
 }
