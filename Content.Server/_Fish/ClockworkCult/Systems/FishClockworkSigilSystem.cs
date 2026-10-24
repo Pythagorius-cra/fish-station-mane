@@ -22,6 +22,7 @@ public sealed partial class FishClockworkSigilSystem : EntitySystem
 {
     [Dependency] private DamageableSystem _damageable = default!;
     [Dependency] private MobStateSystem _mobState = default!;
+    [Dependency] private MobThresholdSystem _mobThreshold = default!;
     [Dependency] private SharedPopupSystem _popup = default!;
     [Dependency] private FishClockworkPowerSystem _power = default!;
     [Dependency] private FishClockworkServantSystem _servant = default!;
@@ -158,7 +159,26 @@ public sealed partial class FishClockworkSigilSystem : EntitySystem
                 {
                     if (_power.TrySpendVitality(matrix.ReviveVitalityCost))
                     {
-                        _mobState.ChangeMobState(occupant, MobState.Critical, mob);
+                        // Как у дефибриллятора: сначала урон ниже порога Dead, иначе DamageChanged снова убьёт.
+                        if (TryComp<MobThresholdsComponent>(occupant, out var thresholds) &&
+                            _mobThreshold.TryGetThresholdForState(occupant, MobState.Dead, out var deadThreshold, thresholds))
+                        {
+                            if (_damageable.GetTotalDamage(occupant) >= deadThreshold)
+                                _damageable.ClearAllDamage(occupant);
+
+                            if (_mobState.IsDead(occupant, mob) &&
+                                _damageable.GetTotalDamage(occupant) < deadThreshold)
+                            {
+                                _mobState.ChangeMobState(occupant, MobState.Critical, mob);
+                            }
+                        }
+                        else
+                        {
+                            _damageable.ClearAllDamage(occupant);
+                            if (_mobState.IsDead(occupant, mob))
+                                _mobState.ChangeMobState(occupant, MobState.Critical, mob);
+                        }
+
                         _popup.PopupEntity(Loc.GetString("fish-clockwork-vitality-revive"), occupant, PopupType.Large);
                         QueueDel(ent.Owner);
                         return;

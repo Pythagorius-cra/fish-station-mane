@@ -144,12 +144,23 @@ public sealed partial class FishClockworkSlabSystem : EntitySystem
         if (!_power.TrySpendPower(proto.PowerCost))
             return;
 
-        if (_scripture.TryInvoke(ent.Owner, user, proto))
+        if (!_scripture.TryInvoke(ent.Owner, user, proto))
         {
-            args.Handled = true;
-            _popup.PopupEntity(Loc.GetString("fish-clockwork-scripture-success", ("name", Loc.GetString(proto.Name))), user, user);
-            UpdateUi(ent.Owner, user);
+            // Возврат фактически списанной суммы (с HeraldCostMultiplier).
+            if (_power.TryGetPower(out var power) && !power.Comp.RatvarAwakened)
+            {
+                var refund = proto.PowerCost;
+                if (power.Comp.Heralded)
+                    refund *= FishClockworkCultConstants.HeraldCostMultiplier;
+                _power.TryAdjustPower(refund, quiet: true);
+            }
+
+            return;
         }
+
+        args.Handled = true;
+        _popup.PopupEntity(Loc.GetString("fish-clockwork-scripture-success", ("name", Loc.GetString(proto.Name))), user, user);
+        UpdateUi(ent.Owner, user);
     }
 
     public void UpdateUi(EntityUid slab, EntityUid user)

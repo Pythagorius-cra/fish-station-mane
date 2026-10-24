@@ -1,11 +1,18 @@
-﻿- type: entity
+﻿# Без MarkerBase: компонент Marker скрывает спрайт у игроков (MarkersVisible=false).
+- type: entity
   id: FishBaseClockworkSigil
   abstract: true
-  parent: MarkerBase
+  placement:
+    mode: SnapgridCenter
   suffix: Fish
   components:
   - type: Transform
     anchored: true
+  - type: Clickable
+  - type: InteractionOutline
+  - type: Tag
+    tags:
+    - ForceFixRotations
   - type: Physics
     bodyType: Static
     canCollide: true
@@ -72,12 +79,20 @@
     sigilType: Transmission
 
 - type: entity
-  parent: MarkerBase
   id: FishCityOfCogsRift
   name: city of cogs rift
   description: A one-way bluespace anomaly leading to Reebe.
   suffix: Fish
+  placement:
+    mode: SnapgridCenter
   components:
+  - type: Transform
+    anchored: true
+  - type: Clickable
+  - type: InteractionOutline
+  - type: Tag
+    tags:
+    - ForceFixRotations
   - type: Sprite
     sprite: _Fish/ClockworkCult/effects.rsi
     state: city_of_cogs_rift
@@ -97,12 +112,20 @@
     lifetimeSeconds: 120
 
 - type: entity
-  parent: MarkerBase
   id: FishSpatialGatewayPortal
   name: spatial gateway
   description: A miniaturized gateway through spacetime.
   suffix: Fish
+  placement:
+    mode: SnapgridCenter
   components:
+  - type: Transform
+    anchored: true
+  - type: Clickable
+  - type: InteractionOutline
+  - type: Tag
+    tags:
+    - ForceFixRotations
   - type: Sprite
     sprite: _Fish/ClockworkCult/effects.rsi
     state: spatial_gateway

@@ -86,7 +86,8 @@ public sealed partial class FishClockworkVanguardSystem : EntitySystem
     private void ExpireVanguard(EntityUid uid, FishClockworkVanguardComponent vanguard)
     {
         var absorbed = vanguard.AbsorbedStunSeconds;
-        RemCompDeferred<FishClockworkVanguardComponent>(uid);
+        // Сразу, до возврата паралича: иначе OnStunned снова поглотит stun.
+        RemComp<FishClockworkVanguardComponent>(uid);
 
         if (absorbed <= 0.1f)
             return;

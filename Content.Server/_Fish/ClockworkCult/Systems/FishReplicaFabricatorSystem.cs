@@ -80,10 +80,12 @@ public sealed partial class FishReplicaFabricatorSystem : EntitySystem
             }
         }
 
-        // Fish-edit: сначала стена, иначе пол под стеной «съедает» клик.
-        if (args.Target != null && TryConvertWall(ent, args.User, args.Target.Value))
+        // Сначала стена; пол — только при клике по полу (без entity-target),
+        // иначе отказ по неконвертируемой стене превращал бы пол под ней.
+        if (args.Target != null)
         {
-            args.Handled = true;
+            if (TryConvertWall(ent, args.User, args.Target.Value))
+                args.Handled = true;
             return;
         }
 

@@ -58,6 +58,7 @@ public sealed partial class FishClockworkStructureSystem : EntitySystem
         SubscribeLocalEvent<FishEminenceSpireComponent, ActivateInWorldEvent>(OnEminenceActivate);
         SubscribeLocalEvent<FishClockworkObeliskComponent, ActivateInWorldEvent>(OnObeliskActivate);
         SubscribeLocalEvent<FishClockworkObeliskComponent, GetVerbsEvent<AlternativeVerb>>(OnObeliskVerbs);
+        SubscribeLocalEvent<FishHeraldBeaconComponent, GetVerbsEvent<AlternativeVerb>>(OnHeraldVerbs);
         SubscribeLocalEvent<FishEminenceComponent, FishEminenceMassRecallActionEvent>(OnEminenceMassRecall);
         SubscribeLocalEvent<FishEminenceComponent, ComponentShutdown>(OnEminenceShutdown);
         SubscribeLocalEvent<FishJudicialVisorComponent, AfterInteractEvent>(OnJudicialVisor);
@@ -104,16 +105,25 @@ public sealed partial class FishClockworkStructureSystem : EntitySystem
         var query = EntityQueryEnumerator<FishManiaMotorComponent, TransformComponent>();
         while (query.MoveNext(out var uid, out var motor, out var xform))
         {
-            if (!motor.Enabled)
-                continue;
-
             motor.Accumulator += frameTime;
             if (motor.Accumulator < motor.TickInterval)
                 continue;
 
             motor.Accumulator = 0f;
 
-            if (!_power.TrySpendPower(motor.PowerDrainPerSecond * motor.TickInterval, quiet: true))
+            var tickCost = motor.PowerDrainPerSecond * motor.TickInterval;
+
+            // Авто-включение после восстановления энергии.
+            if (!motor.Enabled)
+            {
+                if (!_power.HasPower(tickCost))
+                    continue;
+
+                motor.Enabled = true;
+                Dirty(uid, motor);
+            }
+
+            if (!_power.TrySpendPower(tickCost, quiet: true))
             {
                 motor.Enabled = false;
                 Dirty(uid, motor);
@@ -202,10 +212,37 @@ public sealed partial class FishClockworkStructureSystem : EntitySystem
             _power.HierophantAnnounce(Loc.GetString("fish-clockwork-herald-vote-start"));
         }
 
+        ent.Comp.VotesNo.Remove(args.User);
         ent.Comp.VotesYes.Add(args.User);
         Dirty(ent);
         _popup.PopupEntity(Loc.GetString("fish-clockwork-herald-voted-yes"), args.User, args.User);
         args.Handled = true;
+    }
+
+    private void OnHeraldVerbs(Entity<FishHeraldBeaconComponent> ent, ref GetVerbsEvent<AlternativeVerb> args)
+    {
+        if (!args.CanAccess || !args.CanInteract || !_servant.IsServant(args.User))
+            return;
+
+        if (ent.Comp.Activated || ent.Comp.VoteEndsAt == null)
+            return;
+
+        var user = args.User;
+        args.Verbs.Add(new AlternativeVerb
+        {
+            Text = Loc.GetString("fish-clockwork-herald-verb-vote-no"),
+            Act = () =>
+            {
+                if (ent.Comp.Activated || ent.Comp.VoteEndsAt == null)
+                    return;
+
+                ent.Comp.VotesYes.Remove(user);
+                ent.Comp.VotesNo.Add(user);
+                Dirty(ent);
+                _popup.PopupEntity(Loc.GetString("fish-clockwork-herald-voted-no"), user, user);
+            },
+            Priority = 1,
+        });
     }
 
     private void UpdateHeraldVotes()

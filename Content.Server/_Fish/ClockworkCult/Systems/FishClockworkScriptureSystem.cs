@@ -81,8 +81,8 @@ public sealed partial class FishClockworkScriptureSystem : EntitySystem
             return true;
 
         var spawnId = proto.SpawnPrototype.Value.Id;
-        // Range covers a full tile diagonal so same-tile entities are always candidates;
-        // occupancy is decided by grid+indices, not distance (CodeRabbit OnePerTile).
+        // Радиус покрывает полную диагональ тайла, поэтому сущности на том же тайле всегда попадают в выборку;
+        // занятость определяется по гриду и индексам, а не по расстоянию (OnePerTile).
         foreach (var nearby in _lookup.GetEntitiesInRange(coords, 1.5f))
         {
             if (MetaData(nearby).EntityPrototype?.ID != spawnId)
