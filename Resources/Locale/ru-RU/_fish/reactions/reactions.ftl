@@ -1,11 +1,11 @@
-fish-reactions-grenade-shot = Выстрел попадает в {THE($item)} и приводит его в действие! Какой выстрел!
-fish-reactions-blast-wave = Ударная волна швыряет вас!
-fish-reactions-blast-wall = Вы врезаетесь в препятствие — мир плывёт...
+fish-reactions-grenade-shot = Р’С‹СЃС‚СЂРµР» РїРѕРїР°РґР°РµС‚ РІ {THE($item)} Рё РїСЂРёРІРѕРґРёС‚ РµРіРѕ РІ РґРµР№СЃС‚РІРёРµ! РљР°РєРѕР№ РІС‹СЃС‚СЂРµР»!
+fish-reactions-blast-wave = РЈРґР°СЂРЅР°СЏ РІРѕР»РЅР° С€РІС‹СЂСЏРµС‚ РІР°СЃ!
+fish-reactions-blast-wall = Р’С‹ РІСЂРµР·Р°РµС‚РµСЃСЊ РІ РїСЂРµРїСЏС‚СЃС‚РІРёРµ вЂ” РјРёСЂ РїР»С‹РІС‘С‚...
 
-fish-trauma-tinnitus = В ушах звенит...
-fish-trauma-chest-pain = Грудь болит — дышать тяжело.
-fish-trauma-cant-stand-dead = Вы не можете встать.
-fish-trauma-cant-stand-shock = Вы слишком слабы от кровопотери, чтобы встать.
-fish-trauma-cant-stand-legs = Ноги не держат.
-fish-trauma-cant-stand-chest = Боль в груди не даёт подняться.
-fish-trauma-cant-stand-concussion = Мир плывёт — встать невозможно.
+fish-trauma-tinnitus = Р’ СѓС€Р°С… Р·РІРµРЅРёС‚...
+fish-trauma-chest-pain = Р“СЂСѓРґСЊ Р±РѕР»РёС‚ вЂ” РґС‹С€Р°С‚СЊ С‚СЏР¶РµР»Рѕ.
+fish-trauma-cant-stand-dead = Р’С‹ РЅРµ РјРѕР¶РµС‚Рµ РІСЃС‚Р°С‚СЊ.
+fish-trauma-cant-stand-shock = Р’С‹ СЃР»РёС€РєРѕРј СЃР»Р°Р±С‹ РѕС‚ РєСЂРѕРІРѕРїРѕС‚РµСЂРё, С‡С‚РѕР±С‹ РІСЃС‚Р°С‚СЊ.
+fish-trauma-cant-stand-legs = РќРѕРіРё РЅРµ РґРµСЂР¶Р°С‚.
+fish-trauma-cant-stand-chest = Р‘РѕР»СЊ РІ РіСЂСѓРґРё РЅРµ РґР°С‘С‚ РїРѕРґРЅСЏС‚СЊСЃСЏ.
+fish-trauma-cant-stand-concussion = РњРёСЂ РїР»С‹РІС‘С‚ вЂ” РІСЃС‚Р°С‚СЊ РЅРµРІРѕР·РјРѕР¶РЅРѕ.

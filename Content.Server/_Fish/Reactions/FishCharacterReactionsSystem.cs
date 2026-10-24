@@ -21,6 +21,7 @@ using Content.Shared.Chat.Prototypes;
 using Content.Shared.Popups;
 using Content.Shared.Speech.Components;
 using Content.Shared.Standing;
+using Content.Shared.Stunnable;
 using Content.Shared.Trigger.Components.Effects;
 using Content.Shared.Trigger.Systems;
 using Robust.Shared.Audio;
@@ -45,6 +46,7 @@ public sealed partial class FishCharacterReactionsSystem : SharedFishCharacterRe
     [Dependency] private SharedAudioSystem _audio = default!;
     [Dependency] private SharedJitteringSystem _jitter = default!;
     [Dependency] private StandingStateSystem _standing = default!;
+    [Dependency] private SharedStunSystem _stun = default!;
     [Dependency] private ChatSystem _chat = default!;
     [Dependency] private IPrototypeManager _proto = default!;
 
@@ -64,6 +66,7 @@ public sealed partial class FishCharacterReactionsSystem : SharedFishCharacterRe
 
         SubscribeLocalEvent<FishCharacterReactionsComponent, DamageChangedEvent>(OnDamageChanged);
         SubscribeLocalEvent<FishCharacterReactionsComponent, IgnitedEvent>(OnIgnited);
+        SubscribeLocalEvent<FishCharacterReactionsComponent, ExtinguishedEvent>(OnExtinguished);
         SubscribeLocalEvent<FishCharacterReactionsComponent, MoveEvent>(OnMove);
         SubscribeLocalEvent<FishCharacterReactionsComponent, FishGotHitByProjectileEvent>(OnGotHitByProjectile);
         InitializeBlast();
@@ -104,21 +107,32 @@ public sealed partial class FishCharacterReactionsSystem : SharedFishCharacterRe
 
     private void OnIgnited(Entity<FishCharacterReactionsComponent> ent, ref IgnitedEvent args)
     {
-        if (MobStateSys.IsDead(ent) || HasComp<FishCritUnconsciousComponent>(ent))
+        if (MobStateSys.IsDead(ent))
             return;
 
-        if (Timing.CurTime < ent.Comp.NextPainSound)
-            return;
+        // Боль до маркера бессознательности — иначе в Crit на огне крик никогда не сыграет.
+        if (!HasComp<FishCritUnconsciousComponent>(ent) && Timing.CurTime >= ent.Comp.NextPainSound)
+        {
+            PlayPainSound(ent, FishPainSoundKind.Burn);
+            _audio.PlayPvs(ent.Comp.BurnSound, ent);
+            _jitter.DoJitter(ent, TimeSpan.FromSeconds(2), refresh: true, amplitude: 14f, frequency: 6f);
+            ent.Comp.NextPainSound = Timing.CurTime + ent.Comp.PainSoundCooldown;
+            Dirty(ent);
+        }
 
-        PlayPainSound(ent, FishPainSoundKind.Burn);
-        _audio.PlayPvs(ent.Comp.BurnSound, ent);
-        _jitter.DoJitter(ent, TimeSpan.FromSeconds(2), refresh: true, amplitude: 14f, frequency: 6f);
-        ent.Comp.NextPainSound = Timing.CurTime + ent.Comp.PainSoundCooldown;
-        Dirty(ent);
-
-        // В Crit на огне — ползти/тушиться, без soft-crit «встать».
+        // В Crit на огне — networked-маркер (OnFire не sync): ползти/тушиться, без soft-crit «встать».
+        // Не зависит от PainSoundCooldown (раньше маркер не ставился на кулдауне).
         if (_crit.IsInCritZone(ent) && TryComp<FlammableComponent>(ent, out var flam) && flam.OnFire)
             EnsureComp<FishCritUnconsciousComponent>(ent);
+    }
+
+    private void OnExtinguished(Entity<FishCharacterReactionsComponent> ent, ref ExtinguishedEvent args)
+    {
+        // Снимаем огненный маркер; паралич Crit оставляем.
+        if (!HasComp<FishCritUnconsciousComponent>(ent) || _stun.IsParalyzed(ent))
+            return;
+
+        RemCompDeferred<FishCritUnconsciousComponent>(ent);
     }
 
     private void OnMove(Entity<FishCharacterReactionsComponent> ent, ref MoveEvent args)
@@ -184,7 +198,9 @@ public sealed partial class FishCharacterReactionsSystem : SharedFishCharacterRe
             return;
 
         var surfaceAmount = FixedPoint2.New(ent.Comp.HitBloodOnSurface * scale);
-        AddBloodToSurface(ent.Owner, emitter, blood, surfaceAmount, standingPreferFoots: true);
+        // Лёжа — body_surface (как TryBleedTrail), иначе foots.
+        var standing = !_standing.IsDown(ent.Owner);
+        AddBloodToSurface(ent.Owner, emitter, blood, surfaceAmount, standingPreferFoots: standing);
         _audio.PlayPvs(ent.Comp.BleedSound, ent);
     }
 
@@ -234,8 +250,10 @@ public sealed partial class FishCharacterReactionsSystem : SharedFishCharacterRe
             ? blood.BloodReferenceSolution.Contents[0].Reagent
             : new ReagentId("Blood", null);
 
-        solution.AddReagent(reagent, amount);
-        _solutions.UpdateChemicals(solEnt.Value);
+        // TryAddReagent respects MaxVolume and keeps ReagentId data (unlike Solution.AddReagent).
+        if (!_solutions.TryAddReagent(solEnt.Value, reagent, amount, out _))
+            return false;
+
         return true;
     }
 

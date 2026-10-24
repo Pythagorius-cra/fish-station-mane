@@ -14,8 +14,6 @@ using Content.Shared.Sunrise.Eye;
 using Content.Shared.Weapons.Ranged.Components;
 using Content.Shared.Weapons.Ranged.Events;
 using Content.Shared.Wieldable;
-using Robust.Shared.Audio;
-using Robust.Shared.Audio.Systems;
 using Robust.Shared.Timing;
 using MobStateEnum = Content.Shared.Mobs.MobState;
 
@@ -31,15 +29,11 @@ public abstract partial class SharedFishComplexCritSystem : EntitySystem
     [Dependency] protected MobThresholdSystem MobThreshold = default!;
     [Dependency] protected IGameTiming Timing = default!;
     [Dependency] private ActionBlockerSystem _blocker = default!;
-    [Dependency] private SharedAudioSystem _audio = default!;
     [Dependency] private SharedJitteringSystem _jitter = default!;
     [Dependency] private SharedDarkenedVisionSystem _darkenedVision = default!;
     [Dependency] private MovementSpeedModifierSystem _movement = default!;
     [Dependency] private SharedWieldableSystem _wieldable = default!;
     [Dependency] private SharedPopupSystem _critPopup = default!;
-
-    private static readonly SoundSpecifier FallSound =
-        new SoundCollectionSpecifier("FishCritFall", AudioParams.Default.WithVolume(-2f));
 
     private const float CritVisionDarkening = 3.5f;
     private const float DeepCritVisionDarkening = 6f;
@@ -68,12 +62,20 @@ public abstract partial class SharedFishComplexCritSystem : EntitySystem
 
     private void OnMapInit(Entity<FishComplexCritComponent> ent, ref MapInitEvent args)
     {
-        if (TryComp<MobThresholdsComponent>(ent, out var thresholds) &&
-            MobThreshold.TryGetThresholdForState(ent, MobStateEnum.Dead, out var dead, thresholds) &&
-            dead != null)
+        if (TryComp<MobThresholdsComponent>(ent, out var thresholds))
         {
-            ent.Comp.OriginalDeadThreshold = dead.Value.Float();
-            ent.Comp.DeadDamageThreshold = dead.Value.Float();
+            if (MobThreshold.TryGetThresholdForState(ent, MobStateEnum.Critical, out var crit, thresholds) &&
+                crit != null)
+            {
+                ent.Comp.CritDamageThreshold = crit.Value.Float();
+            }
+
+            if (MobThreshold.TryGetThresholdForState(ent, MobStateEnum.Dead, out var dead, thresholds) &&
+                dead != null)
+            {
+                ent.Comp.OriginalDeadThreshold = dead.Value.Float();
+                ent.Comp.DeadDamageThreshold = dead.Value.Float();
+            }
         }
 
         ent.Comp.NextTick = Timing.CurTime + ent.Comp.TickInterval;
@@ -101,11 +103,9 @@ public abstract partial class SharedFishComplexCritSystem : EntitySystem
         if (args.NewMobState != MobStateEnum.Critical)
             return;
 
+        // Звук падения — только на сервере (иначе predicted + PlayPvs = двойной звук).
         if (args.OldMobState != MobStateEnum.Critical && Timing.IsFirstTimePredicted)
-        {
-            _audio.PlayPvs(FallSound, ent);
             _jitter.DoJitter(ent, TimeSpan.FromSeconds(2.5), refresh: true, amplitude: 12f, frequency: 5f);
-        }
 
         // Снять двуручный хват при входе в Crit.
         _wieldable.UnwieldAll(ent.Owner, force: true);

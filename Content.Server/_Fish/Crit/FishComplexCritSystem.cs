@@ -1,5 +1,6 @@
 using Content.Server.Popups;
 using Content.Shared._Fish.Crit;
+using Content.Shared.Atmos.Components;
 using Content.Shared.Body.Components;
 using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Chemistry.Reagent;
@@ -14,6 +15,8 @@ using Content.Shared.Nutrition.EntitySystems;
 using Content.Shared.Popups;
 using Content.Shared.Speech.EntitySystems;
 using Content.Shared.Stunnable;
+using Robust.Shared.Audio;
+using Robust.Shared.Audio.Systems;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using MobStateEnum = Content.Shared.Mobs.MobState;
@@ -32,6 +35,10 @@ public sealed partial class FishComplexCritSystem : SharedFishComplexCritSystem
     [Dependency] private SatiationSystem _satiation = default!;
     [Dependency] private IRobustRandom _random = default!;
     [Dependency] private IPrototypeManager _proto = default!;
+    [Dependency] private SharedAudioSystem _audio = default!;
+
+    private static readonly SoundSpecifier FallSound =
+        new SoundCollectionSpecifier("FishCritFall", AudioParams.Default.WithVolume(-2f));
 
     private static readonly ProtoId<DamageTypePrototype> Asphyxiation = "Asphyxiation";
     private static readonly ProtoId<DamageTypePrototype> Blunt = "Blunt";
@@ -81,6 +88,18 @@ public sealed partial class FishComplexCritSystem : SharedFishComplexCritSystem
         base.Initialize();
         InitializeCpr();
         InitializeDefib();
+        SubscribeLocalEvent<FishComplexCritComponent, MobStateChangedEvent>(OnServerMobStateChanged);
+    }
+
+    /// <summary>
+    /// Fall sound only on server — Shared DoJitter stays predicted; PlayPvs here avoids double audio.
+    /// </summary>
+    private void OnServerMobStateChanged(Entity<FishComplexCritComponent> ent, ref MobStateChangedEvent args)
+    {
+        if (args.NewMobState != MobStateEnum.Critical || args.OldMobState == MobStateEnum.Critical)
+            return;
+
+        _audio.PlayPvs(FallSound, ent);
     }
 
     public override void Update(float frameTime)
@@ -101,7 +120,9 @@ public sealed partial class FishComplexCritSystem : SharedFishComplexCritSystem
             Dirty(uid, crit);
 
             // Снимаем маркер полной бессознательности, если паралич уже прошёл.
-            if (HasComp<FishCritUnconsciousComponent>(uid) && !_stun.IsParalyzed(uid))
+            // Пока горит — оставляем: OnFire не networked, маркер нужен клиенту для soft-crit.
+            if (HasComp<FishCritUnconsciousComponent>(uid) && !_stun.IsParalyzed(uid) &&
+                (!TryComp<FlammableComponent>(uid, out var flam) || !flam.OnFire))
                 RemCompDeferred<FishCritUnconsciousComponent>(uid);
 
             HandleCriticalCondition(uid, crit, damageable, mobState);

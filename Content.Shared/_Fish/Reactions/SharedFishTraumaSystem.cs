@@ -1,6 +1,7 @@
 using Content.Shared._Fish.Crit;
 using Content.Shared.Body.Components;
 using Content.Shared.Body.Systems;
+using Content.Shared.Damage;
 using Content.Shared.Damage.Components;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Systems;
@@ -46,6 +47,7 @@ public abstract partial class SharedFishTraumaSystem : EntitySystem
         SubscribeLocalEvent<FishTraumaStatusComponent, GetStandUpTimeEvent>(OnGetStandUpTime);
         SubscribeLocalEvent<FishTraumaStatusComponent, GetVisionDarkeningEvent>(OnVisionDarkening);
         SubscribeLocalEvent<FishTraumaStatusComponent, MobStateChangedEvent>(OnMobState);
+        SubscribeLocalEvent<FishTraumaStatusComponent, DamageChangedEvent>(OnDamageChanged);
     }
 
     public override void Update(float frameTime)
@@ -124,6 +126,17 @@ public abstract partial class SharedFishTraumaSystem : EntitySystem
     {
         if (args.NewMobState == MobStateEnum.Dead)
             ClearTrauma(ent);
+    }
+
+    /// <summary>
+    /// Глубина Crit меняет GetMovementMultiplier — без refresh скорость отстаёт от урона.
+    /// </summary>
+    private void OnDamageChanged(Entity<FishTraumaStatusComponent> ent, ref DamageChangedEvent args)
+    {
+        if (!_mobState.IsCritical(ent) || !HasComp<FishComplexCritComponent>(ent))
+            return;
+
+        _movement.RefreshMovementSpeedModifiers(ent.Owner);
     }
 
     private void OnRefreshSpeed(Entity<FishTraumaStatusComponent> ent, ref RefreshMovementSpeedModifiersEvent args)

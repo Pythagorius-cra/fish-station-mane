@@ -16,6 +16,7 @@ public abstract partial class SharedFishCharacterReactionsSystem : EntitySystem
     [Dependency] protected MobStateSystem MobStateSys = default!;
     [Dependency] protected StandingStateSystem Standing = default!;
     [Dependency] protected IGameTiming Timing = default!;
+    [Dependency] protected SharedFishTraumaSystem TraumaSys = default!;
 
     public override void Initialize()
     {
@@ -61,20 +62,9 @@ public abstract partial class SharedFishCharacterReactionsSystem : EntitySystem
         RemCompDeferred<FishLoseBreathComponent>(uid);
         RemCompDeferred<FishCritShockComponent>(uid);
         RemCompDeferred<FishBlastedComponent>(uid);
+        // ClearTrauma также RefreshMovementSpeed / vision — ручной сброс полей этого не делал.
         if (TryComp<FishTraumaStatusComponent>(uid, out var trauma))
-        {
-            // Смерть / удаление — сброс временных травм; компонент оставляем на живых.
-            trauma.ShockFactor = 0f;
-            trauma.LegImpairment = 0f;
-            trauma.ConcussionSeverity = 0f;
-            trauma.ConcussionUntil = TimeSpan.Zero;
-            trauma.TinnitusUntil = TimeSpan.Zero;
-            trauma.DisorientUntil = TimeSpan.Zero;
-            trauma.ChestTraumaUntil = TimeSpan.Zero;
-            trauma.ChestTraumaSeverity = 0f;
-            trauma.LastBlastForce = 0f;
-            Dirty(uid, trauma);
-        }
+            TraumaSys.ClearTrauma((uid, trauma));
 
         if (MobStateSys.IsDead(uid))
         {

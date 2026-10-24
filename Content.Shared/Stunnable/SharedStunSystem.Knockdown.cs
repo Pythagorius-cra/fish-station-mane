@@ -359,11 +359,12 @@ public abstract partial class SharedStunSystem
 
     public bool KnockdownOver(Entity<KnockedDownComponent> entity)
     {
-        // Fish-start: soft-crit — таймер weaken не блокирует «встать» (иначе кнопка мертва)
+        // Fish-start: soft-crit — таймер weaken не блокирует «встать» (иначе кнопка мертва),
+        // но Blocker.CanMove сохраняем: иначе встают при других блокерах движения.
         if (TryComp<MobStateComponent>(entity.Owner, out var softMob) &&
             SharedFishComplexCritSystem.AllowsSoftCritActions(EntityManager, entity.Owner, softMob.CurrentState))
         {
-            return true;
+            return Blocker.CanMove(entity);
         }
         // Fish-end
 
