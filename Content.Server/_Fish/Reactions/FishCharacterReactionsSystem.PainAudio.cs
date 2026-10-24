@@ -34,7 +34,7 @@ public sealed partial class FishCharacterReactionsSystem
 
     private void OnStandPainSound(Entity<FishCharacterReactionsComponent> ent, ref StandUpAttemptEvent args)
     {
-        if (args.Cancelled || MobStateSys.IsDead(ent) || HasComp<FishCritUnconsciousComponent>(ent))
+        if (args.Cancelled || args.Autostand || MobStateSys.IsDead(ent) || HasComp<FishCritUnconsciousComponent>(ent))
             return;
 
         if (Timing.CurTime < ent.Comp.NextPainSound)

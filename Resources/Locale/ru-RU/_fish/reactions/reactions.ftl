@@ -1,6 +1,6 @@
-fish-reactions-grenade-shot = Р’С‹СЃС‚СЂРµР» РїРѕРїР°РґР°РµС‚ РІ {THE($item)} Рё РїСЂРёРІРѕРґРёС‚ РµРіРѕ РІ РґРµР№СЃС‚РІРёРµ! РљР°РєРѕР№ РІС‹СЃС‚СЂРµР»!
-fish-reactions-blast-wave = РЈРґР°СЂРЅР°СЏ РІРѕР»РЅР° С€РІС‹СЂСЏРµС‚ РІР°СЃ!
-fish-reactions-blast-wall = Р’С‹ РІСЂРµР·Р°РµС‚РµСЃСЊ РІ РїСЂРµРїСЏС‚СЃС‚РІРёРµ вЂ” РјРёСЂ РїР»С‹РІС‘С‚...
+fish-reactions-grenade-shot = Выстрел попадает в {THE($item)} и приводит его в действие! Какой выстрел!
+fish-reactions-blast-wave = Ударная волна швыряет вас!
+fish-reactions-blast-wall = Вы врезаетесь в препятствие — мир плывёт...
 
 fish-trauma-tinnitus = В ушах звенит...
 fish-trauma-chest-pain = Грудь болит — дышать тяжело.

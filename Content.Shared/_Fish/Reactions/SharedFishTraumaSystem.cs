@@ -141,7 +141,8 @@ public abstract partial class SharedFishTraumaSystem : EntitySystem
         if (!CanAttemptStand(ent, out var reason))
         {
             args.Cancelled = true;
-            if (reason != null)
+            // Не спамим popup на AutoStand-тик.
+            if (reason != null && !args.Autostand)
                 args.Message = (Loc.GetString(reason), PopupType.SmallCaution);
         }
     }
@@ -247,6 +248,11 @@ public abstract partial class SharedFishTraumaSystem : EntitySystem
             reasonKey = "fish-crit-cant-stand-unconscious";
             return false;
         }
+
+        // Soft-crit: не блокируем попытку жёстко — только замедляем через GetStandUpTime.
+        // Иначе после взрыва/шока кнопка «встать» вообще не стартует do-after.
+        if (_mobState.IsCritical(ent) && HasComp<FishComplexCritComponent>(ent))
+            return true;
 
         if (ent.Comp.ShockFactor >= ShockStandBlock)
         {

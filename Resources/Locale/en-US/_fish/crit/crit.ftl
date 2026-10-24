@@ -36,6 +36,8 @@ fish-crit-defib-arrhythmia-cleared = Cardiac arrhythmia cleared.
 
 fish-crit-stand-struggle = You struggle to get up...
 fish-crit-cant-stand-unconscious = You can't get up — consciousness fades.
+fish-crit-one-hand-only = You're too weak to use both hands.
+fish-crit-one-hand-gun = You're too weak to fire this two-handed.
 
 reagent-name-fish-atropine = atropine
 reagent-desc-fish-atropine = A cardiac alkaloid used to treat heart failure complications.

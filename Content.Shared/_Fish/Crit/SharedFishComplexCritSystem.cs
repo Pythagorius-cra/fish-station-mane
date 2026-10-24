@@ -11,6 +11,9 @@ using Content.Shared.Popups;
 using Content.Shared.Standing;
 using Content.Shared.Stunnable;
 using Content.Shared.Sunrise.Eye;
+using Content.Shared.Weapons.Ranged.Components;
+using Content.Shared.Weapons.Ranged.Events;
+using Content.Shared.Wieldable;
 using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Timing;
@@ -32,6 +35,8 @@ public abstract partial class SharedFishComplexCritSystem : EntitySystem
     [Dependency] private SharedJitteringSystem _jitter = default!;
     [Dependency] private SharedDarkenedVisionSystem _darkenedVision = default!;
     [Dependency] private MovementSpeedModifierSystem _movement = default!;
+    [Dependency] private SharedWieldableSystem _wieldable = default!;
+    [Dependency] private SharedPopupSystem _critPopup = default!;
 
     private static readonly SoundSpecifier FallSound =
         new SoundCollectionSpecifier("FishCritFall", AudioParams.Default.WithVolume(-2f));
@@ -56,6 +61,9 @@ public abstract partial class SharedFishComplexCritSystem : EntitySystem
         SubscribeLocalEvent<FishComplexCritComponent, GetStandUpTimeEvent>(OnGetStandUpTime);
         SubscribeLocalEvent<FishComplexCritComponent, StandUpAttemptEvent>(OnStandUpAttempt);
         SubscribeLocalEvent<FishComplexCritComponent, RefreshMovementSpeedModifiersEvent>(OnRefreshSpeed);
+        // Soft-crit: максимум одна рука — без двуручного хвата / двуручного огнестрела.
+        SubscribeLocalEvent<FishComplexCritComponent, WieldAttemptEvent>(OnSoftCritWieldAttempt);
+        SubscribeLocalEvent<FishComplexCritComponent, ShotAttemptedEvent>(OnSoftCritShotAttempt);
     }
 
     private void OnMapInit(Entity<FishComplexCritComponent> ent, ref MapInitEvent args)
@@ -99,10 +107,42 @@ public abstract partial class SharedFishComplexCritSystem : EntitySystem
             _jitter.DoJitter(ent, TimeSpan.FromSeconds(2.5), refresh: true, amplitude: 12f, frequency: 5f);
         }
 
+        // Снять двуручный хват при входе в Crit.
+        _wieldable.UnwieldAll(ent.Owner, force: true);
+
         if (SharedFishCharacterReactionsSystem.ShouldSuppressSoftCritStand(EntityManager, ent.Owner))
             return;
 
         _blocker.UpdateCanMove(ent.Owner);
+    }
+
+    private void OnSoftCritWieldAttempt(Entity<FishComplexCritComponent> ent, ref WieldAttemptEvent args)
+    {
+        if (!MobStateSys.IsCritical(ent))
+            return;
+
+        if (!AllowsSoftCritActions(EntityManager, ent.Owner, MobStateEnum.Critical))
+            return;
+
+        args.Cancelled = true;
+        args.Message = Loc.GetString("fish-crit-one-hand-only");
+    }
+
+    private void OnSoftCritShotAttempt(Entity<FishComplexCritComponent> ent, ref ShotAttemptedEvent args)
+    {
+        if (!MobStateSys.IsCritical(ent))
+            return;
+
+        if (!AllowsSoftCritActions(EntityManager, ent.Owner, MobStateEnum.Critical))
+            return;
+
+        // Только оружие, которое обязано стрелять с двуручного хвата.
+        if (!HasComp<GunRequiresWieldComponent>(args.Used.Owner))
+            return;
+
+        args.Cancel();
+        if (Timing.IsFirstTimePredicted)
+            _critPopup.PopupCursor(Loc.GetString("fish-crit-one-hand-gun"), ent.Owner, PopupType.SmallCaution);
     }
 
     private void OnGetVisionDarkening(Entity<FishComplexCritComponent> ent, ref GetVisionDarkeningEvent args)
@@ -138,7 +178,9 @@ public abstract partial class SharedFishComplexCritSystem : EntitySystem
             return;
         }
 
-        args.Message = (Loc.GetString("fish-crit-stand-struggle"), PopupType.Small);
+        // Не спамим popup на каждый AutoStand-тик — только ручная попытка.
+        if (!args.Autostand)
+            args.Message = (Loc.GetString("fish-crit-stand-struggle"), PopupType.Small);
     }
 
     private void OnRefreshSpeed(Entity<FishComplexCritComponent> ent, ref RefreshMovementSpeedModifiersEvent args)

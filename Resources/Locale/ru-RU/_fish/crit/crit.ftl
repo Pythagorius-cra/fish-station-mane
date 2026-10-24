@@ -36,6 +36,8 @@ fish-crit-defib-arrhythmia-cleared = Сердечная аритмия устр�
 
 fish-crit-stand-struggle = Вы с трудом пытаетесь подняться...
 fish-crit-cant-stand-unconscious = Вы не можете встать — сознание плывёт.
+fish-crit-one-hand-only = Вы слишком слабы, чтобы действовать двумя руками.
+fish-crit-one-hand-gun = Вы слишком слабы, чтобы стрелять из этого двуручного оружия.
 
 reagent-name-fish-atropine = атропин
 reagent-desc-fish-atropine = Сердечный алкалоид для лечения сердечной недостаточности.

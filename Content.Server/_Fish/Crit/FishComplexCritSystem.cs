@@ -410,6 +410,18 @@ public sealed partial class FishComplexCritSystem : SharedFishComplexCritSystem
         if (IsTryingToStand(EntityManager, uid))
             return;
 
+        // Soft-crit: не валим снова того, кто уже встал, и не крутим NextUpdate —
+        // иначе KnockdownOver всегда false и кнопка «встать» мёртвая.
+        if (MobStateSys.IsCritical(uid) && HasComp<FishComplexCritComponent>(uid))
+        {
+            if (!TryComp<KnockedDownComponent>(uid, out var knocked))
+                return;
+
+            _stun.SetKnockdownTime((uid, knocked), TimeSpan.Zero);
+            _stun.SetAutoStand((uid, knocked), false);
+            return;
+        }
+
         _stun.TryKnockdown(uid, duration, refresh: true, autoStand: false, drop: true);
     }
 
@@ -417,6 +429,16 @@ public sealed partial class FishComplexCritSystem : SharedFishComplexCritSystem
     {
         if (IsTryingToStand(EntityManager, uid))
             return;
+
+        if (MobStateSys.IsCritical(uid) && HasComp<FishComplexCritComponent>(uid))
+        {
+            if (!TryComp<KnockedDownComponent>(uid, out var knocked))
+                return;
+
+            _stun.SetKnockdownTime((uid, knocked), TimeSpan.Zero);
+            _stun.SetAutoStand((uid, knocked), false);
+            return;
+        }
 
         _stun.TryKnockdown(uid, duration, refresh: true, autoStand: false, drop: false);
     }
