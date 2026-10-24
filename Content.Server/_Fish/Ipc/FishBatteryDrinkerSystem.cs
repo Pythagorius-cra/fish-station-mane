@@ -14,13 +14,13 @@ namespace Content.Server._Fish.Ipc;
 /// <summary>
 /// Зарядка КПБ от ЛКП через альтернативный verb (Paradise APC power cord).
 /// </summary>
-public sealed class FishBatteryDrinkerSystem : EntitySystem
+public sealed partial class FishBatteryDrinkerSystem : EntitySystem
 {
-    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedBatterySystem _battery = default!;
-    [Dependency] private readonly PowerCellSystem _powerCell = default!;
-    [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private SharedDoAfterSystem _doAfter = default!;
+    [Dependency] private SharedAudioSystem _audio = default!;
+    [Dependency] private SharedBatterySystem _battery = default!;
+    [Dependency] private PowerCellSystem _powerCell = default!;
+    [Dependency] private PopupSystem _popup = default!;
 
     public override void Initialize()
     {

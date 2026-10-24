@@ -7,10 +7,10 @@ using Content.Shared.Mobs.Systems;
 namespace Content.Server._Fish.Ipc;
 
 /// <summary>В crit КПБ получают continuous brute (Paradise: нет oxy → brute).</summary>
-public sealed class FishIpcCritBruteSystem : EntitySystem
+public sealed partial class FishIpcCritBruteSystem : EntitySystem
 {
-    [Dependency] private readonly MobStateSystem _mobState = default!;
-    [Dependency] private readonly DamageableSystem _damageable = default!;
+    [Dependency] private MobStateSystem _mobState = default!;
+    [Dependency] private DamageableSystem _damageable = default!;
 
     private static readonly DamageSpecifier CritDamage = new()
     {

@@ -7,10 +7,10 @@ using Content.Shared.Popups;
 namespace Content.Server._Fish.Ipc;
 
 /// <summary>EMP: burn + shock (Paradise EMP на IPC).</summary>
-public sealed class FishIpcEmpSystem : EntitySystem
+public sealed partial class FishIpcEmpSystem : EntitySystem
 {
-    [Dependency] private readonly DamageableSystem _damageable = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private DamageableSystem _damageable = default!;
+    [Dependency] private SharedPopupSystem _popup = default!;
 
     public override void Initialize()
     {
