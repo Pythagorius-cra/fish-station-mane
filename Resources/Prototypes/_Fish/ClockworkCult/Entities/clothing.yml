@@ -1,4 +1,6 @@
-﻿- type: entity
+﻿# Clockwork armaments — reuse known-good clothing RSIs so PrototypeSaveTest
+# (AllItemsHaveSpritesTest) always sees a valid SpriteComponent.Icon.
+- type: entity
   parent: ClothingHeadBase
   id: FishClothingHeadHelmetClockwork
   name: clockwork helmet
@@ -7,6 +9,7 @@
   components:
   - type: Sprite
     sprite: Clothing/Head/Helmets/security.rsi
+    state: icon
   - type: Clothing
     sprite: Clothing/Head/Helmets/security.rsi
   - type: Armor
@@ -26,6 +29,7 @@
   components:
   - type: Sprite
     sprite: Clothing/OuterClothing/Armor/security.rsi
+    state: icon
   - type: Clothing
     sprite: Clothing/OuterClothing/Armor/security.rsi
   - type: Armor
@@ -36,26 +40,18 @@
         Piercing: 0.5
         Heat: 0.6
 
+# Parent combat gloves so sprite/inhand layers are guaranteed valid
+# (Clothing/Hands/Gloves/color.rsi does not exist — Color/color.rsi does).
 - type: entity
-  parent: ClothingHandsBase
+  parent: ClothingHandsGlovesCombat
   id: FishClothingHandsGlovesClockwork
   name: clockwork gauntlets
   description: Brass gauntlets.
   suffix: Fish
-  components:
-  - type: Sprite
-    sprite: Clothing/Hands/Gloves/combat.rsi
-  - type: Clothing
-    sprite: Clothing/Hands/Gloves/combat.rsi
 
 - type: entity
-  parent: ClothingShoesBase
+  parent: ClothingShoesBootsCombat
   id: FishClothingShoesClockwork
   name: clockwork treads
   description: Brass boots.
   suffix: Fish
-  components:
-  - type: Sprite
-    sprite: Clothing/Shoes/Boots/combatboots.rsi
-  - type: Clothing
-    sprite: Clothing/Shoes/Boots/combatboots.rsi
