@@ -1,6 +1,6 @@
 - type: entity
   id: BaseLathe
-  parent: [ BaseMachinePowered, ConstructibleMachine ]
+  parent: [ BaseMachinePowered, ConstructibleMachine, BaseConstructibleMachineDestructible ]
   abstract: true
   name: lathe
   components:
@@ -29,15 +29,11 @@
     thresholds:
     - trigger:
         !type:DamageTrigger
-        damage: 100
+        damage: 175
       behaviors:
       - !type:PlaySoundBehavior
         sound:
           collection: MetalBreak
-      - !type:ChangeConstructionNodeBehavior
-        node: machineFrame
-      - !type:DoActsBehavior
-        acts: ["Destruction"]
   - type: WiresPanel
   - type: ActivatableUI
     key: enum.LatheUiKey.Key
@@ -55,6 +51,11 @@
     price: 800
   - type: ResearchClient
   - type: TechnologyDatabase
+  - type: ApcPowerReceiver
+    powerLoad: 150
+  - type: PowerState
+    idlePowerDraw: 150
+    workingPowerDraw: 1000
 
 # a lathe that can be sped up with space lube / slowed down with glue
 - type: entity
@@ -67,16 +68,20 @@
     modifiers:
       SpaceLube: 0.25
       SpaceGlue: 5
-  - type: SolutionContainerManager
+  - type: SolutionManager
     solutions:
-      lube:
-        maxVol: 250
+    - SolutionLatheLube
   - type: Spillable
     solution: lube
   - type: RefillableSolution
     solution: lube
   - type: ExaminableSolution
     solution: lube
+
+- type: entity
+  parent: [SolutionLube, SolutionLarge]
+  id: SolutionLatheLube # Its own prototype since some lathes might interface with solutions in other ways
+  categories: [ HideSpawnMenu ]
 
 - type: entity
   abstract: true
@@ -144,7 +149,7 @@
     emagStaticPacks:
     - SecurityStaticSunrise # Sunrise-Add
     - SyndicateAmmoStatic
-    - SyndicateBorgModulesEmagSunrise # Sunrise-Add
+    # - SyndicateBorgModulesEmagSunrise # Sunrise-Add # Fish edit - убрано в техфаб СБ
   - type: BlueprintReceiver
     whitelist:
       tags:
@@ -224,8 +229,8 @@
     - NightVisionDevice
     # Sunrise-End
   - type: EmagLatheRecipes
-    emagStaticPacks:
-    - SyndicateBorgModulesEmagSunrise # Sunrise-Add
+    # emagStaticPacks: # Fish edit
+    # - SyndicateBorgModulesEmagSunrise # Sunrise-Add # Fish edit
     emagDynamicPacks:
     # - SecurityAmmo # Sunrise-edit
     - SecurityExplosives
@@ -415,6 +420,8 @@
   - type: Lathe
     idleState: icon
     runningState: icon
+    unlitIdleState: unlit
+    unlitRunningState: unlit-building
     staticPacks:
     - SecurityEquipmentStatic
     - SecurityPracticeStatic
@@ -481,6 +488,8 @@
     - type: Lathe
       idleState: icon
       runningState: icon
+      unlitIdleState: unlit
+      unlitRunningState: unlit-building
       staticPacks:
     #  - SecurityAmmoStatic # Sunrise - comment
       - SecurityStaticSunrise # Sunrise-Add
@@ -513,6 +522,8 @@
   - type: Lathe
     idleState: icon
     runningState: icon
+    unlitIdleState: unlit
+    unlitRunningState: unlit-building
     staticPacks:
     - TopicalsStatic
     - ChemistryStatic
@@ -526,6 +537,7 @@
     - Chemistry
     - SurgeryDynamicSunrise # Sunrise-Add
     - MedicalDynamicSunrise # Sunrise-Add
+    - FishMedicalPouchesDynamic # Fish-edit: рецепты подсумков открываются исследованиями T2 и T3
     - MedicalCyberlimbDynamic # Sunrise-Add
     - MedicalCyberOrgansDynamic # Sunrise-Add
     - MedicalImplantDynamic # Sunrise-Add
@@ -541,6 +553,7 @@
   - type: OreSiloClient
   - type: LatheAnnouncing
     channels: [Medical]
+  - type: AmbientMusicMarkerMedical
 
 - type: entity
   parent: BaseLathe
@@ -578,6 +591,7 @@
     - Carpets
     - Bedsheets
     - UniformStaticSunrise # Sunrise-Add
+    - UniformStaticFish # FIsh edit - белый берет СИ в принтере униформы
   - type: EmagLatheRecipes
     emagStaticPacks:
     - ClothingCentComm
@@ -638,7 +652,7 @@
   parent: BaseLathe
   id: OreProcessor
   name: ore processor
-  description: It produces sheets and ingots using ores. Automatically absorbs nearby ore and awards mining points.
+  description: It produces sheets and ingots using ores.
   components:
     - type: Sprite
       sprite: Structures/Machines/ore_processor.rsi
@@ -659,6 +673,11 @@
       whitelist:
         tags:
           - Ore
+    # Fish added start - добавлен магнит для сбора руды с пола
+    - type: OreProcessorMagnet
+      range: 3
+      duration: 2
+    # Fish added end
     - type: Lathe
       idleState: icon
       runningState: building
@@ -666,11 +685,6 @@
       staticPacks:
       - OreSmelting
       - RGlassSmelting
-    # FIsh edit start - автопоглощение руды как у SS13 ORM
-    - type: OreRedemptionMachine
-      range: 1.5
-      autoProcess: true
-    # FIsh edit end
 
 - type: entity
   parent: OreProcessor
@@ -727,8 +741,6 @@
   name: cutter machine
   description: This is a cutter. It cuts. Add variety to your station floor with eye-pleasing patterns! Don't stick your fingers in.
   components:
-  - type: Transform
-    noRot: false
   - type: Sprite
     sprite: Structures/Machines/cuttermachine.rsi
     snapCardinals: true
@@ -751,10 +763,15 @@
     - FloorSteelTilesStatic
     - FloorWhiteTilesStatic
     - FloorMaintsTilesStatic
+    - FloorIndustrialTilesStatic
     - FloorWoodTilesStatic
     - FloorConcreteTilesStatic
     - CircuitFloorsStatic
     - FloorMarbleTilesStatic
+    - FloorShuttleTilesStatic
+    - PlasticTilesStatic
+    - CarpetTilesStatic
+    - PreciousTilesStatic
     - SunriseFloorTilesStatic # Sunrise-Edit
     dynamicPacks:
     - FauxTiles

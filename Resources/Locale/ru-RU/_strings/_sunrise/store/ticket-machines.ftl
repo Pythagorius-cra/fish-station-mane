@@ -1,5 +1,5 @@
 ﻿vendor-salvage-ticket-machine = тикет-автомат утилизаторов
-vendor-mining-ticket-machine = автомат снаряжения шахтёров # FIsh edit
+vendor-mining-ticket-machine = тикет-автомат шахтеров
 store-category-salvage-equipment = Экипировка
 store-category-ticket-tools = Инструменты
 store-category-ticket-consumeables = Расходники

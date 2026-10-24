@@ -1,1 +1,1 @@
-﻿materials-unit-tickets = очки шахтёра # FIsh edit
+﻿materials-unit-tickets = тикеты
