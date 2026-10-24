@@ -265,3 +265,8 @@
   - type: CritHeartbeat
   - type: PetOnInteract
   # Sunrise-End
+  # Fish-start: Crit SS1984 + Character Reactions (боль/кровь/огонь/гранаты)
+  - type: FishSs1984Crit
+  - type: FishCharacterReactions
+  # Fish-end
+  # EmoteOnDamage — server-only компонент, вешается в FishCharacterReactionsSystem.MapInit
