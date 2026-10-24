@@ -38,6 +38,16 @@ public sealed partial class FishIpcPowerSystem : SharedFishIpcSystem
 
         SubscribeLocalEvent<FishIpcComponent, PowerCellSlotEmptyEvent>(OnPowerCellEmpty);
         SubscribeLocalEvent<FishIpcComponent, EntInsertedIntoContainerMessage>(OnCellInserted);
+        SubscribeLocalEvent<FishIpcComponent, EntityTerminatingEvent>(OnTerminating);
+    }
+
+    private void OnTerminating(Entity<FishIpcComponent> ent, ref EntityTerminatingEvent args)
+    {
+        if (!ent.Comp.PowerDown)
+            return;
+
+        ent.Comp.PowerDown = false;
+        _statusEffects.TryRemoveStatusEffect(ent.Owner, SleepingSystem.StatusEffectForcedSleeping);
     }
 
     public override void Update(float frameTime)

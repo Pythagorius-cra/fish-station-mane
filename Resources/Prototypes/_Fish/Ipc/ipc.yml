@@ -121,6 +121,12 @@
     locked: true
     lockOnClick: false
     unlockOnClick: false
+  - type: Satiation
+    satiations:
+      Hunger:
+        prototype: IpcSatiationHunger
+      Thirst:
+        prototype: IpcSatiationThirst
   - type: FishIpc
     batteryPowered: true
     drainPerSecond: 1.5

@@ -1,6 +1,6 @@
 <Document>
   # КПБ (IPC)
-  <GuideEntityEmbed Entity="MobSynth" Caption="КПБ"/>
+  <GuideEntityEmbed Entity="MobIpc" Caption="КПБ"/>
 
   КПБ (Кибернетический Позитронный Блок, англ. IPC) — разумный синтетик с позитронным мозгом.
   Это [color=yellow]самостоятельная личность[/color]: у КПБ [color=red]нет законов робототехники[/color], их нельзя «сломать» емагом как борга.
