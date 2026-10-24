@@ -1,0 +1,9 @@
+fish-ipc-startup-verb = Перезапустить шасси
+fish-ipc-startup-failed = Перезапуск не удался: повреждения всё ещё критичны.
+fish-ipc-startup-success = Системы { CAPITALIZE($target) } онлайн.
+fish-ipc-crit = Целостность шасси критична. Диагностика сбоит...
+fish-ipc-battery-critical = Критический заряд батареи!
+fish-ipc-power-redirect = Перенаправление остаточного заряда...
+fish-ipc-overheating = Перегрев — охлаждение отказывает!
+fish-ipc-emp-hit = ЭМИ-импульс! Схемы горят!
+fish-ipc-electrocute-charge = Остаточный ток поглощён батареей.

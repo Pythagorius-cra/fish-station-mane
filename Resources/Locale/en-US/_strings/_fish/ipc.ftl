@@ -1,0 +1,9 @@
+fish-ipc-startup-verb = Restart chassis
+fish-ipc-startup-failed = Restart failed: damage still critical.
+fish-ipc-startup-success = { CAPITALIZE($target) } systems online.
+fish-ipc-crit = Chassis integrity critical. Diagnostics failing...
+fish-ipc-battery-critical = Power cell critical!
+fish-ipc-power-redirect = Redirecting residual charge...
+fish-ipc-overheating = Thermal overload — cooling failing!
+fish-ipc-emp-hit = EMP surge! Circuits frying!
+fish-ipc-electrocute-charge = Residual current absorbed into the power cell.
