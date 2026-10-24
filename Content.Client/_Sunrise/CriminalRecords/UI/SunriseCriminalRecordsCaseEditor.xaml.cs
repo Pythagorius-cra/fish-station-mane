@@ -50,7 +50,7 @@ public sealed partial class SunriseCriminalRecordsCaseEditor : Control
     private uint? _lastCaseId;
     private int _savedSentence;
     private bool _isWarning;
-    private int _previewSentence;
+    // Fish-edit: превью срока для быстрой печати`r`n    private int _previewSentence;
 
     private float _saveTimer;
     private const float SaveDelay = 1.0f;

@@ -183,8 +183,6 @@ public sealed partial class RCDSystem : EntitySystem
         // Get the starting cost, delay, and effect from the prototype
         var cost = prototype.Cost;
         var delay = prototype.Delay;
-        // Fish-edit: СЃРєРѕСЂРѕСЃС‚СЊ Р РЎРЈ РѕС‚ РЅР°РІС‹РєР° СЃС‚СЂРѕРёС‚РµР»СЊСЃС‚РІР°
-        delay *= _skills.GetSkillDelayMultiplier(args.User, "FishSkillConstruction");
         var effectPrototype = prototype.Effect;
 
         #region: Operation modifiers
@@ -236,6 +234,9 @@ public sealed partial class RCDSystem : EntitySystem
         }
 
         #endregion
+
+        // Fish-edit: навык строительства влияет и на construct, и на deconstruct
+        delay *= _skills.GetSkillDelayMultiplier(args.User, "FishSkillConstruction");
 
         // Try to start the do after
         var effect = Spawn(effectPrototype, _mapSystem.ToCenterCoordinates(tile, mapGrid));

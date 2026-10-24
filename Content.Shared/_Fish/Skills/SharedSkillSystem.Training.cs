@@ -120,13 +120,14 @@ public abstract partial class SharedSkillSystem
     {
         failLoc = null;
         var skill = manual.Comp.Skill;
-        var target = Math.Clamp(manual.Comp.TargetLevel, SkillLevels.Min, SkillMath.BookTrainingMaxLevel);
 
-        if (target > SkillMath.BookTrainingMaxLevel)
+        if (manual.Comp.TargetLevel > SkillMath.BookTrainingMaxLevel)
         {
             failLoc = "skills-manual-error-master-locked";
             return false;
         }
+
+        var target = Math.Clamp(manual.Comp.TargetLevel, SkillLevels.Min, SkillMath.BookTrainingMaxLevel);
 
         if (!Prototypes.TryIndex(skill, out SkillPrototype? skillProto))
         {
