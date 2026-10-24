@@ -23,7 +23,6 @@ public abstract partial class SharedFishComplexCritSystem : EntitySystem
     [Dependency] protected DamageableSystem Damageable = default!;
     [Dependency] protected MobStateSystem MobStateSys = default!;
     [Dependency] protected MobThresholdSystem MobThreshold = default!;
-    [Dependency] protected StandingStateSystem Standing = default!;
     [Dependency] protected IGameTiming Timing = default!;
     [Dependency] private ActionBlockerSystem _blocker = default!;
     [Dependency] private SharedAudioSystem _audio = default!;
@@ -45,6 +44,8 @@ public abstract partial class SharedFishComplexCritSystem : EntitySystem
         SubscribeLocalEvent<FishComplexCritComponent, ComponentShutdown>(OnShutdown);
         SubscribeLocalEvent<FishComplexCritComponent, MobStateChangedEvent>(OnMobStateChanged);
         SubscribeLocalEvent<FishComplexCritComponent, GetVisionDarkeningEvent>(OnGetVisionDarkening);
+        // Soft-crit = crawl: блокируем вставание, даже если soft-crit разрешает прочие действия.
+        SubscribeLocalEvent<FishComplexCritComponent, StandAttemptEvent>(OnStandAttempt);
     }
 
     private void OnMapInit(Entity<FishComplexCritComponent> ent, ref MapInitEvent args)
@@ -77,24 +78,20 @@ public abstract partial class SharedFishComplexCritSystem : EntitySystem
         if (args.NewMobState == MobStateEnum.Critical || args.OldMobState == MobStateEnum.Critical)
             _darkenedVision.UpdateVisionDarkening(ent.Owner);
 
-        if (args.NewMobState == MobStateEnum.Critical && args.OldMobState != MobStateEnum.Critical)
-        {
-            // Звук падения + дрожь при входе в Crit.
-            if (Timing.IsFirstTimePredicted)
-            {
-                _audio.PlayPvs(FallSound, ent);
-                _jitter.DoJitter(ent, TimeSpan.FromSeconds(2.5), refresh: true, amplitude: 12f, frequency: 5f);
-            }
-        }
-
-        // Soft-crit: после входа в Critical сразу поднимаем, если нет полной бессознательности / огня.
         if (args.NewMobState != MobStateEnum.Critical)
             return;
 
+        if (args.OldMobState != MobStateEnum.Critical && Timing.IsFirstTimePredicted)
+        {
+            // Звук падения + дрожь при входе в Crit. Soft-crit — ползание, без Stand.
+            _audio.PlayPvs(FallSound, ent);
+            _jitter.DoJitter(ent, TimeSpan.FromSeconds(2.5), refresh: true, amplitude: 12f, frequency: 5f);
+        }
+
+        // Остаёмся вниз (crawl). Только обновляем CanMove для soft-crit.
         if (SharedFishCharacterReactionsSystem.ShouldSuppressSoftCritStand(EntityManager, ent.Owner))
             return;
 
-        Standing.Stand(ent.Owner);
         _blocker.UpdateCanMove(ent.Owner);
     }
 
@@ -105,6 +102,15 @@ public abstract partial class SharedFishComplexCritSystem : EntitySystem
 
         var health = GetCritScaleHealth(ent);
         args.Strength += health <= -50f ? DeepCritVisionDarkening : CritVisionDarkening;
+    }
+
+    private void OnStandAttempt(Entity<FishComplexCritComponent> ent, ref StandAttemptEvent args)
+    {
+        if (!MobStateSys.IsCritical(ent))
+            return;
+
+        // Ползание в Crit: не встаём (в т.ч. после окончания Knockdown AutoStand).
+        args.Cancel();
     }
 
     /// <summary>Обновить затемнение (глубина Crit меняется без смены MobState).</summary>

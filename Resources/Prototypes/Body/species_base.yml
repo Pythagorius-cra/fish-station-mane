@@ -269,4 +269,3 @@
   - type: FishComplexCrit
   - type: FishCharacterReactions
   # Fish-end
-  # EmoteOnDamage — server-only компонент, вешается в FishCharacterReactionsSystem.MapInit

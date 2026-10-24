@@ -1,9 +1,6 @@
-using Content.Server.Chat.Systems;
 using Content.Server.Popups;
 using Content.Shared._Fish.Crit;
 using Content.Shared.Body.Components;
-using Content.Shared.Chat;
-using Content.Shared.Chat.Prototypes;
 using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Chemistry.Reagent;
 using Content.Shared.Damage;
@@ -28,7 +25,6 @@ namespace Content.Server._Fish.Crit;
 /// </summary>
 public sealed partial class FishComplexCritSystem : SharedFishComplexCritSystem
 {
-    [Dependency] private ChatSystem _chat = default!;
     [Dependency] private PopupSystem _popup = default!;
     [Dependency] private SharedStunSystem _stun = default!;
     [Dependency] private StutteringSystem _stutter = default!;
@@ -50,14 +46,6 @@ public sealed partial class FishComplexCritSystem : SharedFishComplexCritSystem
     private static readonly ProtoId<ReagentPrototype> Heparin = "Heparin";
     private static readonly ProtoId<ReagentPrototype> Atropine = "FishAtropine";
 
-    private static readonly ProtoId<EmotePrototype>[] CritEmotes =
-    [
-        "Gasp",
-        "Crying",
-        "Sigh",
-        "Whine",
-        "Scream",
-    ];
 
     private static readonly string[] MildFeelKeys =
     [
@@ -142,8 +130,6 @@ public sealed partial class FishComplexCritSystem : SharedFishComplexCritSystem
             if (cur >= lose.NextOxyTick)
             {
                 lose.NextOxyTick = cur + TimeSpan.FromSeconds(2);
-                if (_random.Prob(0.75f))
-                    TryEmote(uid, "Gasp");
 
                 // Пока LoseBreath > 0 — персонаж не дышит нормально; доп. окси-урон даёт arrest / crit ranges.
             }
@@ -156,7 +142,7 @@ public sealed partial class FishComplexCritSystem : SharedFishComplexCritSystem
     }
 
     /// <summary>
-    /// Тик критического состояния: окси-урон, эмоуты, шок/СН/остановка сердца.
+    /// Тик критического состояния: окси-урон, шок/СН/остановка сердца.
     /// </summary>
     private void HandleCriticalCondition(
         EntityUid uid,
@@ -192,9 +178,6 @@ public sealed partial class FishComplexCritSystem : SharedFishComplexCritSystem
 
         if (critScaleHealth <= 0f)
         {
-            if (_random.Prob(0.05f))
-                TryEmote(uid, _random.Pick(CritEmotes));
-
             _stutter.DoStutter(uid, TimeSpan.FromSeconds(10), refresh: true);
 
             if (_random.Prob(0.07f))
@@ -206,10 +189,8 @@ public sealed partial class FishComplexCritSystem : SharedFishComplexCritSystem
 
         switch (critScaleHealth)
         {
-            // Тяжёлый Critical: объединяет (-99..-80] и часть (-INF..-100]
             case <= -80f:
                 ApplyOxy(uid, 1f);
-                // Из зоны <= -100: шанс остановки сердца / HF (на health≈-90 → ~9%/18%)
                 if (_random.Prob(Math.Clamp(-critScaleHealth * 0.001f, 0f, 0.15f)))
                     TrySetHeartAttack(uid, true);
                 if (_random.Prob(Math.Clamp(-critScaleHealth * 0.002f, 0f, 0.25f)))
@@ -233,21 +214,19 @@ public sealed partial class FishComplexCritSystem : SharedFishComplexCritSystem
                 if (_random.Prob(0.06f))
                 {
                     _popup.PopupEntity(Loc.GetString(_random.Pick(SevereFeelKeys)), uid, uid, PopupType.MediumCaution);
+                    // autoStand: false — soft-crit crawl, без рывка «встать» раз в минуту.
                     ApplyWeaken(uid, TimeSpan.FromSeconds(6));
                 }
                 if (_random.Prob(0.03f))
                     ApplyParalyse(uid, TimeSpan.FromSeconds(4));
                 break;
 
-            default: // -49 .. 0
+            default: // -49 .. 0 — уже лежим в Crit, лишний knockdown не нужен
                 ApplyOxy(uid, 1f);
                 if (_random.Prob(0.03f))
                     TryContractShock(uid);
                 if (_random.Prob(0.05f))
-                {
                     _popup.PopupEntity(Loc.GetString(_random.Pick(MildFeelKeys)), uid, uid, PopupType.MediumCaution);
-                    ApplyKnockdown(uid, TimeSpan.FromSeconds(6));
-                }
                 break;
         }
     }
@@ -295,26 +274,16 @@ public sealed partial class FishComplexCritSystem : SharedFishComplexCritSystem
         switch (shock.Stage)
         {
             case 1:
-                if (_random.Prob(0.08f))
-                    TryEmote(uid, _random.Pick(new[] { "Sigh", "Whine", "Gasp" }));
                 if (_random.Prob(0.05f))
                     _popup.PopupEntity(Loc.GetString("fish-crit-shock-weak"), uid, uid, PopupType.SmallCaution);
                 break;
             case 2:
-                if (_random.Prob(0.08f))
-                    TryEmote(uid, _random.Pick(new[] { "Sigh", "Whine", "Gasp", "Crying" }));
                 if (_random.Prob(0.05f))
                     _popup.PopupEntity(Loc.GetString("fish-crit-shock-terrible"), uid, uid, PopupType.MediumCaution);
-                if (_random.Prob(0.05f))
-                    TryEmote(uid, "Whine");
                 break;
             default:
-                if (_random.Prob(0.08f))
-                    TryEmote(uid, _random.Pick(new[] { "Sigh", "Whine", "Gasp", "Crying" }));
                 if (_random.Prob(0.05f))
                     _popup.PopupEntity(Loc.GetString("fish-crit-shock-horrible"), uid, uid, PopupType.MediumCaution);
-                if (_random.Prob(0.05f))
-                    TryEmote(uid, _random.Pick(new[] { "Gasp", "Whine", "Sigh" }));
                 if (_random.Prob(0.07f))
                 {
                     _popup.PopupEntity(Loc.GetString("fish-crit-cant-breathe"), uid, uid, PopupType.LargeCaution);
@@ -350,16 +319,12 @@ public sealed partial class FishComplexCritSystem : SharedFishComplexCritSystem
         switch (hf.Stage)
         {
             case 1:
-                if (_random.Prob(0.08f))
-                    TryEmote(uid, _random.Pick(new[] { "Sigh", "Gasp" }));
                 if (_random.Prob(0.05f))
                     _popup.PopupEntity(Loc.GetString("fish-crit-arm-hurts"), uid, uid, PopupType.SmallCaution);
                 else if (_random.Prob(0.05f))
                     _popup.PopupEntity(Loc.GetString("fish-crit-chest-hurts"), uid, uid, PopupType.SmallCaution);
                 break;
             case 2:
-                if (_random.Prob(0.08f))
-                    TryEmote(uid, _random.Pick(new[] { "Sigh", "Whine" }));
                 if (_random.Prob(0.05f))
                 {
                     _popup.PopupEntity(Loc.GetString("fish-crit-heart-lurches"), uid, uid, PopupType.MediumCaution);
@@ -370,13 +335,9 @@ public sealed partial class FishComplexCritSystem : SharedFishComplexCritSystem
                     _popup.PopupEntity(Loc.GetString("fish-crit-heart-stops"), uid, uid, PopupType.LargeCaution);
                     AdjustLoseBreath(uid, TimeSpan.FromSeconds(6));
                 }
-                if (_random.Prob(0.05f))
-                    TryEmote(uid, _random.Pick(new[] { "Gasp", "Whine" }));
                 break;
             default:
                 ApplyOxy(uid, 1f);
-                if (_random.Prob(0.08f))
-                    TryEmote(uid, _random.Pick(new[] { "Gasp", "Whine" }));
                 if (_random.Prob(0.05f))
                     TrySetHeartAttack(uid, true);
                 break;
@@ -441,23 +402,19 @@ public sealed partial class FishComplexCritSystem : SharedFishComplexCritSystem
 
     private void ApplyWeaken(EntityUid uid, TimeSpan duration)
     {
-        _stun.TryKnockdown(uid, duration, refresh: true, autoStand: true, drop: true);
+        // autoStand: false — soft-crit crawl, без авто-вставания после knockdown.
+        _stun.TryKnockdown(uid, duration, refresh: true, autoStand: false, drop: true);
     }
 
     private void ApplyKnockdown(EntityUid uid, TimeSpan duration)
     {
-        _stun.TryKnockdown(uid, duration, refresh: true, autoStand: true, drop: false);
+        _stun.TryKnockdown(uid, duration, refresh: true, autoStand: false, drop: false);
     }
 
     private void ApplyConfused(EntityUid uid, TimeSpan duration)
     {
-        // AdjustConfused: отдельного Confused в SS14 нет — усиливаем stutter (документированное отклонение).
+        // Отдельного Confused нет — stutter.
         _stutter.DoStutter(uid, duration, refresh: false);
-    }
-
-    private void TryEmote(EntityUid uid, ProtoId<EmotePrototype> emote)
-    {
-        _chat.TryEmoteWithChat(uid, emote, ChatTransmitRange.Normal, forceEmote: true);
     }
 
     private float GetDamage(EntityUid uid, ProtoId<DamageTypePrototype> type)

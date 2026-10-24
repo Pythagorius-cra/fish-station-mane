@@ -3,7 +3,6 @@ using Content.Shared.Atmos.Components;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Systems;
 using Content.Shared.Standing;
-using Content.Shared.Stunnable;
 using Robust.Shared.Timing;
 using MobStateEnum = Content.Shared.Mobs.MobState;
 
@@ -33,10 +32,9 @@ public abstract partial class SharedFishCharacterReactionsSystem : EntitySystem
             return;
         }
 
-        // После revive из Dead — убрать зависшие осложнения Crit/реакций, если урон уже ниже крита.
+        // После revive из Dead — убрать зависшие осложнения Crit/реакций.
         if (args.OldMobState == MobStateEnum.Dead && args.NewMobState != MobStateEnum.Dead)
         {
-            // LoseBreath / unconscious сбрасываем; шок/HF оставляем — HF сам не проходит.
             RemCompDeferred<FishCritUnconsciousComponent>(ent);
             RemCompDeferred<FishLoseBreathComponent>(ent);
         }
@@ -54,9 +52,7 @@ public abstract partial class SharedFishCharacterReactionsSystem : EntitySystem
     {
         RemCompDeferred<FishCritUnconsciousComponent>(uid);
         RemCompDeferred<FishLoseBreathComponent>(uid);
-        // Шок снимается при смерти.
         RemCompDeferred<FishCritShockComponent>(uid);
-        // HF и cardiac arrest — только при смерти.
         if (MobStateSys.IsDead(uid))
         {
             RemCompDeferred<FishHeartFailureComponent>(uid);
@@ -65,8 +61,8 @@ public abstract partial class SharedFishCharacterReactionsSystem : EntitySystem
     }
 
     /// <summary>
-    /// Soft-crit не должен поднимать горящего / сбитого / бессознательного персонажа
-    /// (stop-drop-roll / Resist и Knockdown из Crit требуют оставаться вниз).
+    /// Soft-crit crawl: не поднимаем горящего / бессознательного.
+    /// Knockdown больше не блокирует soft-crit — персонаж ползает, а не встаёт рывками.
     /// </summary>
     public static bool ShouldSuppressSoftCritStand(IEntityManager entMan, EntityUid uid)
     {
@@ -74,10 +70,6 @@ public abstract partial class SharedFishCharacterReactionsSystem : EntitySystem
             return true;
 
         if (entMan.HasComponent<FishCritUnconsciousComponent>(uid))
-            return true;
-
-        // Не отменять активный knockdown/crawl soft-crit'ом при входе в Critical.
-        if (entMan.HasComponent<KnockedDownComponent>(uid))
             return true;
 
         return false;

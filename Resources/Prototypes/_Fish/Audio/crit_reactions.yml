@@ -1,19 +1,13 @@
-# Fish: звуки реакций персонажа на урон / Crit / кровь
-- type: soundCollection
-  id: FishCritPain
-  files:
-  - /Audio/Voice/Human/malescream_1.ogg
-  - /Audio/Voice/Human/malescream_2.ogg
-  - /Audio/Voice/Human/malescream_3.ogg
-  - /Audio/Voice/Human/femalescream_1.ogg
-  - /Audio/Voice/Human/femalescream_2.ogg
-  - /Audio/Voice/Human/femalescream_3.ogg
+# Fish: звуки реакций персонажа (кровь / огонь / падение).
+# Крики боли — MaleScreams / FemaleScreams из Resources/Prototypes/SoundCollections/screams.yml
 
 - type: soundCollection
   id: FishCritBleed
   files:
   - /Audio/Effects/Fluids/blood1.ogg
   - /Audio/Effects/Fluids/blood2.ogg
+  - /Audio/Effects/Footsteps/blood1.ogg
+  - /Audio/Effects/Footsteps/blood2.ogg
 
 - type: soundCollection
   id: FishCritBurn

@@ -12,7 +12,7 @@ namespace Content.Shared._Fish.Reactions;
 [Access(typeof(SharedFishCharacterReactionsSystem))]
 public sealed partial class FishCharacterReactionsComponent : Component
 {
-    /// <summary>15% шанс детонации гранаты в руке от пули.</summary>
+    /// <summary>Шанс детонации взрывчатки в руке от пули.</summary>
     [DataField, AutoNetworkedField]
     public float HeldExplosiveDetonateChance = 0.15f;
 
@@ -22,34 +22,55 @@ public sealed partial class FishCharacterReactionsComponent : Component
 
     /// <summary>Кулдаун кровоточащего следа.</summary>
     [DataField, AutoNetworkedField]
-    public TimeSpan BleedTrailCooldown = TimeSpan.FromSeconds(0.75);
+    public TimeSpan BleedTrailCooldown = TimeSpan.FromSeconds(0.6);
 
     [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
     [AutoNetworkedField, AutoPausedField]
     public TimeSpan NextBleedTrail;
 
-    /// <summary>Сколько крови переносить в раствор ног за тик следа.</summary>
+    /// <summary>Сколько крови в раствор ног/тела за тик следа.</summary>
     [DataField, AutoNetworkedField]
-    public float BleedTrailTransfer = 1.5f;
+    public float BleedTrailTransfer = 2.5f;
+
+    /// <summary>Минимум крови, проливаемой на пол при попадании (лужа).</summary>
+    [DataField, AutoNetworkedField]
+    public float HitBloodSpill = 2.5f;
+
+    /// <summary>Сколько крови наносить на ноги/тело при попадании (для следов).</summary>
+    [DataField, AutoNetworkedField]
+    public float HitBloodOnSurface = 4f;
+
+    /// <summary>Минимальный прирост кровоточащего урона для брызг/следов.</summary>
+    [DataField, AutoNetworkedField]
+    public float HitBloodMinDamage = 3f;
 
     [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
     [AutoNetworkedField, AutoPausedField]
-    public TimeSpan NextPainEmote;
+    public TimeSpan NextPainSound;
+
+    /// <summary>Кулдаун болевого крика (только звук, без эмоута).</summary>
+    [DataField, AutoNetworkedField]
+    public TimeSpan PainSoundCooldown = TimeSpan.FromSeconds(4.5);
+
+    /// <summary>Минимальный «реальный» урон (без asphyx/poison-only) для крика.</summary>
+    [DataField, AutoNetworkedField]
+    public float PainMinDamage = 8f;
 
     [DataField, AutoNetworkedField]
-    public TimeSpan PainEmoteCooldown = TimeSpan.FromSeconds(2.5);
+    public SoundSpecifier MalePainSound =
+        new SoundCollectionSpecifier("MaleScreams", AudioParams.Default.WithVolume(2f).WithVariation(0.08f));
 
     [DataField, AutoNetworkedField]
-    public SoundSpecifier PainSound =
-        new SoundCollectionSpecifier("FishCritPain", AudioParams.Default.WithVolume(-3f).WithVariation(0.1f));
+    public SoundSpecifier FemalePainSound =
+        new SoundCollectionSpecifier("FemaleScreams", AudioParams.Default.WithVolume(2f).WithVariation(0.08f));
 
     [DataField, AutoNetworkedField]
     public SoundSpecifier BleedSound =
-        new SoundCollectionSpecifier("FishCritBleed", AudioParams.Default.WithVolume(-6f).WithVariation(0.15f));
+        new SoundCollectionSpecifier("FishCritBleed", AudioParams.Default.WithVolume(-4f).WithVariation(0.15f));
 
     [DataField, AutoNetworkedField]
     public SoundSpecifier BurnSound =
-        new SoundCollectionSpecifier("FishCritBurn", AudioParams.Default.WithVolume(-4f));
+        new SoundCollectionSpecifier("FishCritBurn", AudioParams.Default.WithVolume(-2f));
 
     [DataField, AutoNetworkedField]
     public TimeSpan PainJitterDuration = TimeSpan.FromSeconds(1.25);

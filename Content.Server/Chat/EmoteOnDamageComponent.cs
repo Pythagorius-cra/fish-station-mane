@@ -8,8 +8,7 @@ namespace Content.Server.Chat;
 /// <summary>
 /// Causes an entity to automatically emote when taking damage.
 /// </summary>
-// Fish-edit: доступ для Character Reactions при MapInit-настройке
-[RegisterComponent, Access(typeof(EmoteOnDamageSystem), typeof(Content.Server._Fish.Reactions.FishCharacterReactionsSystem)), AutoGenerateComponentPause]
+[RegisterComponent, Access(typeof(EmoteOnDamageSystem)), AutoGenerateComponentPause]
 public sealed partial class EmoteOnDamageComponent : Component
 {
     /// <summary>

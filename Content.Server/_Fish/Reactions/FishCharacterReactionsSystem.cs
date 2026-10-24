@@ -1,13 +1,11 @@
-using Content.Server.Chat;
-using Content.Server.Chat.Systems;
 using Content.Shared._Fish.Crit;
 using Content.Shared._Fish.Reactions;
 using Content.Shared._Sunrise.Footprints;
 using Content.Shared.Atmos;
 using Content.Shared.Atmos.Components;
 using Content.Shared.Body.Components;
-using Content.Shared.Chat;
-using Content.Shared.Chat.Prototypes;
+using Content.Shared.Body.Systems;
+using Content.Shared.Chemistry.Components;
 using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Chemistry.Reagent;
 using Content.Shared.Damage;
@@ -16,11 +14,13 @@ using Content.Shared.Damage.Systems;
 using Content.Shared.Explosion.Components;
 using Content.Shared.FixedPoint;
 using Content.Shared.Hands.EntitySystems;
+using Content.Shared.Humanoid;
 using Content.Shared.Jittering;
 using Content.Shared.Popups;
-using Content.Shared.Projectiles;
+using Content.Shared.Standing;
 using Content.Shared.Trigger.Components.Effects;
 using Content.Shared.Trigger.Systems;
+using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
@@ -28,49 +28,39 @@ using Robust.Shared.Random;
 namespace Content.Server._Fish.Reactions;
 
 /// <summary>
-/// Серверные реакции: боль/эмоут/звук, кровь, детонация гранат в руках, связка с Crit/огнём.
+/// Серверные реакции: болевой крик (звук), кровь на полу/следы, детонация взрывчатки в руках.
 /// </summary>
 public sealed partial class FishCharacterReactionsSystem : SharedFishCharacterReactionsSystem
 {
-    [Dependency] private ChatSystem _chat = default!;
     [Dependency] private SharedPopupSystem _popup = default!;
     [Dependency] private SharedHandsSystem _hands = default!;
     [Dependency] private TriggerSystem _trigger = default!;
     [Dependency] private SharedSolutionContainerSystem _solutions = default!;
+    [Dependency] private BloodstreamSystem _bloodstream = default!;
     [Dependency] private IRobustRandom _random = default!;
     [Dependency] private SharedFishComplexCritSystem _crit = default!;
     [Dependency] private SharedAudioSystem _audio = default!;
     [Dependency] private SharedJitteringSystem _jitter = default!;
+    [Dependency] private StandingStateSystem _standing = default!;
 
-    private static readonly ProtoId<EmotePrototype> ScreamEmote = "Scream";
-    private static readonly ProtoId<EmotePrototype> GaspEmote = "Gasp";
-    private static readonly ProtoId<EmotePrototype> WhineEmote = "Whine";
     private static readonly ProtoId<DamageTypePrototype> HeatDamage = "Heat";
+    private static readonly ProtoId<DamageTypePrototype> SlashDamage = "Slash";
+    private static readonly ProtoId<DamageTypePrototype> PiercingDamage = "Piercing";
+    private static readonly ProtoId<DamageTypePrototype> BluntDamage = "Blunt";
+    private static readonly ProtoId<DamageTypePrototype> AsphyxiationDamage = "Asphyxiation";
+    private static readonly ProtoId<DamageTypePrototype> PoisonDamage = "Poison";
+    private static readonly ProtoId<DamageTypePrototype> BloodlossDamage = "Bloodloss";
+    private static readonly ProtoId<DamageTypePrototype> CellularDamage = "Cellular";
+    private static readonly ProtoId<DamageTypePrototype> ColdDamage = "Cold";
 
     public override void Initialize()
     {
         base.Initialize();
 
-        SubscribeLocalEvent<FishCharacterReactionsComponent, MapInitEvent>(OnMapInit);
         SubscribeLocalEvent<FishCharacterReactionsComponent, DamageChangedEvent>(OnDamageChanged);
         SubscribeLocalEvent<FishCharacterReactionsComponent, IgnitedEvent>(OnIgnited);
-        SubscribeLocalEvent<FishCharacterReactionsComponent, ExtinguishedEvent>(OnExtinguished);
         SubscribeLocalEvent<FishCharacterReactionsComponent, MoveEvent>(OnMove);
-    }
-
-    private void OnMapInit(Entity<FishCharacterReactionsComponent> ent, ref MapInitEvent args)
-    {
-        // EmoteOnDamage живёт только на сервере — добавляем здесь, не из YAML.
-        var emote = EnsureComp<EmoteOnDamageComponent>(ent);
-        emote.WithChat = true;
-        emote.EmoteChance = 0.35f;
-        emote.EmoteCooldown = TimeSpan.FromSeconds(2.5);
-        emote.Emotes =
-        [
-            ScreamEmote,
-            WhineEmote,
-            GaspEmote,
-        ];
+        SubscribeLocalEvent<FishCharacterReactionsComponent, FishGotHitByProjectileEvent>(OnGotHitByProjectile);
     }
 
     private void OnDamageChanged(Entity<FishCharacterReactionsComponent> ent, ref DamageChangedEvent args)
@@ -78,15 +68,25 @@ public sealed partial class FishCharacterReactionsSystem : SharedFishCharacterRe
         if (!args.DamageIncreased || args.DamageDelta == null)
             return;
 
-        if (MobStateSys.IsDead(ent))
+        if (MobStateSys.IsDead(ent) || HasComp<FishCritUnconsciousComponent>(ent))
             return;
 
-        // Полная бессознательность Crit — без болевых эмоутов.
-        if (HasComp<FishCritUnconsciousComponent>(ent))
+        TryBloodOnHit(ent, args);
+        TryPainSound(ent, args);
+    }
+
+    private void OnGotHitByProjectile(Entity<FishCharacterReactionsComponent> ent, ref FishGotHitByProjectileEvent args)
+    {
+        if (MobStateSys.IsDead(ent) || HasComp<FishCritUnconsciousComponent>(ent))
             return;
 
-        TryDetonateHeldExplosive(ent, args);
-        TryPainReaction(ent, args);
+#pragma warning disable CS0618
+        var total = args.Damage.GetTotal().Float();
+#pragma warning restore CS0618
+        if (total < ent.Comp.HeldExplosiveMinDamage)
+            return;
+
+        TryDetonateHeldExplosive(ent);
     }
 
     private void OnIgnited(Entity<FishCharacterReactionsComponent> ent, ref IgnitedEvent args)
@@ -94,29 +94,22 @@ public sealed partial class FishCharacterReactionsSystem : SharedFishCharacterRe
         if (MobStateSys.IsDead(ent) || HasComp<FishCritUnconsciousComponent>(ent))
             return;
 
-        if (Timing.CurTime < ent.Comp.NextPainEmote)
+        if (Timing.CurTime < ent.Comp.NextPainSound)
             return;
 
-        _chat.TryEmoteWithChat(ent, ScreamEmote, ChatTransmitRange.Normal, forceEmote: true);
+        PlayPainSound(ent);
         _audio.PlayPvs(ent.Comp.BurnSound, ent);
         _jitter.DoJitter(ent, TimeSpan.FromSeconds(2), refresh: true, amplitude: 14f, frequency: 6f);
-        ent.Comp.NextPainEmote = Timing.CurTime + ent.Comp.PainEmoteCooldown;
+        ent.Comp.NextPainSound = Timing.CurTime + ent.Comp.PainSoundCooldown;
         Dirty(ent);
 
-        // В Crit на огне — не даём soft-crit «встать поверх» stop-drop-roll.
+        // В Crit на огне — ползти/тушиться, без soft-crit «встать».
         if (_crit.IsInCritZone(ent) && TryComp<FlammableComponent>(ent, out var flam) && flam.OnFire)
             EnsureComp<FishCritUnconsciousComponent>(ent);
     }
 
-    private void OnExtinguished(Entity<FishCharacterReactionsComponent> ent, ref ExtinguishedEvent args)
-    {
-        // После тушения снимаем только «огненный» unconscious, если нет паралича Crit.
-        // Фактический паралич чистит Crit-система.
-    }
-
     private void OnMove(Entity<FishCharacterReactionsComponent> ent, ref MoveEvent args)
     {
-        // OnlyRotation — поворот на месте; следы крови только при реальном смещении.
         if (args.OnlyRotation || args.ParentChanged)
             return;
 
@@ -124,25 +117,21 @@ public sealed partial class FishCharacterReactionsSystem : SharedFishCharacterRe
     }
 
     /// <summary>
-    /// Детонация взрывчатки в руке при попадании снаряда (~15%).
+    /// Детонация взрывчатки в руке (~15%) при попадании снаряда.
     /// </summary>
-    private void TryDetonateHeldExplosive(Entity<FishCharacterReactionsComponent> ent, DamageChangedEvent args)
+    private void TryDetonateHeldExplosive(Entity<FishCharacterReactionsComponent> ent)
     {
-        if (args.Origin is not { } origin || !HasComp<ProjectileComponent>(origin))
-            return;
-
-#pragma warning disable CS0618
-        var totalDelta = args.DamageDelta?.GetTotal() ?? FixedPoint2.Zero;
-#pragma warning restore CS0618
-        if (totalDelta.Float() < ent.Comp.HeldExplosiveMinDamage)
-            return;
-
         if (!_random.Prob(ent.Comp.HeldExplosiveDetonateChance))
             return;
 
         foreach (var held in _hands.EnumerateHeld(ent.Owner))
         {
-            if (!HasComp<ExplodeOnTriggerComponent>(held) || !HasComp<ExplosiveComponent>(held))
+            if (!HasComp<ExplosiveComponent>(held))
+                continue;
+
+            // Гранаты / бомбы: ExplodeOnTrigger или любой Explosive в руках.
+            var canBoom = HasComp<ExplodeOnTriggerComponent>(held) || HasComp<ExplosionOnTriggerComponent>(held);
+            if (!canBoom)
                 continue;
 
             _popup.PopupEntity(
@@ -150,36 +139,62 @@ public sealed partial class FishCharacterReactionsSystem : SharedFishCharacterRe
                 ent,
                 PopupType.LargeCaution);
 
-            _trigger.Trigger(held, ent.Owner, key: "timer");
-            if (!Deleted(held) && !EntityManager.IsQueuedForDeletion(held))
-                QueueDel(held);
+            // key null — срабатывают все OnTrigger-эффекты; "timer" — штатный ключ гранат.
+            if (!_trigger.Trigger(held, ent.Owner, key: "timer"))
+                _trigger.Trigger(held, ent.Owner, key: null);
 
+            // Не QueueDel — иначе взрыв может не успеть обработаться; ExplodeOnTrigger сам удаляет.
             return;
         }
     }
 
-    private void TryPainReaction(Entity<FishCharacterReactionsComponent> ent, DamageChangedEvent args)
+    /// <summary>
+    /// Брызги крови на пол + кровь на ноги/тело для следов (пуля и ближний бой).
+    /// </summary>
+    private void TryBloodOnHit(Entity<FishCharacterReactionsComponent> ent, DamageChangedEvent args)
     {
-        if (Timing.CurTime < ent.Comp.NextPainEmote)
+        if (args.DamageDelta == null)
+            return;
+
+        var bleedDmg = GetBleedDamage(args.DamageDelta);
+        if (bleedDmg < ent.Comp.HitBloodMinDamage)
+            return;
+
+        if (!TryComp<BloodstreamComponent>(ent, out var blood))
+            return;
+
+        var scale = Math.Clamp(bleedDmg / 10f, 0.5f, 2.5f);
+        var spill = FixedPoint2.New(ent.Comp.HitBloodSpill * scale);
+        _bloodstream.TryBleedOut((ent.Owner, blood), spill);
+
+        if (!TryComp<FootprintEmitterComponent>(ent, out var emitter))
+            return;
+
+        var surfaceAmount = FixedPoint2.New(ent.Comp.HitBloodOnSurface * scale);
+        AddBloodToSurface(ent.Owner, emitter, blood, surfaceAmount, standingPreferFoots: true);
+        _audio.PlayPvs(ent.Comp.BleedSound, ent);
+    }
+
+    private void TryPainSound(Entity<FishCharacterReactionsComponent> ent, DamageChangedEvent args)
+    {
+        if (Timing.CurTime < ent.Comp.NextPainSound)
             return;
 
         if (args.DamageDelta == null)
             return;
 
-#pragma warning disable CS0618
-        if (args.DamageDelta.GetTotal() < FixedPoint2.New(5))
+        var pain = GetPainDamage(args.DamageDelta);
+        if (pain < ent.Comp.PainMinDamage)
             return;
-#pragma warning restore CS0618
 
-        if (!_random.Prob(0.35f))
+        if (!_random.Prob(0.55f))
             return;
 
         var heat = args.DamageDelta.DamageDict.TryGetValue(HeatDamage, out var h) && h > 0;
-        var inCrit = _crit.IsInCritZone(ent);
-        ProtoId<EmotePrototype> emote = heat ? ScreamEmote : inCrit ? GaspEmote : WhineEmote;
+        PlayPainSound(ent);
+        if (heat)
+            _audio.PlayPvs(ent.Comp.BurnSound, ent);
 
-        _chat.TryEmoteWithChat(ent, emote, ChatTransmitRange.Normal, forceEmote: true);
-        _audio.PlayPvs(heat ? ent.Comp.BurnSound : ent.Comp.PainSound, ent);
         _jitter.DoJitter(
             ent,
             ent.Comp.PainJitterDuration,
@@ -187,12 +202,18 @@ public sealed partial class FishCharacterReactionsSystem : SharedFishCharacterRe
             amplitude: heat ? ent.Comp.PainJitterAmplitude * 1.4f : ent.Comp.PainJitterAmplitude,
             frequency: heat ? 6f : 4f);
 
-        ent.Comp.NextPainEmote = Timing.CurTime + ent.Comp.PainEmoteCooldown;
+        ent.Comp.NextPainSound = Timing.CurTime + ent.Comp.PainSoundCooldown;
         Dirty(ent);
     }
 
+    private void PlayPainSound(Entity<FishCharacterReactionsComponent> ent)
+    {
+        var female = TryComp<HumanoidProfileComponent>(ent, out var profile) && profile.Sex == Sex.Female;
+        _audio.PlayPvs(female ? ent.Comp.FemalePainSound : ent.Comp.MalePainSound, ent);
+    }
+
     /// <summary>
-    /// Кровоточащий след: при BleedAmount > 0 капаем кровь в FootprintEmitter foots solution.
+    /// Кровоточащий след при движении: foots стоя / body_surface лёжа.
     /// </summary>
     private void TryBleedTrail(Entity<FishCharacterReactionsComponent> ent)
     {
@@ -205,20 +226,72 @@ public sealed partial class FishCharacterReactionsSystem : SharedFishCharacterRe
         if (!TryComp<FootprintEmitterComponent>(ent, out var emitter))
             return;
 
-        if (!_solutions.TryGetSolution(ent.Owner, emitter.FootsSolutionName, out var solEnt, out var solution))
+        var amount = FixedPoint2.New(ent.Comp.BleedTrailTransfer * Math.Clamp(blood.BleedAmount / 5f, 0.35f, 2.5f));
+        var standing = !_standing.IsDown(ent.Owner);
+        if (!AddBloodToSurface(ent.Owner, emitter, blood, amount, standingPreferFoots: standing))
             return;
+
+        // Следы рисует FootprintSystem на MoveEvent — мы только наполняем раствор.
+        ent.Comp.NextBleedTrail = Timing.CurTime + ent.Comp.BleedTrailCooldown;
+        Dirty(ent);
+    }
+
+    private bool AddBloodToSurface(
+        EntityUid uid,
+        FootprintEmitterComponent emitter,
+        BloodstreamComponent blood,
+        FixedPoint2 amount,
+        bool standingPreferFoots)
+    {
+        var solutionName = standingPreferFoots ? emitter.FootsSolutionName : emitter.BodySurfaceSolutionName;
+        Entity<SolutionComponent>? solEnt = standingPreferFoots ? emitter.FootsSolution : emitter.BodySurfaceSolution;
+
+        if (!_solutions.ResolveSolution(uid, solutionName, ref solEnt, out var solution))
+            return false;
+
+        if (standingPreferFoots)
+            emitter.FootsSolution = solEnt;
+        else
+            emitter.BodySurfaceSolution = solEnt;
 
         var reagent = blood.BloodReferenceSolution.Contents.Count > 0
             ? blood.BloodReferenceSolution.Contents[0].Reagent
             : new ReagentId("Blood", null);
 
-        var amount = FixedPoint2.New(ent.Comp.BleedTrailTransfer * Math.Clamp(blood.BleedAmount / 5f, 0.25f, 2f));
         solution.AddReagent(reagent, amount);
         _solutions.UpdateChemicals(solEnt.Value);
+        return true;
+    }
 
-        _audio.PlayPvs(ent.Comp.BleedSound, ent);
+    /// <summary>Урон, который оставляет кровь (slash/pierce/blunt).</summary>
+    private static float GetBleedDamage(DamageSpecifier delta)
+    {
+        float total = 0f;
+        if (delta.DamageDict.TryGetValue(SlashDamage, out var s))
+            total += s.Float();
+        if (delta.DamageDict.TryGetValue(PiercingDamage, out var p))
+            total += p.Float();
+        if (delta.DamageDict.TryGetValue(BluntDamage, out var b))
+            total += b.Float() * 0.35f;
+        return total;
+    }
 
-        ent.Comp.NextBleedTrail = Timing.CurTime + ent.Comp.BleedTrailCooldown;
-        Dirty(ent);
+    /// <summary>
+    /// Урон для крика: игнорируем asphyx/poison/bloodloss/cellular/cold (тик Crit / воздух / хил-шум).
+    /// </summary>
+    private static float GetPainDamage(DamageSpecifier delta)
+    {
+        float total = 0f;
+        foreach (var (type, amount) in delta.DamageDict)
+        {
+            if (amount <= 0)
+                continue;
+            if (type == AsphyxiationDamage || type == PoisonDamage || type == BloodlossDamage ||
+                type == CellularDamage || type == ColdDamage)
+                continue;
+            total += amount.Float();
+        }
+
+        return total;
     }
 }
