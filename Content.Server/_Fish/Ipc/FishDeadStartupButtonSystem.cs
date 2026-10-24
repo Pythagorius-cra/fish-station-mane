@@ -7,7 +7,6 @@ using Content.Shared.Mobs.Systems;
 using Content.Shared.Popups;
 using Content.Shared.Verbs;
 using Robust.Shared.Audio.Systems;
-using Robust.Shared.Serialization;
 using Robust.Shared.Utility;
 
 namespace Content.Server._Fish.Ipc;
@@ -82,6 +81,3 @@ public sealed partial class FishDeadStartupButtonSystem : EntitySystem
         _audio.PlayPvs(component.Sound, uid);
     }
 }
-
-[Serializable, NetSerializable]
-public sealed partial class FishDeadStartupDoAfterEvent : SimpleDoAfterEvent;

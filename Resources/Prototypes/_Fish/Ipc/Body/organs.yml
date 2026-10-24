@@ -87,6 +87,11 @@
     layers:
     - state: eyeball-l
     - state: eyeball-r
+  - type: VisualOrganMarkings
+    markingData:
+      layers:
+      - Eyes
+      group: Ipc
   - type: FlashImmunity
     showInExamine: false
 

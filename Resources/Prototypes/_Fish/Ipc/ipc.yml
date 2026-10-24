@@ -90,10 +90,7 @@
     speechVerb: Robotic
     speechSounds: Pai
   - type: Vocal
-    sounds:
-      Male: UnisexIpc
-      Female: UnisexIpc
-      Unsexed: UnisexIpc
+    emoteSounds: UnisexIpc
     wilhelm: /Audio/_Fish/Voice/Ipc/wilhelm.ogg
     wilhelmProbability: 0.001
   - type: TypingIndicator

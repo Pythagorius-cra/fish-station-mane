@@ -3,7 +3,7 @@
 - type: marking
   id: SynthTvAntennae
   bodyPart: HeadTop
-  groupWhitelist: [Synth]
+  groupWhitelist: [ Ipc ]
   sprites:
   - sprite: _Fish/Mobs/Customization/ipc_antenna.rsi
     state: ipc_antenna_tv
@@ -11,7 +11,7 @@
 - type: marking
   id: SynthTesla
   bodyPart: HeadTop
-  groupWhitelist: [Synth]
+  groupWhitelist: [ Ipc ]
   sprites:
   - sprite: _Fish/Mobs/Customization/ipc_antenna.rsi
     state: ipc_antenna_tesla
@@ -19,7 +19,7 @@
 - type: marking
   id: SynthLight
   bodyPart: HeadTop
-  groupWhitelist: [Synth]
+  groupWhitelist: [ Ipc ]
   sprites:
   - sprite: _Fish/Mobs/Customization/ipc_antenna.rsi
     state: ipc_antenna_light
@@ -27,7 +27,7 @@
 - type: marking
   id: SynthCyberHead
   bodyPart: HeadTop
-  groupWhitelist: [Synth]
+  groupWhitelist: [ Ipc ]
   sprites:
   - sprite: _Fish/Mobs/Customization/ipc_antenna.rsi
     state: ipc_antenna_cyberhead
@@ -35,7 +35,7 @@
 - type: marking
   id: SynthSideLights
   bodyPart: HeadTop
-  groupWhitelist: [Synth]
+  groupWhitelist: [ Ipc ]
   sprites:
   - sprite: _Fish/Mobs/Customization/ipc_antenna.rsi
     state: ipc_antenna_sidelights
@@ -43,7 +43,7 @@
 - type: marking
   id: SynthAntlers
   bodyPart: HeadTop
-  groupWhitelist: [Synth]
+  groupWhitelist: [ Ipc ]
   sprites:
   - sprite: _Fish/Mobs/Customization/ipc_antenna.rsi
     state: ipc_antenna_antlers
@@ -51,7 +51,7 @@
 - type: marking
   id: SynthDroneEyes
   bodyPart: HeadTop
-  groupWhitelist: [Synth]
+  groupWhitelist: [ Ipc ]
   sprites:
   - sprite: _Fish/Mobs/Customization/ipc_antenna.rsi
     state: ipc_antenna_droneeyes
@@ -59,7 +59,7 @@
 - type: marking
   id: SynthCrowned
   bodyPart: HeadTop
-  groupWhitelist: [Synth]
+  groupWhitelist: [ Ipc ]
   sprites:
   - sprite: _Fish/Mobs/Customization/ipc_antenna.rsi
     state: ipc_antenna_crowned
@@ -67,7 +67,7 @@
 - type: marking
   id: SynthAntennae
   bodyPart: HeadTop
-  groupWhitelist: [Synth]
+  groupWhitelist: [ Ipc ]
   sprites:
   - sprite: _Fish/Mobs/Customization/ipc_antenna.rsi
     state: ipc_antenna_towers

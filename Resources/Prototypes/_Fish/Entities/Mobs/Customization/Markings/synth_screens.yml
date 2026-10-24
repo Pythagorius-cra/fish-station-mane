@@ -3,7 +3,7 @@
 - type: marking
   id: SynthMonitorBlue
   bodyPart: Hair
-  groupWhitelist: [Synth]
+  groupWhitelist: [ Ipc ]
   sprites:
   - sprite: _Fish/Mobs/Customization/ipc_screens.rsi
     state: ipc_screen_blue
@@ -11,7 +11,7 @@
 - type: marking
   id: SynthMonitorBreakout
   bodyPart: Hair
-  groupWhitelist: [Synth]
+  groupWhitelist: [ Ipc ]
   sprites:
   - sprite: _Fish/Mobs/Customization/ipc_screens.rsi
     state: ipc_screen_breakout
@@ -19,7 +19,7 @@
 - type: marking
   id: SynthMonitorConsole
   bodyPart: Hair
-  groupWhitelist: [Synth]
+  groupWhitelist: [ Ipc ]
   sprites:
   - sprite: _Fish/Mobs/Customization/ipc_screens.rsi
     state: ipc_screen_console
@@ -27,7 +27,7 @@
 - type: marking
   id: SynthMonitorEight
   bodyPart: Hair
-  groupWhitelist: [Synth]
+  groupWhitelist: [ Ipc ]
   sprites:
   - sprite: _Fish/Mobs/Customization/ipc_screens.rsi
     state: ipc_screen_eight
@@ -35,7 +35,7 @@
 - type: marking
   id: SynthMonitorFrowny
   bodyPart: Hair
-  groupWhitelist: [Synth]
+  groupWhitelist: [ Ipc ]
   sprites:
   - sprite: _Fish/Mobs/Customization/ipc_screens.rsi
     state: ipc_screen_frown
@@ -43,7 +43,7 @@
 - type: marking
   id: SynthMonitorGoggles
   bodyPart: Hair
-  groupWhitelist: [Synth]
+  groupWhitelist: [ Ipc ]
   sprites:
   - sprite: _Fish/Mobs/Customization/ipc_screens.rsi
     state: ipc_screen_goggles
@@ -51,7 +51,7 @@
 - type: marking
   id: SynthMonitorGreen
   bodyPart: Hair
-  groupWhitelist: [Synth]
+  groupWhitelist: [ Ipc ]
   sprites:
   - sprite: _Fish/Mobs/Customization/ipc_screens.rsi
     state: ipc_screen_l
@@ -59,7 +59,7 @@
 - type: marking
   id: SynthMonitorHeart
   bodyPart: Hair
-  groupWhitelist: [Synth]
+  groupWhitelist: [ Ipc ]
   sprites:
   - sprite: _Fish/Mobs/Customization/ipc_screens.rsi
     state: ipc_screen_heart
@@ -67,7 +67,7 @@
 - type: marking
   id: SynthMonitorMonoeye
   bodyPart: Hair
-  groupWhitelist: [Synth]
+  groupWhitelist: [ Ipc ]
   sprites:
   - sprite: _Fish/Mobs/Customization/ipc_screens.rsi
     state: ipc_screen_monoeye
@@ -75,7 +75,7 @@
 - type: marking
   id: SynthMonitorNature
   bodyPart: Hair
-  groupWhitelist: [Synth]
+  groupWhitelist: [ Ipc ]
   sprites:
   - sprite: _Fish/Mobs/Customization/ipc_screens.rsi
     state: ipc_screen_nature
@@ -83,7 +83,7 @@
 - type: marking
   id: SynthMonitorNo
   bodyPart: Hair
-  groupWhitelist: [Synth]
+  groupWhitelist: [ Ipc ]
   sprites:
   - sprite: _Fish/Mobs/Customization/ipc_screens.rsi
     state: ipc_screen_exclaim
@@ -91,7 +91,7 @@
 - type: marking
   id: SynthMonitorOrange
   bodyPart: Hair
-  groupWhitelist: [Synth]
+  groupWhitelist: [ Ipc ]
   sprites:
   - sprite: _Fish/Mobs/Customization/ipc_screens.rsi
     state: ipc_screen_orange
@@ -99,7 +99,7 @@
 - type: marking
   id: SynthMonitorPink
   bodyPart: Hair
-  groupWhitelist: [Synth]
+  groupWhitelist: [ Ipc ]
   sprites:
   - sprite: _Fish/Mobs/Customization/ipc_screens.rsi
     state: ipc_screen_pink
@@ -107,7 +107,7 @@
 - type: marking
   id: SynthMonitorPurple
   bodyPart: Hair
-  groupWhitelist: [Synth]
+  groupWhitelist: [ Ipc ]
   sprites:
   - sprite: _Fish/Mobs/Customization/ipc_screens.rsi
     state: ipc_screen_rgb
@@ -115,7 +115,7 @@
 - type: marking
   id: SynthMonitorRed
   bodyPart: Hair
-  groupWhitelist: [Synth]
+  groupWhitelist: [ Ipc ]
   sprites:
   - sprite: _Fish/Mobs/Customization/ipc_screens.rsi
     state: ipc_screen_redtext
@@ -123,7 +123,7 @@
 - type: marking
   id: SynthMonitorRgb
   bodyPart: Hair
-  groupWhitelist: [Synth]
+  groupWhitelist: [ Ipc ]
   sprites:
   - sprite: _Fish/Mobs/Customization/ipc_screens.rsi
     state: ipc_screen_rgb
@@ -131,7 +131,7 @@
 - type: marking
   id: SynthMonitorScroll
   bodyPart: Hair
-  groupWhitelist: [Synth]
+  groupWhitelist: [ Ipc ]
   sprites:
   - sprite: _Fish/Mobs/Customization/ipc_screens.rsi
     state: ipc_screen_scroll
@@ -139,7 +139,7 @@
 - type: marking
   id: SynthMonitorShower
   bodyPart: Hair
-  groupWhitelist: [Synth]
+  groupWhitelist: [ Ipc ]
   sprites:
   - sprite: _Fish/Mobs/Customization/ipc_screens.rsi
     state: ipc_screen_shower
@@ -147,7 +147,7 @@
 - type: marking
   id: SynthMonitorSmiley
   bodyPart: Hair
-  groupWhitelist: [Synth]
+  groupWhitelist: [ Ipc ]
   sprites:
   - sprite: _Fish/Mobs/Customization/ipc_screens.rsi
     state: ipc_screen_smile
@@ -155,7 +155,7 @@
 - type: marking
   id: SynthMonitorStars
   bodyPart: Hair
-  groupWhitelist: [Synth]
+  groupWhitelist: [ Ipc ]
   sprites:
   - sprite: _Fish/Mobs/Customization/ipc_screens.rsi
     state: ipc_screen_stars
@@ -163,7 +163,7 @@
 - type: marking
   id: SynthMonitorYellow
   bodyPart: Hair
-  groupWhitelist: [Synth]
+  groupWhitelist: [ Ipc ]
   sprites:
   - sprite: _Fish/Mobs/Customization/ipc_screens.rsi
     state: ipc_screen_yellow
@@ -171,7 +171,7 @@
 - type: marking
   id: SynthMonitorYes
   bodyPart: Hair
-  groupWhitelist: [Synth]
+  groupWhitelist: [ Ipc ]
   sprites:
   - sprite: _Fish/Mobs/Customization/ipc_screens.rsi
     state: ipc_screen_question
@@ -179,7 +179,7 @@
 - type: marking
   id: SynthMonitorStatic
   bodyPart: Hair
-  groupWhitelist: [Synth]
+  groupWhitelist: [ Ipc ]
   sprites:
   - sprite: _Fish/Mobs/Customization/ipc_screens.rsi
     state: ipc_screen_static
@@ -187,7 +187,7 @@
 - type: marking
   id: SynthMonitorGolGlider
   bodyPart: Hair
-  groupWhitelist: [Synth]
+  groupWhitelist: [ Ipc ]
   sprites:
   - sprite: _Fish/Mobs/Customization/ipc_screens.rsi
     state: ipc_screen_glider
@@ -195,7 +195,7 @@
 - type: marking
   id: SynthMonitorRainbow
   bodyPart: Hair
-  groupWhitelist: [Synth]
+  groupWhitelist: [ Ipc ]
   sprites:
   - sprite: _Fish/Mobs/Customization/ipc_screens.rsi
     state: ipc_screen_rainbowhoriz
@@ -203,7 +203,7 @@
 - type: marking
   id: SynthMonitorOff
   bodyPart: Hair
-  groupWhitelist: [Synth]
+  groupWhitelist: [ Ipc ]
   sprites:
   - sprite: _Fish/Mobs/Customization/ipc_screens.rsi
     state: ipc_screen_blank
@@ -211,7 +211,7 @@
 - type: marking
   id: SynthMonitorTest
   bodyPart: Hair
-  groupWhitelist: [Synth]
+  groupWhitelist: [ Ipc ]
   sprites:
   - sprite: _Fish/Mobs/Customization/ipc_screens.rsi
     state: ipc_screen_loading
@@ -219,7 +219,7 @@
 - type: marking
   id: SynthMonitorSmoking
   bodyPart: Hair
-  groupWhitelist: [Synth]
+  groupWhitelist: [ Ipc ]
   sprites:
   - sprite: _Fish/Mobs/Customization/ipc_screens.rsi
     state: ipc_screen_bsod
