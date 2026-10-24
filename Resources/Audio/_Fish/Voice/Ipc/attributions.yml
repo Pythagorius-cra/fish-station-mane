@@ -9,6 +9,6 @@
   - "whirr2.ogg"
   - "whirr3.ogg"
   - "wilhelm.ogg"
-  license: "AGPL-3.0-or-later"
-  copyright: "Einstein Engines / Delta-V IPC voice pack."
+  license: "Custom"
+  copyright: "Einstein Engines / Delta-V IPC voice pack. Upstream license AGPL-3.0-or-later."
   source: "https://github.com/ARF-SS13/coyotesector-14"
