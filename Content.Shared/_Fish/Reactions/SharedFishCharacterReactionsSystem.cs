@@ -76,6 +76,7 @@ public abstract partial class SharedFishCharacterReactionsSystem : EntitySystem
     /// <summary>
     /// Soft-crit crawl: не поднимаем горящего / бессознательного.
     /// Knockdown больше не блокирует soft-crit — персонаж ползает, а не встаёт рывками.
+    /// Relies on FlammableComponent.OnFire being AutoNetworkedField (client-visible).
     /// </summary>
     public static bool ShouldSuppressSoftCritStand(IEntityManager entMan, EntityUid uid)
     {

@@ -481,8 +481,10 @@ public sealed partial class ExplosionSystem
             || throwForce <= 0
             || EntityManager.IsQueuedForDeletion(uid)
             || !_physicsQuery.TryGetComponent(uid, out var physics)
-            // Fish-edit: игроки = KinematicController, не только Dynamic
-            || (physics.BodyType != BodyType.Dynamic && physics.BodyType != BodyType.KinematicController))
+            // Fish-edit: Dynamic всегда; KinematicController только у персонажей (не AnimateSpell и т.п.)
+            || (physics.BodyType != BodyType.Dynamic
+                && !(physics.BodyType == BodyType.KinematicController
+                     && HasComp<Content.Shared._Fish.Reactions.FishCharacterReactionsComponent>(uid))))
             return;
 
         var pos = _transformSystem.GetWorldPosition(xform);
@@ -491,12 +493,24 @@ public sealed partial class ExplosionSystem
             dir = _robustRandom.NextVector2().Normalized();
 
         // Fish-start: маркер blast-trauma (удар о стену / контузия)
-        var blasted = EnsureComp<Content.Shared._Fish.Reactions.FishBlastedComponent>(uid);
-        blasted.ThrowSpeed = throwForce;
-        blasted.Expires = _timing.CurTime + TimeSpan.FromSeconds(4);
-        Dirty(uid, blasted);
-        // Startup мог сработать с ThrowSpeed=0 — применяем эффекты после выставления полей.
-        _fishReactions.ApplyBlastEffects((uid, blasted));
+        // ThrowSpeed must be set before ComponentStartup (OnBlastedStartup reads it).
+        if (TryComp<Content.Shared._Fish.Reactions.FishBlastedComponent>(uid, out var existingBlast))
+        {
+            existingBlast.ThrowSpeed = throwForce;
+            existingBlast.Expires = _timing.CurTime + TimeSpan.FromSeconds(4);
+            Dirty(uid, existingBlast);
+            // Re-blast within window: Startup already ran — apply effects explicitly.
+            _fishReactions.ApplyBlastEffects((uid, existingBlast));
+        }
+        else
+        {
+            AddComp(uid, new Content.Shared._Fish.Reactions.FishBlastedComponent
+            {
+                ThrowSpeed = throwForce,
+                Expires = _timing.CurTime + TimeSpan.FromSeconds(4),
+            });
+            // Fresh AddComp → OnBlastedStartup applies effects with correct ThrowSpeed.
+        }
         // Fish-end
 
         _throwingSystem.TryThrow(

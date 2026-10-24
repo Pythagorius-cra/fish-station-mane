@@ -66,18 +66,18 @@ public sealed class FishCharacterReactionsTests : InteractionTest
 
         await Server.WaitPost(() =>
         {
-            var reactions = SEntMan.System<Content.Server._Fish.Reactions.FishCharacterReactionsSystem>();
-            var blasted = SEntMan.EnsureComponent<FishBlastedComponent>(STarget!.Value);
-            blasted.ThrowSpeed = 10f;
-            blasted.Expires = TimeSpan.FromSeconds(9999); // не истекает за время теста
-            // Startup мог сработать с ThrowSpeed=0 — явно применяем эффекты.
-            reactions.ApplyBlastEffects((STarget.Value, blasted));
+            // Values must be set before ComponentStartup: OnBlastedStartup reads ThrowSpeed.
+            SEntMan.AddComponent(STarget!.Value, new FishBlastedComponent
+            {
+                ThrowSpeed = 10f,
+                Expires = TimeSpan.FromSeconds(9999), // не истекает за время теста
+            });
         });
         await RunTicks(5);
 
         var trauma = Comp<FishTraumaStatusComponent>();
         Assert.That(trauma.ConcussionSeverity, Is.GreaterThan(0f), "Primary blast должен дать контузию");
-        Assert.That(trauma.LastBlastForce, Is.GreaterThan(0f));
+        Assert.That(trauma.LastBlastForce, Is.EqualTo(10f).Within(0.01f));
         Assert.That(traumaSys.CanAttemptStand((STarget!.Value, trauma), out _), Is.True);
     }
 

@@ -2,7 +2,6 @@ using Content.Shared._Fish.Crit;
 using Content.Shared._Fish.Reactions;
 using Content.Shared._Sunrise.Footprints;
 using Content.Shared.Atmos;
-using Content.Shared.Atmos.Components;
 using Content.Shared.Body.Components;
 using Content.Shared.Body.Systems;
 using Content.Shared.Chemistry.Components;
@@ -21,7 +20,6 @@ using Content.Shared.Chat.Prototypes;
 using Content.Shared.Popups;
 using Content.Shared.Speech.Components;
 using Content.Shared.Standing;
-using Content.Shared.Stunnable;
 using Content.Shared.Trigger.Components.Effects;
 using Content.Shared.Trigger.Systems;
 using Robust.Shared.Audio;
@@ -65,7 +63,6 @@ public sealed partial class FishCharacterReactionsSystem : SharedFishCharacterRe
 
         SubscribeLocalEvent<FishCharacterReactionsComponent, DamageChangedEvent>(OnDamageChanged);
         SubscribeLocalEvent<FishCharacterReactionsComponent, IgnitedEvent>(OnIgnited);
-        SubscribeLocalEvent<FishCharacterReactionsComponent, ExtinguishedEvent>(OnExtinguished);
         SubscribeLocalEvent<FishCharacterReactionsComponent, MoveEvent>(OnMove);
         SubscribeLocalEvent<FishCharacterReactionsComponent, FishGotHitByProjectileEvent>(OnGotHitByProjectile);
         InitializeBlast();
@@ -110,6 +107,7 @@ public sealed partial class FishCharacterReactionsSystem : SharedFishCharacterRe
             return;
 
         // Боль до маркера бессознательности — иначе в Crit на огне крик никогда не сыграет.
+        // OnFire is AutoNetworkedField: soft-crit stand suppression reads it on the client.
         if (!HasComp<FishCritUnconsciousComponent>(ent) && Timing.CurTime >= ent.Comp.NextPainSound)
         {
             PlayPainSound(ent, FishPainSoundKind.Burn);
@@ -118,20 +116,6 @@ public sealed partial class FishCharacterReactionsSystem : SharedFishCharacterRe
             ent.Comp.NextPainSound = Timing.CurTime + ent.Comp.PainSoundCooldown;
             Dirty(ent);
         }
-
-        // В Crit на огне — networked-маркер (OnFire не sync): ползти/тушиться, без soft-crit «встать».
-        // Не зависит от PainSoundCooldown (раньше маркер не ставился на кулдауне).
-        if (_crit.IsInCritZone(ent) && TryComp<FlammableComponent>(ent, out var flam) && flam.OnFire)
-            EnsureComp<FishCritUnconsciousComponent>(ent);
-    }
-
-    private void OnExtinguished(Entity<FishCharacterReactionsComponent> ent, ref ExtinguishedEvent args)
-    {
-        // Снимаем огненный маркер; паралич Crit оставляем.
-        if (!HasComp<FishCritUnconsciousComponent>(ent) || _stun.IsParalyzed(ent))
-            return;
-
-        RemCompDeferred<FishCritUnconsciousComponent>(ent);
     }
 
     private void OnMove(Entity<FishCharacterReactionsComponent> ent, ref MoveEvent args)

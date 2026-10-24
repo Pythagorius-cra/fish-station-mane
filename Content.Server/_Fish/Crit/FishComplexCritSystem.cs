@@ -1,6 +1,5 @@
 using Content.Server.Popups;
 using Content.Shared._Fish.Crit;
-using Content.Shared.Atmos.Components;
 using Content.Shared.Body.Components;
 using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Chemistry.Reagent;
@@ -113,9 +112,8 @@ public sealed partial class FishComplexCritSystem : SharedFishComplexCritSystem
             Dirty(uid, crit);
 
             // Снимаем маркер полной бессознательности, если паралич уже прошёл.
-            // Пока горит — оставляем: OnFire не networked, маркер нужен клиенту для soft-crit.
-            if (HasComp<FishCritUnconsciousComponent>(uid) && !_stun.IsParalyzed(uid) &&
-                (!TryComp<FlammableComponent>(uid, out var flam) || !flam.OnFire))
+            // Fire soft-crit suppression uses networked FlammableComponent.OnFire directly.
+            if (HasComp<FishCritUnconsciousComponent>(uid) && !_stun.IsParalyzed(uid))
                 RemCompDeferred<FishCritUnconsciousComponent>(uid);
 
             HandleCriticalCondition(uid, crit, damageable, mobState);
@@ -164,10 +162,10 @@ public sealed partial class FishComplexCritSystem : SharedFishComplexCritSystem
         MobStateComponent mobState)
     {
         var critScaleHealth = GetCritScaleHealth(uid, crit, damageable);
-        var oxy = GetDamage(uid, Asphyxiation);
-        var brute = GetDamage(uid, Blunt) + GetDamage(uid, Slash) + GetDamage(uid, Piercing);
-        var burn = GetDamage(uid, Heat) + GetDamage(uid, Shock);
-        var brain = GetDamage(uid, Cellular);
+        var oxy = GetDamage(damageable, Asphyxiation);
+        var brute = GetDamage(damageable, Blunt) + GetDamage(damageable, Slash) + GetDamage(damageable, Piercing);
+        var burn = GetDamage(damageable, Heat) + GetDamage(damageable, Shock);
+        var brain = GetDamage(damageable, Cellular);
 
         // guaranteed_death_threshold = health + oxy*0.5 - fire*0.67 - brute*0.67
         var guaranteedDeath = critScaleHealth + oxy * 0.5f - burn * 0.67f - brute * 0.67f;
@@ -366,7 +364,7 @@ public sealed partial class FishComplexCritSystem : SharedFishComplexCritSystem
             return;
 
         // Corazone / аналоги не портированы — только наличие сердца через компонент.
-        var oxy = GetDamage(uid, Asphyxiation);
+        var oxy = GetDamage(damageable, Asphyxiation);
         if (oxy > 0f)
             ApplyCellular(uid, 3f);
         else if (_random.Prob(0.10f))
@@ -459,12 +457,10 @@ public sealed partial class FishComplexCritSystem : SharedFishComplexCritSystem
         _stutter.DoStutter(uid, duration, refresh: false);
     }
 
-    private float GetDamage(EntityUid uid, ProtoId<DamageTypePrototype> type)
+    private static float GetDamage(DamageableComponent damageable, ProtoId<DamageTypePrototype> type)
     {
-#pragma warning disable CS0618
-        var all = Damageable.GetAllDamage(uid);
-#pragma warning restore CS0618
-        return all.DamageDict.TryGetValue(type, out var val) ? (float)val : 0f;
+        // Avoid DamageableSystem.GetAllDamage — it Clone()s the full specifier on every call.
+        return damageable.Damage.DamageDict.TryGetValue(type, out var val) ? (float)val : 0f;
     }
 
     private bool IsHungerAboveHypoglycemia(EntityUid uid)
