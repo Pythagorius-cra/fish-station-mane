@@ -31,16 +31,17 @@ public sealed partial class FishComplexCritSystem
         if (args.Handled || args.User == ent.Owner)
             return;
 
-        // CPR только на цели, не от самой цели при self-interact.
-        if (!IsInCritZone(ent.Owner, ent.Comp))
-            return;
-
+        // Сначала смерть: IsInCritZone для мёртвых всегда false.
         if (MobStateSys.IsDead(ent.Owner))
         {
             _popup.PopupEntity(Loc.GetString("fish-crit-cpr-target-dead"), ent.Owner, args.User, PopupType.SmallCaution);
             args.Handled = true;
             return;
         }
+
+        // CPR только на цели в зоне крита, не от самой цели при self-interact.
+        if (!IsInCritZone(ent.Owner, ent.Comp))
+            return;
 
         if (HasComp<FishCritCprActiveComponent>(ent))
         {
@@ -57,12 +58,15 @@ public sealed partial class FishComplexCritSystem
             ent,
             PopupType.MediumCaution);
 
-        _doAfter.TryStartDoAfter(new DoAfterArgs(EntityManager, args.User, TimeSpan.FromSeconds(4), new FishCritCprDoAfterEvent(), ent.Owner, ent.Owner)
+        if (!_doAfter.TryStartDoAfter(new DoAfterArgs(EntityManager, args.User, TimeSpan.FromSeconds(4), new FishCritCprDoAfterEvent(), ent.Owner, ent.Owner)
+            {
+                BreakOnMove = true,
+                BreakOnDamage = true,
+                NeedHand = true,
+            }))
         {
-            BreakOnMove = true,
-            BreakOnDamage = true,
-            NeedHand = true,
-        });
+            RemCompDeferred<FishCritCprActiveComponent>(ent);
+        }
     }
 
     private void OnCprDoAfter(Entity<FishComplexCritComponent> ent, ref FishCritCprDoAfterEvent args)

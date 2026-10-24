@@ -382,10 +382,7 @@ public sealed partial class FishComplexCritSystem : SharedFishComplexCritSystem
 
     private void ApplyOxy(EntityUid uid, float amount)
     {
-        // Не рвём do-after вставания (BreakOnDamage на TryStanding).
-        if (IsTryingToStand(EntityManager, uid))
-            return;
-
+        // interruptsDoAfters: false — не рвём do-after вставания; урон oxy (в т.ч. от остановки сердца) всё равно идёт.
         var spec = new DamageSpecifier(_proto.Index(Asphyxiation), FixedPoint2.New(amount));
         Damageable.TryChangeDamage(uid, spec, ignoreResistances: true, interruptsDoAfters: false);
     }

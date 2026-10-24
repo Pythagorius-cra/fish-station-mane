@@ -495,6 +495,8 @@ public sealed partial class ExplosionSystem
         blasted.ThrowSpeed = throwForce;
         blasted.Expires = _timing.CurTime + TimeSpan.FromSeconds(4);
         Dirty(uid, blasted);
+        // Startup мог сработать с ThrowSpeed=0 — применяем эффекты после выставления полей.
+        _fishReactions.ApplyBlastEffects((uid, blasted));
         // Fish-end
 
         _throwingSystem.TryThrow(

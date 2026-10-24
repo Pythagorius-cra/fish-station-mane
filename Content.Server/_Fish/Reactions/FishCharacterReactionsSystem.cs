@@ -75,10 +75,15 @@ public sealed partial class FishCharacterReactionsSystem : SharedFishCharacterRe
         if (!args.DamageIncreased || args.DamageDelta == null)
             return;
 
-        if (MobStateSys.IsDead(ent) || HasComp<FishCritUnconsciousComponent>(ent))
+        if (MobStateSys.IsDead(ent))
             return;
 
+        // Кровь на полу/теле даже в unconscious; звук/травма — только если в сознании.
         TryBloodOnHit(ent, args);
+
+        if (HasComp<FishCritUnconsciousComponent>(ent))
+            return;
+
         TryPainSound(ent, args);
         TryApplyDamageTrauma(ent, args);
     }

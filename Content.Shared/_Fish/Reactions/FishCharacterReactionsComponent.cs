@@ -24,8 +24,9 @@ public sealed partial class FishCharacterReactionsComponent : Component
     [DataField, AutoNetworkedField]
     public TimeSpan BleedTrailCooldown = TimeSpan.FromSeconds(0.6);
 
+    /// <summary>Серверный таймер следующего кровоточащего следа (не сетевой).</summary>
     [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
-    [AutoNetworkedField, AutoPausedField]
+    [AutoPausedField]
     public TimeSpan NextBleedTrail;
 
     /// <summary>Сколько крови в раствор ног/тела за тик следа.</summary>
@@ -44,8 +45,9 @@ public sealed partial class FishCharacterReactionsComponent : Component
     [DataField, AutoNetworkedField]
     public float HitBloodMinDamage = 3f;
 
+    /// <summary>Серверный таймер следующего болевого звука (не сетевой).</summary>
     [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
-    [AutoNetworkedField, AutoPausedField]
+    [AutoPausedField]
     public TimeSpan NextPainSound;
 
     /// <summary>Кулдаун болевого крика (только звук, без эмоута).</summary>

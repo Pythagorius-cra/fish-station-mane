@@ -55,6 +55,18 @@ public sealed partial class FishCharacterReactionsSystem
 
     private void OnBlastedStartup(Entity<FishBlastedComponent> ent, ref ComponentStartup args)
     {
+        // EnsureComp вызывает Startup до присвоения ThrowSpeed — ждём ApplyBlastEffects.
+        if (ent.Comp.ThrowSpeed <= 0f)
+            return;
+
+        ApplyBlastEffects(ent);
+    }
+
+    /// <summary>
+    /// Применить primary blast-эффекты после выставления ThrowSpeed (вызов из ExplosionSystem).
+    /// </summary>
+    public void ApplyBlastEffects(Entity<FishBlastedComponent> ent)
+    {
         if (MobStateSys.IsDead(ent))
             return;
 

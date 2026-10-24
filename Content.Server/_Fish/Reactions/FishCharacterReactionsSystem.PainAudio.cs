@@ -181,12 +181,13 @@ public sealed partial class FishCharacterReactionsSystem
     {
         return kind switch
         {
+            // Женских long/burn/panic/fall пакетов нет — используем sharp/moan female, не male.
             FishPainSoundKind.Sharp => female ? SharpFemale : SharpMale,
             FishPainSoundKind.Moan => female ? MoanFemale : MoanMale,
-            FishPainSoundKind.Long => LongMale,
-            FishPainSoundKind.Burn => BurnMale,
-            FishPainSoundKind.Fall => FallMale,
-            FishPainSoundKind.Panic => PanicMale,
+            FishPainSoundKind.Long => female ? SharpFemale : LongMale,
+            FishPainSoundKind.Burn => female ? MoanFemale : BurnMale,
+            FishPainSoundKind.Fall => female ? MoanFemale : FallMale,
+            FishPainSoundKind.Panic => female ? SharpFemale : PanicMale,
             FishPainSoundKind.Gasp => GaspCol,
             FishPainSoundKind.Stand => female ? MoanFemale : StandMale,
             FishPainSoundKind.Death => DeathMale,

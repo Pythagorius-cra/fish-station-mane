@@ -66,9 +66,12 @@ public sealed class FishCharacterReactionsTests : InteractionTest
 
         await Server.WaitPost(() =>
         {
+            var reactions = SEntMan.System<Content.Server._Fish.Reactions.FishCharacterReactionsSystem>();
             var blasted = SEntMan.EnsureComponent<FishBlastedComponent>(STarget!.Value);
             blasted.ThrowSpeed = 10f;
             blasted.Expires = TimeSpan.FromSeconds(9999); // не истекает за время теста
+            // Startup мог сработать с ThrowSpeed=0 — явно применяем эффекты.
+            reactions.ApplyBlastEffects((STarget.Value, blasted));
         });
         await RunTicks(5);
 
