@@ -1,0 +1,1268 @@
+- type: entity
+  parent: [SimpleMobBase, MobCombat]
+  id: FishSlimeBaseFish
+  name: slime
+  suffix: Fish
+  abstract: true
+  description: A gelatinous xenobiology slime.
+  components:
+  - type: FishSlime
+  - type: Sprite
+    drawdepth: Mobs
+    sprite: _Fish/Xenobiology/slimes/slimes.rsi
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: blue_adult_slime
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeCircle
+          radius: 0.30
+        density: 80
+        mask:
+        - MobMask
+        layer:
+        - MobLayer
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      150: Dead
+  - type: MovementSpeedModifier
+    baseWalkSpeed: 2.2
+    baseSprintSpeed: 2.2
+  - type: FootstepModifier
+    footstepSoundCollection:
+      collection: FootstepSlime
+  - type: MeleeWeapon
+    altDisarm: false
+    angle: 0
+    animation: WeaponArcPunch
+    damage:
+      types:
+        Blunt: 6
+        Caustic: 4
+  - type: Damageable
+    damageModifierSet: Slime
+  - type: NpcFactionMember
+    factions:
+    - SimpleNeutral
+  - type: Speech
+    speechVerb: Slime
+    speechSounds: Slime
+  - type: Temperature
+  - type: AtmosExposed
+  - type: Reactive
+    groups:
+      Flammable: [ Touch ]
+      Extinguish: [ Touch ]
+    reactions:
+    - reagents: [ Water ]
+      methods: [ Touch ]
+      effects:
+      - !type:HealthChange
+        damage:
+          types:
+            Blunt: 12
+      - !type:PopupMessage
+        type: Local
+        messages: [ "fish-slime-hurt-by-water" ]
+        probability: 0.25
+  - type: InteractionPopup
+    successChance: 0.5
+    interactSuccessString: petting-success-slimes
+    interactFailureString: petting-failure-generic
+  - type: VentCrawler
+  - type: Tag
+    tags:
+    - DoorBumpOpener
+    - FootstepSound
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimeGreyBabyFish
+  name: grey baby slime
+  suffix: Fish
+  description: A grey xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: grey
+    isAdult: false
+  - type: Sprite
+    color: "#b0b0b0"
+    scale: 0.72, 0.72
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: blue_adult_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: blue_adult_slime
+      Dead:
+        Base: blue_adult_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      150: Dead
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimeGreyAdultFish
+  name: grey adult slime
+  suffix: Fish
+  description: A grey xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: grey
+    isAdult: true
+  - type: Sprite
+    color: "#b0b0b0"
+    scale: 1, 1
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: blue_adult_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: blue_adult_slime
+      Dead:
+        Base: blue_adult_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      200: Dead
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimePurpleBabyFish
+  name: purple baby slime
+  suffix: Fish
+  description: A purple xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: purple
+    isAdult: false
+  - type: Sprite
+    color: "#b14cff"
+    scale: 0.72, 0.72
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: blue_adult_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: blue_adult_slime
+      Dead:
+        Base: blue_adult_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      150: Dead
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimePurpleAdultFish
+  name: purple adult slime
+  suffix: Fish
+  description: A purple xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: purple
+    isAdult: true
+  - type: Sprite
+    color: "#b14cff"
+    scale: 1, 1
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: blue_adult_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: blue_adult_slime
+      Dead:
+        Base: blue_adult_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      200: Dead
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimeMetalBabyFish
+  name: metal baby slime
+  suffix: Fish
+  description: A metal xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: metal
+    isAdult: false
+  - type: Sprite
+    color: "#c5c8d4"
+    scale: 0.72, 0.72
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: blue_adult_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: blue_adult_slime
+      Dead:
+        Base: blue_adult_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      150: Dead
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimeMetalAdultFish
+  name: metal adult slime
+  suffix: Fish
+  description: A metal xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: metal
+    isAdult: true
+  - type: Sprite
+    color: "#c5c8d4"
+    scale: 1, 1
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: blue_adult_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: blue_adult_slime
+      Dead:
+        Base: blue_adult_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      200: Dead
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimeOrangeBabyFish
+  name: orange baby slime
+  suffix: Fish
+  description: A orange xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: orange
+    isAdult: false
+  - type: Sprite
+    color: "#ff8a1e"
+    scale: 0.72, 0.72
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: blue_adult_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: blue_adult_slime
+      Dead:
+        Base: blue_adult_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      150: Dead
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimeOrangeAdultFish
+  name: orange adult slime
+  suffix: Fish
+  description: A orange xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: orange
+    isAdult: true
+  - type: Sprite
+    color: "#ff8a1e"
+    scale: 1, 1
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: blue_adult_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: blue_adult_slime
+      Dead:
+        Base: blue_adult_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      200: Dead
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimeBlueBabyFish
+  name: blue baby slime
+  suffix: Fish
+  description: A blue xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: blue
+    isAdult: false
+  - type: Sprite
+    color: "#ffffff"
+    scale: 0.72, 0.72
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: blue_adult_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: blue_adult_slime
+      Dead:
+        Base: blue_adult_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      150: Dead
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimeBlueAdultFish
+  name: blue adult slime
+  suffix: Fish
+  description: A blue xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: blue
+    isAdult: true
+  - type: Sprite
+    color: "#ffffff"
+    scale: 1, 1
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: blue_adult_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: blue_adult_slime
+      Dead:
+        Base: blue_adult_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      200: Dead
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimeDarkBlueBabyFish
+  name: dark blue baby slime
+  suffix: Fish
+  description: A dark blue xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: darkblue
+    isAdult: false
+  - type: Sprite
+    color: "#1a237e"
+    scale: 0.72, 0.72
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: blue_adult_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: blue_adult_slime
+      Dead:
+        Base: blue_adult_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      150: Dead
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimeDarkBlueAdultFish
+  name: dark blue adult slime
+  suffix: Fish
+  description: A dark blue xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: darkblue
+    isAdult: true
+  - type: Sprite
+    color: "#1a237e"
+    scale: 1, 1
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: blue_adult_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: blue_adult_slime
+      Dead:
+        Base: blue_adult_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      200: Dead
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimeDarkPurpleBabyFish
+  name: dark purple baby slime
+  suffix: Fish
+  description: A dark purple xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: darkpurple
+    isAdult: false
+  - type: Sprite
+    color: "#4a148c"
+    scale: 0.72, 0.72
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: blue_adult_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: blue_adult_slime
+      Dead:
+        Base: blue_adult_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      150: Dead
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimeDarkPurpleAdultFish
+  name: dark purple adult slime
+  suffix: Fish
+  description: A dark purple xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: darkpurple
+    isAdult: true
+  - type: Sprite
+    color: "#4a148c"
+    scale: 1, 1
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: blue_adult_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: blue_adult_slime
+      Dead:
+        Base: blue_adult_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      200: Dead
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimeYellowBabyFish
+  name: yellow baby slime
+  suffix: Fish
+  description: A yellow xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: yellow
+    isAdult: false
+  - type: Sprite
+    color: "#ffffff"
+    scale: 0.72, 0.72
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: yellow_adult_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: yellow_adult_slime
+      Dead:
+        Base: yellow_adult_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      150: Dead
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimeYellowAdultFish
+  name: yellow adult slime
+  suffix: Fish
+  description: A yellow xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: yellow
+    isAdult: true
+  - type: Sprite
+    color: "#ffffff"
+    scale: 1, 1
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: yellow_adult_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: yellow_adult_slime
+      Dead:
+        Base: yellow_adult_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      200: Dead
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimeSilverBabyFish
+  name: silver baby slime
+  suffix: Fish
+  description: A silver xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: silver
+    isAdult: false
+  - type: Sprite
+    color: "#e6e6e6"
+    scale: 0.72, 0.72
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: blue_adult_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: blue_adult_slime
+      Dead:
+        Base: blue_adult_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      150: Dead
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimeSilverAdultFish
+  name: silver adult slime
+  suffix: Fish
+  description: A silver xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: silver
+    isAdult: true
+  - type: Sprite
+    color: "#e6e6e6"
+    scale: 1, 1
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: blue_adult_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: blue_adult_slime
+      Dead:
+        Base: blue_adult_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      200: Dead
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimePinkBabyFish
+  name: pink baby slime
+  suffix: Fish
+  description: A pink xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: pink
+    isAdult: false
+  - type: Sprite
+    color: "#ff5fa2"
+    scale: 0.72, 0.72
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: blue_adult_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: blue_adult_slime
+      Dead:
+        Base: blue_adult_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      150: Dead
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimePinkAdultFish
+  name: pink adult slime
+  suffix: Fish
+  description: A pink xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: pink
+    isAdult: true
+  - type: Sprite
+    color: "#ff5fa2"
+    scale: 1, 1
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: blue_adult_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: blue_adult_slime
+      Dead:
+        Base: blue_adult_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      200: Dead
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimeRedBabyFish
+  name: red baby slime
+  suffix: Fish
+  description: A red xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: red
+    isAdult: false
+  - type: Sprite
+    color: "#e53935"
+    scale: 0.72, 0.72
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: blue_adult_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: blue_adult_slime
+      Dead:
+        Base: blue_adult_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      150: Dead
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimeRedAdultFish
+  name: red adult slime
+  suffix: Fish
+  description: A red xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: red
+    isAdult: true
+  - type: Sprite
+    color: "#e53935"
+    scale: 1, 1
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: blue_adult_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: blue_adult_slime
+      Dead:
+        Base: blue_adult_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      200: Dead
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimeGoldBabyFish
+  name: gold baby slime
+  suffix: Fish
+  description: A gold xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: gold
+    isAdult: false
+  - type: Sprite
+    color: "#ffd54f"
+    scale: 0.72, 0.72
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: blue_adult_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: blue_adult_slime
+      Dead:
+        Base: blue_adult_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      150: Dead
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimeGoldAdultFish
+  name: gold adult slime
+  suffix: Fish
+  description: A gold xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: gold
+    isAdult: true
+  - type: Sprite
+    color: "#ffd54f"
+    scale: 1, 1
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: blue_adult_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: blue_adult_slime
+      Dead:
+        Base: blue_adult_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      200: Dead
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimeGreenBabyFish
+  name: green baby slime
+  suffix: Fish
+  description: A green xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: green
+    isAdult: false
+  - type: Sprite
+    color: "#ffffff"
+    scale: 0.72, 0.72
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: green_adult_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: green_adult_slime
+      Dead:
+        Base: green_adult_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      150: Dead
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimeGreenAdultFish
+  name: green adult slime
+  suffix: Fish
+  description: A green xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: green
+    isAdult: true
+  - type: Sprite
+    color: "#ffffff"
+    scale: 1, 1
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: green_adult_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: green_adult_slime
+      Dead:
+        Base: green_adult_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      200: Dead
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimeAdamantineBabyFish
+  name: adamantine baby slime
+  suffix: Fish
+  description: A adamantine xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: adamantine
+    isAdult: false
+  - type: Sprite
+    color: "#26c6da"
+    scale: 0.72, 0.72
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: blue_adult_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: blue_adult_slime
+      Dead:
+        Base: blue_adult_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      150: Dead
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimeAdamantineAdultFish
+  name: adamantine adult slime
+  suffix: Fish
+  description: A adamantine xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: adamantine
+    isAdult: true
+  - type: Sprite
+    color: "#26c6da"
+    scale: 1, 1
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: blue_adult_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: blue_adult_slime
+      Dead:
+        Base: blue_adult_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      200: Dead
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimeOilBabyFish
+  name: oil baby slime
+  suffix: Fish
+  description: A oil xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: oil
+    isAdult: false
+  - type: Sprite
+    color: "#2b2b2b"
+    scale: 0.72, 0.72
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: blue_adult_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: blue_adult_slime
+      Dead:
+        Base: blue_adult_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      150: Dead
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimeOilAdultFish
+  name: oil adult slime
+  suffix: Fish
+  description: A oil xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: oil
+    isAdult: true
+  - type: Sprite
+    color: "#2b2b2b"
+    scale: 1, 1
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: blue_adult_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: blue_adult_slime
+      Dead:
+        Base: blue_adult_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      200: Dead
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimeLightPinkBabyFish
+  name: light pink baby slime
+  suffix: Fish
+  description: A light pink xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: lightpink
+    isAdult: false
+  - type: Sprite
+    color: "#ffc1e3"
+    scale: 0.72, 0.72
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: blue_adult_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: blue_adult_slime
+      Dead:
+        Base: blue_adult_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      150: Dead
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimeLightPinkAdultFish
+  name: light pink adult slime
+  suffix: Fish
+  description: A light pink xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: lightpink
+    isAdult: true
+  - type: Sprite
+    color: "#ffc1e3"
+    scale: 1, 1
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: blue_adult_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: blue_adult_slime
+      Dead:
+        Base: blue_adult_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      200: Dead
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimeBluespaceBabyFish
+  name: bluespace baby slime
+  suffix: Fish
+  description: A bluespace xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: bluespace
+    isAdult: false
+  - type: Sprite
+    color: "#5c6bc0"
+    scale: 0.72, 0.72
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: blue_adult_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: blue_adult_slime
+      Dead:
+        Base: blue_adult_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      150: Dead
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimeBluespaceAdultFish
+  name: bluespace adult slime
+  suffix: Fish
+  description: A bluespace xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: bluespace
+    isAdult: true
+  - type: Sprite
+    color: "#5c6bc0"
+    scale: 1, 1
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: blue_adult_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: blue_adult_slime
+      Dead:
+        Base: blue_adult_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      200: Dead
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimeCeruleanBabyFish
+  name: cerulean baby slime
+  suffix: Fish
+  description: A cerulean xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: cerulean
+    isAdult: false
+  - type: Sprite
+    color: "#00acc1"
+    scale: 0.72, 0.72
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: blue_adult_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: blue_adult_slime
+      Dead:
+        Base: blue_adult_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      150: Dead
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimeCeruleanAdultFish
+  name: cerulean adult slime
+  suffix: Fish
+  description: A cerulean xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: cerulean
+    isAdult: true
+  - type: Sprite
+    color: "#00acc1"
+    scale: 1, 1
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: blue_adult_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: blue_adult_slime
+      Dead:
+        Base: blue_adult_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      200: Dead
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimeSepiaBabyFish
+  name: sepia baby slime
+  suffix: Fish
+  description: A sepia xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: sepia
+    isAdult: false
+  - type: Sprite
+    color: "#8d6e63"
+    scale: 0.72, 0.72
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: blue_adult_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: blue_adult_slime
+      Dead:
+        Base: blue_adult_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      150: Dead
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimeSepiaAdultFish
+  name: sepia adult slime
+  suffix: Fish
+  description: A sepia xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: sepia
+    isAdult: true
+  - type: Sprite
+    color: "#8d6e63"
+    scale: 1, 1
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: blue_adult_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: blue_adult_slime
+      Dead:
+        Base: blue_adult_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      200: Dead
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimeBlackBabyFish
+  name: black baby slime
+  suffix: Fish
+  description: A black xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: black
+    isAdult: false
+  - type: Sprite
+    color: "#222222"
+    scale: 0.72, 0.72
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: blue_adult_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: blue_adult_slime
+      Dead:
+        Base: blue_adult_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      150: Dead
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimeBlackAdultFish
+  name: black adult slime
+  suffix: Fish
+  description: A black xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: black
+    isAdult: true
+  - type: Sprite
+    color: "#222222"
+    scale: 1, 1
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: blue_adult_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: blue_adult_slime
+      Dead:
+        Base: blue_adult_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      200: Dead
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimePyriteBabyFish
+  name: pyrite baby slime
+  suffix: Fish
+  description: A pyrite xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: pyrite
+    isAdult: false
+  - type: Sprite
+    color: "#c6a400"
+    scale: 0.72, 0.72
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: blue_adult_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: blue_adult_slime
+      Dead:
+        Base: blue_adult_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      150: Dead
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimePyriteAdultFish
+  name: pyrite adult slime
+  suffix: Fish
+  description: A pyrite xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: pyrite
+    isAdult: true
+  - type: Sprite
+    color: "#c6a400"
+    scale: 1, 1
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: blue_adult_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: blue_adult_slime
+      Dead:
+        Base: blue_adult_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      200: Dead
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimeRainbowBabyFish
+  name: rainbow baby slime
+  suffix: Fish
+  description: A rainbow xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: rainbow
+    isAdult: false
+  - type: Sprite
+    color: "#ffffff"
+    scale: 0.72, 0.72
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: rainbow_baby_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: rainbow_baby_slime
+      Dead:
+        Base: rainbow_baby_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      150: Dead
+
+- type: entity
+  parent: FishSlimeBaseFish
+  id: FishSlimeRainbowAdultFish
+  name: rainbow adult slime
+  suffix: Fish
+  description: A rainbow xenobiology slime.
+  components:
+  - type: FishSlime
+    colorId: rainbow
+    isAdult: true
+  - type: Sprite
+    color: "#ffffff"
+    scale: 1, 1
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: rainbow_baby_slime
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: rainbow_baby_slime
+      Dead:
+        Base: rainbow_baby_slime_dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      200: Dead
+
