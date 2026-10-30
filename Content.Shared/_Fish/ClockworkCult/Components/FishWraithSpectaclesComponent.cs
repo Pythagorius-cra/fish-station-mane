@@ -18,7 +18,6 @@ public sealed partial class FishWraithSpectaclesComponent : Component
     /// <summary>
     /// Накопленный «глазной» урон (лечится при снятии). Только сервер.
     /// </summary>
-    [DataField]
     public float AccumulatedEyeDamage;
 
     [ViewVariables]

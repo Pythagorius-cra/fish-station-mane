@@ -80,7 +80,7 @@
 
 - type: entity
   id: FishCityOfCogsRift
-  name: city of cogs rift
+  name: clockwork rift
   description: A one-way bluespace anomaly leading to Reebe.
   suffix: Fish
   placement:
