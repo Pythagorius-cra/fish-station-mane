@@ -1,0 +1,31 @@
+# Fish-edit - запас кубов ксенобиологии, гидратация остаётся на ванильном Rehydratable
+- type: entity
+  parent: MonkeyCube
+  id: FishXenobiologyMonkeyCube
+  name: monkey cube
+  description: Just add water to get a live monkey for slime feeding.
+  suffix: Fish
+
+- type: entity
+  parent: MonkeyCubeWrapped
+  id: FishXenobiologyMonkeyCubeWrapped
+  name: monkey cube
+  description: Unwrap this to get a monkey cube.
+  suffix: Fish
+  components:
+  - type: SpawnItemsOnUse
+    items:
+    - id: FishXenobiologyMonkeyCube
+
+- type: entity
+  parent: MonkeyCubeBox
+  id: FishXenobiologyMonkeyCubeBox
+  name: monkey cube box
+  description: Drymate brand monkey cubes for the xenobiology lab. Just add water!
+  suffix: Fish
+  components:
+  - type: EntityTableContainerFill
+    containers:
+      storagebase:
+        id: FishXenobiologyMonkeyCubeWrapped
+        amount: 8
