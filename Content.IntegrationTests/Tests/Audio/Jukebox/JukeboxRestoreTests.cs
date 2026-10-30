@@ -15,7 +15,8 @@ namespace Content.IntegrationTests.Tests.Audio.Jukebox;
 /// </summary>
 public sealed class JukeboxRestoreTests : GameTest
 {
-    private static readonly string[] ExpectedTracks =
+    /// <summary>Original upstream SS14 jukebox tracks.</summary>
+    private static readonly string[] UpstreamTracks =
     [
         "FlipFlap",
         "Tintin",
@@ -25,12 +26,33 @@ public sealed class JukeboxRestoreTests : GameTest
         "starlight",
     ];
 
+    /// <summary>Licensed classic SS13 title/lobby + Fish tracks added to the jukebox catalog.</summary>
+    private static readonly string[] ClassicSs13AndFishTracks =
+    [
+        "EndlessSpace",
+        "Absconditus",
+        "RobocopTitle",
+        "AtomicAmnesia",
+        "Singuloose",
+        "CometHaley",
+        "SpacStac",
+        "PhoronWillMakeUsRich",
+        "LasersRipApartTheBulkhead",
+        "EveryLightIsBlinkingAtOnce",
+        "SpaceAsshole",
+        "TheWizard",
+        "Sunset",
+        "Neon",
+        "DoubleU",
+    ];
+
     [Test]
     [TestOf(typeof(JukeboxPrototype))]
-    public async Task CatalogContainsUpstreamTracks()
+    public async Task CatalogContainsLicensedTracks()
     {
         var protoMan = Server.ProtoMan;
         var resources = Server.ResolveDependency<IResourceManager>();
+        var required = UpstreamTracks.Concat(ClassicSs13AndFishTracks).ToArray();
 
         await Server.WaitAssertion(() =>
         {
@@ -38,14 +60,12 @@ public sealed class JukeboxRestoreTests : GameTest
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(tracks.Keys, Is.EquivalentTo(ExpectedTracks),
-                    "Jukebox catalog should match upstream Standard.yml track IDs.");
+                Assert.That(tracks.Keys, Is.SupersetOf(required),
+                    "Jukebox catalog is missing required licensed tracks.");
 
-                foreach (var id in ExpectedTracks)
+                foreach (var id in required)
                 {
                     Assert.That(tracks[id].Name, Is.Not.Null.And.Not.Empty, $"{id} needs a display name.");
-                    Assert.That(tracks[id].Path.Path.ToString(), Does.StartWith("/Audio/Jukebox/"),
-                        $"{id} should point at /Audio/Jukebox/.");
                     Assert.That(resources.ContentFileExists(tracks[id].Path.Path), Is.True,
                         $"Missing audio resource for {id}: {tracks[id].Path.Path}");
                 }
@@ -82,8 +102,8 @@ public sealed class JukeboxRestoreTests : GameTest
             var system = SEntMan.System<JukeboxSystem>();
             var ent = SEntity<JukeboxComponent>(jukebox);
 
-            system.SetSelectedTrack(ent.AsNullable(), "FlipFlap");
-            Assert.That(ent.Comp.SelectedSongId, Is.EqualTo(new ProtoId<JukeboxPrototype>("FlipFlap")));
+            system.SetSelectedTrack(ent.AsNullable(), "EndlessSpace");
+            Assert.That(ent.Comp.SelectedSongId, Is.EqualTo(new ProtoId<JukeboxPrototype>("EndlessSpace")));
 
             Assert.That(system.TryPlay(ent.AsNullable()), Is.True);
             Assert.That(system.IsPlaying(ent.AsNullable()), Is.True);

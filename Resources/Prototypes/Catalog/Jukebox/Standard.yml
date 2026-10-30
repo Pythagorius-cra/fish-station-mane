@@ -1,3 +1,4 @@
+# Upstream SS14 jukebox catalog
 - type: jukebox
   id: FlipFlap
   name: X-CEED - Flip Flap
@@ -33,3 +34,97 @@
   name: Qwertyquerty - Starlight
   path:
     path: /Audio/Jukebox/starlight.ogg
+
+# Classic SS13 title / lobby tracks (already licensed in-repo; safe for community hosted servers).
+# Commercial /tg/ live-server jukebox tracks (Queen, Bowie, etc.) are intentionally omitted.
+- type: jukebox
+  id: EndlessSpace
+  name: SolusLunes - Endless Space
+  path:
+    path: /Audio/Lobby/endless_space.ogg
+
+- type: jukebox
+  id: Absconditus
+  name: ZhayTee - Absconditus
+  path:
+    path: /Audio/Lobby/absconditus.ogg
+
+- type: jukebox
+  id: RobocopTitle
+  name: Eric Shumaker - Dilbert 3 / RoboCop Title
+  path:
+    path: /Audio/Lobby/title2.ogg
+
+- type: jukebox
+  id: AtomicAmnesia
+  name: Philip Dyer - Atomic Amnesia MMX
+  path:
+    path: /Audio/Lobby/atomicamnesiammx.ogg
+
+- type: jukebox
+  id: Singuloose
+  name: Janis Schiedková - Singuloose
+  path:
+    path: /Audio/Lobby/singuloose.ogg
+
+- type: jukebox
+  id: CometHaley
+  name: Stellardrone - Comet Haley
+  path:
+    path: /Audio/Lobby/comet_haley.ogg
+
+- type: jukebox
+  id: SpacStac
+  name: Hayabusa - Spac Stac
+  path:
+    path: /Audio/Lobby/Spac_Stac.ogg
+
+- type: jukebox
+  id: PhoronWillMakeUsRich
+  name: Sunbeamstress - phoron will make us rich
+  path:
+    path: /Audio/Lobby/pwmur.ogg
+
+- type: jukebox
+  id: LasersRipApartTheBulkhead
+  name: Sunbeamstress - lasers rip apart the bulkhead
+  path:
+    path: /Audio/Lobby/lasers_rip_apart_the_bulkhead.ogg
+
+- type: jukebox
+  id: EveryLightIsBlinkingAtOnce
+  name: Sunbeamstress - every light is blinking at once
+  path:
+    path: /Audio/Lobby/every_light_is_blinking_at_once.ogg
+
+- type: jukebox
+  id: SpaceAsshole
+  name: Chris Remo - Space Asshole
+  path:
+    path: /Audio/Lobby/space_asshole.ogg
+
+- type: jukebox
+  id: TheWizard
+  name: Chris Remo - The Wizard
+  path:
+    path: /Audio/Lobby/the_wizard.ogg
+
+# Previously in upstream SS14 jukebox; still licensed CC-BY-SA-3.0 in Sunrise TapePlayer tracks.
+- type: jukebox
+  id: Sunset
+  name: PigeonBeans - Sunset
+  path:
+    path: /Audio/_Sunrise/TapePlayer/Tracks/sunset.ogg
+
+# Fish-licensed lobby tracks (CC-BY-3.0)
+- type: jukebox
+  id: Neon
+  name: QAntum - Neon
+  path:
+    path: /Audio/_Fish/Lobby/neon.ogg
+
+- type: jukebox
+  id: DoubleU
+  name: QAntum - Double U
+  path:
+    path: /Audio/_Fish/Lobby/double-u.ogg
