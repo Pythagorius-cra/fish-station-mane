@@ -3,6 +3,7 @@ using Content.Server.Power.Components;
 using Content.Shared._Fish.Mining;
 using Content.Shared.Lathe;
 using Content.Shared.Materials;
+using Content.Shared.Research.Prototypes;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Prototypes;
 
@@ -15,6 +16,7 @@ public sealed class OreRedemptionTest
     private static readonly EntProtoId OreProcessorIndustrialProto = "OreProcessorIndustrial";
     private static readonly EntProtoId SteelOreProto = "SteelOre1";
     private static readonly EntProtoId CoalProto = "Coal1";
+    private static readonly ProtoId<LatheRecipePrototype> SteelRecipe = "SheetSteel";
 
     [Test]
     public async Task OreProcessorHasRedemptionComponent()
@@ -46,17 +48,24 @@ public sealed class OreRedemptionTest
         var mapData = await pair.CreateTestMap();
         var entMan = server.EntMan;
         var materials = server.System<SharedMaterialStorageSystem>();
+        var protoMan = server.ProtoMan;
 
-        await server.WaitAssertion(() =>
+        var processor = EntityUid.Invalid;
+        var ore = EntityUid.Invalid;
+        var coal = EntityUid.Invalid;
+        var absorbedOre = false;
+        var absorbedCoal = false;
+
+        await server.WaitPost(() =>
         {
-            var processor = entMan.SpawnEntity(OreProcessorProto, mapData.GridCoords);
+            processor = entMan.SpawnEntity(OreProcessorProto, mapData.GridCoords);
             if (entMan.TryGetComponent(processor, out ApcPowerReceiverComponent power))
             {
                 power.NeedsPower = false;
                 power.Powered = true;
             }
 
-            var ore = entMan.SpawnEntity(SteelOreProto, mapData.GridCoords);
+            ore = entMan.SpawnEntity(SteelOreProto, mapData.GridCoords);
 
             var redemption = server.System<OreRedemptionSystem>();
             var storage = entMan.GetComponent<MaterialStorageComponent>(processor);
@@ -64,18 +73,32 @@ public sealed class OreRedemptionTest
 
             materials.UpdateMaterialWhitelist(processor);
 
-            Assert.That(redemption.TryAbsorbOre(processor, ore, storage, redemptionComp), Is.True,
-                "Direct ore absorb should succeed");
+            absorbedOre = redemption.TryAbsorbOre(processor, ore, storage, redemptionComp);
+
+            coal = entMan.SpawnEntity(CoalProto, mapData.GridCoords);
+            absorbedCoal = redemption.TryAbsorbOre(processor, coal, storage, redemptionComp);
+            redemption.TryAutoProcess(processor);
+        });
+
+        await server.WaitAssertion(() =>
+        {
+            Assert.That(absorbedOre, Is.True, "Direct ore absorb should succeed");
             Assert.That(entMan.Deleted(ore) || entMan.IsQueuedForDeletion(ore), Is.True);
             Assert.That(materials.GetMaterialAmount(processor, "RawIron"), Is.GreaterThan(0));
-
-            var coal = entMan.SpawnEntity(CoalProto, mapData.GridCoords);
-            Assert.That(redemption.TryAbsorbOre(processor, coal, storage, redemptionComp), Is.True);
-            redemption.TryAutoProcess(processor);
+            Assert.That(absorbedCoal, Is.True);
 
             var lathe = entMan.GetComponent<LatheComponent>(processor);
-            Assert.That(lathe.Queue.Count > 0 || lathe.CurrentRecipe != null,
+            var queuedSteel = lathe.CurrentRecipe == SteelRecipe;
+            foreach (var batch in lathe.Queue)
+            {
+                if (batch.Recipe == SteelRecipe)
+                    queuedSteel = true;
+            }
+
+            Assert.That(queuedSteel, Is.True,
                 "With iron and coal the processor should auto-queue steel smelting");
+            Assert.That(protoMan.Index(SteelRecipe).PrintTicket, Is.True,
+                "Steel smelting should print a salvage ticket");
         });
 
         await pair.CleanReturnAsync();

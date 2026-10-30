@@ -29,21 +29,21 @@ namespace Content.Server._Fish.Mining;
 /// Автопоглощение руды у OreProcessor и автопостановка smelting-рецептов в очередь Lathe.
 /// Очки шахтёра (SalvageTicket) начисляются существующим PrintTicket в LatheSystem.
 /// </summary>
-public sealed class OreRedemptionSystem : EntitySystem
+public sealed partial class OreRedemptionSystem : EntitySystem
 {
-    private static readonly ProtoId<TagPrototype> OreTag = "Ore";
+    [Dependency] private IGameTiming _timing = default!;
+    [Dependency] private IPrototypeManager _prototype = default!;
+    [Dependency] private EntityLookupSystem _lookup = default!;
+    [Dependency] private EntityWhitelistSystem _whitelist = default!;
+    [Dependency] private LatheSystem _lathe = default!;
+    [Dependency] private MaterialStorageSystem _materialStorage = default!;
+    [Dependency] private SharedAudioSystem _audio = default!;
+    [Dependency] private SharedContainerSystem _container = default!;
+    [Dependency] private SharedPopupSystem _popup = default!;
+    [Dependency] private SharedAppearanceSystem _appearance = default!;
+    [Dependency] private TagSystem _tag = default!;
 
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IPrototypeManager _prototype = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
-    [Dependency] private readonly LatheSystem _lathe = default!;
-    [Dependency] private readonly MaterialStorageSystem _materialStorage = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedContainerSystem _container = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
-    [Dependency] private readonly TagSystem _tag = default!;
+    private static readonly ProtoId<TagPrototype> OreTag = "Ore";
 
     private EntityQuery<PhysicsComponent> _physicsQuery;
     private EntityQuery<MobStateComponent> _mobQuery;

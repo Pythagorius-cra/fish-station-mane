@@ -678,6 +678,8 @@
       range: 3
       duration: 2
     # Fish added end
+    # Fish-edit: автопоглощение руды и постановка рецептов переплавки
+    - type: OreRedemptionMachine
     - type: Lathe
       idleState: icon
       runningState: building
