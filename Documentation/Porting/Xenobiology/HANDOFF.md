@@ -1,0 +1,206 @@
+# Хендофф порта ксенобиологии SS220
+
+Продолжать отсюда. Исходники Paradise заново не качать и вики не перечитывать: цифры ниже сняты с `ss220club/Paradise-SS220` `master` на дереве `0fffca1f1f29a63aff49d9b56524813eedf82c6d` (репозиторий архивный). Полный инвентарь рядом: `FEATURE_INVENTORY.md`. Этот файл — что уже в ветке и какой шаг следующий.
+
+Ветка: `feature/ss220-xenobiology` на `Pythagorius-cra/fish-station-mane`.
+Единственный PR: https://github.com/Pythagorius-cra/fish-station-mane/pull/6 (draft, base `master` форка). В `makura-games/fish-station` PR не открывать, пока об этом не попросят.
+Tip на момент хендоффа: `be2c775c6f`. Upstream-база нарезки: `makura-games/fish-station` `master` `e98fb511c9`.
+
+Не трогать чужие ветки: `feature/restore-original-music-player`, `feature/ss13-mining-system`, `feature/ss1984-crit-behavior`, `feature/clockwork-cult`, `fish/game-improvements-package`.
+
+После каждого маленького шага: `git pull --rebase origin feature/ss220-xenobiology`, коммит, `git push origin feature/ss220-xenobiology`, и только свои пункты чеклиста в PR #6. Force-push нельзя. Один писатель. Пока слайм и экстракт не замкнуты в цикл, консоль, ресайклер, органы и лабораторию не начинать.
+
+## Что уже в ветке
+
+| SHA | Что это | Проверено |
+| --- | --- | --- |
+| `0d15e6ded5` | `FEATURE_INVENTORY.md` | документ, не геймплей |
+| `dedccef720` | таблица мутаций, `FishSlimeComponent`, `FishSlimeMutationTest` | `dotnet test Content.Tests --filter FullyQualifiedName~FishSlimeMutationTest` — Passed 7, Failed 0 |
+| `8ae12641cf` | 22 цвета, baby/adult прототипы, локали, RSI | сборка сервера ниже |
+| `2a1fdca7b8` | прототипы кубов `FishXenobiologyMonkeyCube`, wrapped, box. Гидратация — ванильный `Rehydratable` / `MonkeyCube` | в игре не смотрели. Спавн из серого экстракта не сделан |
+| `01f4d80af7` | голод, рост, деление на 4, охота, присасывание, смерть взрослого | `dotnet build Content.Server/Content.Server.csproj --configuration Debug --verbosity quiet --no-restore` — succeeded |
+| `5c35445a5e` | `PROGRESS.md` (устарел относительно коммитов ниже) | — |
+| `be2c775c6f` | каркас экстракта: 100 единиц, uses 1..5, память шприца, локали, прототип, спрайт | реакций нет. YAML-линтер не запускался. В клиент не заходили |
+
+Сборка и тест — только то, что в таблице. YAML-линтер не запускался. В игре цикл не гонялся.
+
+Уже известные упрощения в коде слайма, не равные SS13: вода бьёт плоскими 12 blunt за касание, а не `rand(10,15) * volume`. Холод — замедление и короткий паралич, не полная кривая температуры. Игрок на слайме сам не делится: для этого нужен глагол.
+
+## Куда класть код
+
+Уже есть:
+
+- `Content.Shared/_Fish/Xenobiology/Slimes/FishSlimeComponent.cs`
+- `Content.Shared/_Fish/Xenobiology/Slimes/FishSlimeMutation.cs`
+- `Content.Server/_Fish/Xenobiology/Slimes/FishSlimeSystem.cs`
+- `Content.Shared/_Fish/Xenobiology/Extracts/FishSlimeExtractComponent.cs`
+- `Content.Shared/_Fish/Xenobiology/Extracts/FishSlimeExtractSystem.cs` — examine, шприц, `TryAddUse` / `ConsumeUse`. Реакций нет.
+- `Content.Tests/_Fish/Xenobiology/FishSlimeMutationTest.cs`
+- `Resources/Prototypes/_Fish/Xenobiology/slimes.yml`
+- `Resources/Prototypes/_Fish/Xenobiology/extracts.yml`
+- `Resources/Prototypes/_Fish/Xenobiology/cubes.yml`
+- `Resources/Locale/en-US/_Fish/xenobiology/` и `Resources/Locale/ru-RU/_Fish/xenobiology/` (`slimes.ftl`, `extracts.ftl`, `cubes.ftl`)
+- `Resources/Textures/_Fish/Xenobiology/extracts/extracts.rsi/`
+
+Дальше, не смешивая с чужими папками:
+
+- Реакции и зелья: `Content.Server/_Fish/Xenobiology/Extracts/` и прототипы `reactions.yml` / `potions.yml` рядом с уже существующими.
+- Машины (позже): `Content.Shared/_Fish/Xenobiology/Machines/`, `Content.Server/_Fish/Xenobiology/Machines/`, `Content.Client/_Fish/Xenobiology/Machines/`, `machines.yml`.
+- Органы (позже): `Content.Shared/_Fish/Xenobiology/Organs/`, `Content.Server/_Fish/Xenobiology/Organs/`.
+- Кубы уже в `Cubes` не выделены: прототипы в `cubes.yml`, система не нужна, пока серый экстракт не спавнит `FishXenobiologyMonkeyCube`.
+
+Маркеры только `// Fish-edit` и `// Fish-start` / `// Fish-end`, пояснение по-русски. Новые прототипы: id с префикса `Fish` и `suffix: Fish`. `[Dependency]` не `readonly`. Системы `partial`. Строки игрока только через локали.
+
+## Что переиспользовать
+
+- Урон: `DamageableSystem`. Голод слайма — поле `FishSlimeComponent.Nutrition`, не кухонный голод.
+- Таймер жизни 2 секунды (`NextLife` / `NextAi`), не каждый кадр.
+- Шприц и раствор экстракта: штатные `InjectableSolution` / `Solution`. Объём раствора 100. `LastInjector` уже есть под лог взрыва oil.
+- Обезьяна: живой `MobMonkey` (`MonkeyAccentComponent`). Куб: родитель `MonkeyCube`, вода через `Rehydratable`.
+- Консоль без камерного глаза (его в билде нет): команды по слаймам и обезьянам в радиусе лаборатории, доступ Research, питание. Дыру писать в паритет, камеру станции не изображать.
+- Ресайклер: мёртвый `MobMonkey`, 5 туш → 1 `MonkeyCube`. Типы кубов, которых нет в билде, не подменять. Рейтинг деталей не крутить.
+- Процессор: отдельная машина, только мёртвый слайм, выход = `Cores` экстрактов своего цвета. Рейтинг stock parts не портировать, пока у машины нет деталей.
+- Пол сепии и блюспейса (по 25 плиток): не новый мувер. Кладка через существующий `ContentTileDefinition`, замедление — поле friction тайла. `SlipperyComponent` только если friction тайла это не выражает. В коде плиток ещё нет. Смотрели `Content.Shared/Maps/ContentTileDefinition.cs`, `Resources/Prototypes/Tiles/basic.yml` и `SlipperyComponent`.
+- Лаборатория: ящик науки (консоль, процессор, ресайклер, сканер, анализатор, диссектор, серый малыш, кубы, плазма, шприц, кровь), питание от APC, доступ Research. В `SunriseMapPool` карту не добавлять и существующие гриды не переписывать.
+- Спрайты слайма: уже скопирован CC-BY-SA `slimes.rsi` плюс цветовой множитель. `icons/mob/slimes.dmi` SS220 целиком не тащить.
+- Органы без честного эффекта на урон, скорость или реагенты не помечать сделанными. Анализатор — очки ближайшему research server.
+
+Скрещивание ядер не делать: `SLIME_EXTRACT_CROSSING_REQUIRED 10` есть, логики в скачанных файлах слайма нет. Зелий acidproof и explosion resistance в этих файлах нет. Взрыв — реакция oil, огнезащита — chill potion.
+
+## Слайм: цифры
+
+Оригинал: `code/modules/mob/living/simple_animal/slime/slime_mob.dm`, `slime_life.dm`, `slime_powers.dm`, `slime_death.dm`, `subtypes.dm`. Порог: `#define SLIME_EVOLUTION_THRESHOLD 10` в `code/__DEFINES/mob_defines.dm`.
+
+- Малыш: HP 150, nutrition старт 700, max 1000, grow 800, hunger 500, starve 200.
+- Взрослый: HP 200, max 1200, grow 1000, hunger 600, starve 300.
+- `mutation_chance` старт 30. Ребёнок: `clamp(parent ± 5, 0, 100)`.
+- `cores` старт 1, потолок 5. `powerlevel` 0–10.
+- Docile держит nutrition 700 и не охотится.
+- Каждые life: 15% сжечь `1 + adult` nutrition. На нуле 75% шанс урона. Выше порога роста: −20 nutrition и +1 growth, пока не 10.
+- На 10 growth без цели, без кормления и без игрока: малыш эволюционирует, взрослый делится на 4 малышей.
+- Если `mutation_chance >= 100` — rainbow. Иначе `prob(mutation_chance)` берёт один из четырёх слотов, иначе цвет родителя. Слот — `rand(1,4)`, повтор цвета в таблице утяжеляет его.
+- Nutrition ребёнка игрока = 90% родителя. Powerlevel ребёнка = powerlevel/4. Игрок переносится в случайного ребёнка, родитель удаляется.
+- Смерть взрослого (не gib): бешеный малыш того же цвета, сам откатывается в малыша и оживает. Малыш умирает. Gib удаляет.
+- Огонь лечит brute (снаряды burn тоже). Вода: `rand(10,15) * volume` brute. Холод ниже 5°C копит урон, ниже −40°C стан. Жара ≥ 57°C ускоряет.
+- Морфин ×2 к задержке, frostoil ×5. EMP обнуляет powerlevel.
+- Кормление: живой не-слайм не-силикон. Carbon: clone 2–4 и tox 1–2 за тик, слайм +7–15 nutrition и −3 brute. Один слайм на жертву. Смерть жертвы-игрока-человека: 85% rabid.
+- Плазма: 5 листов. Если уже есть Discipline и не trained — trained. Иначе позитивная дисциплина.
+- Цель: радиус 7.
+
+Поля компонента, которые зелья уже могут менять: `MutationChance`, `MutatorUsed`, `Cores`, `Rabid`, `Docile`, `Trained`, `Discipline`, `Nutrition`, `PowerLevel`.
+
+## Таблица мутаций
+
+`mutation_table()` в `subtypes.dm`.
+
+| Цвет | Слоты 1–4 |
+| --- | --- |
+| grey | orange, metal, blue, purple |
+| purple | dark purple, dark blue, green, green |
+| metal | silver, yellow, gold, gold |
+| orange | dark purple, yellow, red, red |
+| blue | dark blue, silver, pink, pink |
+| dark blue | purple, blue, cerulean, cerulean |
+| dark purple | purple, orange, sepia, sepia |
+| yellow | metal, orange, bluespace, bluespace |
+| silver | metal, blue, pyrite, pyrite |
+| pink | pink, pink, light pink, light pink |
+| red | red, red, oil, oil |
+| gold | gold, gold, adamantine, adamantine |
+| green | green, green, black, black |
+| light pink, oil, black, adamantine, bluespace, cerulean, sepia, pyrite, rainbow | четыре раза свой цвет |
+
+`random_colour()` / rainbow-плазма — равномерно из 22 имён, включая rainbow.
+
+## Экстракт и реакции
+
+Оригинал предмета: `/obj/item/slime_extract` в `xenobiology.dm`. 1 использование, реагенты 100, enhancer +1 до 5. `associated_gun_type` на предмете есть, реакции его не спавнят.
+
+Процессор: `code/modules/food_and_drinks/kitchen_machinery/processor.dm`, рецепт `food_processor_process/mob/slime`. Живой слайм вылезает. Мёртвый даёт `cores + rating - 1` экстрактов своего `coretype`. В порте рейтинг не переносим: выход = `Cores`.
+
+Реакции: `code/modules/reagents/chemistry/recipes/slime_extracts.dm`. Контейнер — экстракт. Реагент тратится, использование снимается. Объёмы как в DM.
+
+| Реакция | Цвет | Реагент | Продукт |
+| --- | --- | --- | --- |
+| Slime Spawn | grey | plasma 1 | серый малыш |
+| Epinephrine | grey | water 5 | epinephrine 3 |
+| Monkey | grey | blood 1 | 3 monkey cube |
+| Mutation toxin | green | plasma 1 | mutationtoxin 1 |
+| Metal | metal | plasma 1 | plasteel 5 + metal 15 |
+| Glass | metal | water 1 | rglass 5 + glass 15 |
+| Smart metal | metal | blood 1 | synthetic omnizine 1 |
+| Crit | gold | plasma 1 | 5 враждебных мобов, задержка, общий кап |
+| Crit lesser | gold | blood 1 | 3 нейтральных |
+| Crit friendly | gold | water 1 | 1 дружелюбный |
+| Bork | silver | plasma 1 | 4–6 случайной еды |
+| Bork 2 | silver | water 1 | 4–6 случайных напитков |
+| Frost oil | blue | plasma 1 | frostoil 10 |
+| Stabilizer potion | blue | blood 1 | зелье стабилизатора |
+| Freeze | dark blue | plasma 1 | через ~5 с −240 температуры, радиус 7 |
+| Fireproof potion | dark blue | water 1 | chill potion, 3 заряда |
+| Capsaicin | orange | blood 1 | capsaicin 10 |
+| Fire | orange | plasma 1 | через ~5 с горячий плазменный выброс |
+| EMP | yellow | blood 1 | EMP 3/7 |
+| Powercell | yellow | plasma 1 | high slime cell |
+| Glow | yellow | water 1 | slime flashlight |
+| Steroid | purple | plasma 1 | стероид |
+| Jam | purple | sugar 1 | slimejelly 10 |
+| Plasma sheets | dark purple | plasma 1 | plasma sheet 3 |
+| Mutator | red | plasma 1 | мутатор |
+| Bloodlust | red | blood 1 | видимые слаймы: снять docile, иначе rabid |
+| Speed | red | water 1 | speed treat |
+| Docility | pink | plasma 1 | docility potion |
+| Omnizine | pink | blood 1 | omnizine 1 |
+| Advanced mutation | black | plasma 1 | amutationtoxin 1 |
+| Virus genes | black | blood 1 | virus_genes 1 |
+| Explosion | oil | plasma 1 | через 5 с взрыв devastation 1 / heavy 3 / light 6, лог `LastInjector` |
+| Oil potion | oil | blood 1 | oil slick potion |
+| Sentience | light pink | plasma 1 | sentience potion |
+| Adamantine | adamantine | plasma 1 | лист адамантина |
+| Bluespace floor | bluespace | blood 1 | 25 блюспейс-плиток |
+| Crystal | bluespace | plasma 1 | bluespace crystal |
+| Enhancer | cerulean | plasma 1 | extract enhancer, зовёт `TryAddUse` |
+| Territory | cerulean | blood 1 | cerulean blueprints, один раз на зону |
+| Timestop | sepia | plasma 1 | хронополе 140 тиков, радиус 2, автор иммунен |
+| Camera | sepia | water 1 | камера + плёнка |
+| Sepia floor | sepia | blood 1 | 25 сепия-плиток |
+| Paint | pyrite | plasma 1 | случайная банка краски |
+| Random core | rainbow | plasma 1 | случайный слайм, 50% взрослый |
+| Transfer | rainbow | blood 1 | consciousness transference potion |
+
+У gold, silver и purple третьей реакции в этом файле нет. `MAX_GOLD_CORE_MOBS` в скачанных файлах не попался: кап зафиксировать в коде и написать в паритет.
+
+## Зелья
+
+`xenobiology.dm`, от `/obj/item/slimepotion`.
+
+- Stabilizer: `MutationChance` −15, не ниже 0. Мёртвый и не-слайм — отказ.
+- Mutator: +12, один раз (`MutatorUsed`), не если уже 100.
+- Steroid: только малыш, `Cores` +1, потолок 5.
+- Enhancer: на экстракт, uses +1, потолок 5. Метод `TryAddUse` уже есть.
+- Docility: снять rabid без полной docile; иначе docile, nutrition 700, имя от игрока.
+- Speed: bodytemperature 550, джиттер 15 с, не стакается если уже горячий. Слайм может съесть сам.
+- Fireproof: одежда, 3 заряда, FIRE_PROOF и максимальная теплозащита.
+- Oil slick: slowdown предмета в 0, либо стол `SlipperyComponent`. Активный MOD нельзя.
+- Sentience: опрос призраков 10 с, причина обязательна. Уже с разумом, мёртвые и неорганика — отказ. Два холостых греют зелье, третье взрывается. Остывание −1 стадия за 60 с.
+- Transference: игрок подтверждает, разум уходит в животное, старое тело умирает. Роли сохраняются.
+
+## Машины, которые ещё не начаты
+
+Консоль: `code/modules/research/xenobiology/xenobio_camera.dm`, глаз `code/modules/mob/camera/eye/xenobio_eye.dm`. Положить всех хранимых; подобрать с тайла (лимит 6, с ckey нельзя); выпустить обезьяну; переработать мёртвую мелкую обезьяну (`cube_production / required_grind`); скан (nutrition, рост, мутация, ядра, сила, состояние); скормить загруженное зелье. Хоткеи: shift слайм — забрать, shift пол — выпустить всех, ctrl слайм — скан, alt слайм — зелье, ctrl обезьяна — ресайкл, ctrl пол — обезьяна. В консоль вставляют кубы и одно зелье. Мультитул линкует ресайклер. Определение `slime_scan()` в скачанных файлах нет — печать тех же полей.
+
+Ресайклер: `monkeyrecycler.dm`. Мёртвая мелкая обезьяна. `required_grind` старт 5. Кубов за раз = рейтинг matter bin, в порте всегда 1. Мультитул по типам куба в оригинале крутит monkey, nian worme, farwa, wolpin, stok, neaera. В порте только тот куб, который уже есть.
+
+Сканер отдельным предметом в дереве SS220 нет (есть перевод и кнопка консоли). Ручной сканер — те же поля, что консоль.
+
+Органы: `xenobiology_dissections.dm`, `xenobiology_organs.dm` (~1600 строк эффектов), `organ_analyzer.dm`, `regen_mesh`. Конвейер: диссектор по мёртвому мобу → неопознанная масса → обученный взрослый слайм без разума, 50 тиков → орган. Анализатор: не больше 3 сканов типа, 15 с, очки от цены и качества (pristine ×2, damaged ×0.5). Эффекты без аналога в SS14 не выдумывать под тем же именем.
+
+## Следующие шаги, по порядку
+
+1. Не качать SS220. Открыть этот файл и `FEATURE_INVENTORY.md`.
+2. Реакции экстракта в `FishSlimeExtractSystem`: реагент тратится, `ConsumeUse`, продукт из таблицы. Первым коммитом замкнуть серый экстракт: plasma → серый малыш, water 5 → epinephrine 3, blood 1 → три `FishXenobiologyMonkeyCube`.
+3. Зелья, которые только меняют уже существующие поля слайма: stabilizer, mutator, steroid, docility. Каждое — свой маленький коммит.
+4. Остальные строки таблицы реакций, пачками по цвету, с честным эффектом или явной дырой в `PARITY_REPORT.md`. Плитки сепии и блюспейса — friction существующего тайла, см. выше.
+5. Процессор мёртвого слайма: выход = `Cores` экстрактов цвета `ColorId`.
+6. Только после замкнутого цикла корм → рост → деление → процессор → реакция: консоль, ресайклер, ручной сканер, ящик лаборатории, потом органы.
+7. Один проход ревью по `_Fish/Xenobiology`: не-readonly `Dependency`, `partial`, маркеры Fish, id прототипов, локали en-US и ru-RU. YAML-линтер, если трогались прототипы. В чеклист PR писать команду и результат. В игре не утверждать то, что не запускалось.
