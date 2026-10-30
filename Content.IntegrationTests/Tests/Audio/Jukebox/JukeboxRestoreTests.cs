@@ -192,6 +192,18 @@ public sealed class JukeboxRestoreTests : GameTest
 
         await Server.WaitPost(() =>
         {
+            played = system.TryPlay(SEntity<JukeboxComponent>(jukebox).AsNullable());
+        });
+
+        await Server.WaitAssertion(() =>
+        {
+            var ent = SEntity<JukeboxComponent>(jukebox);
+            Assert.That(played, Is.True);
+            Assert.That(system.IsPlaying(ent.AsNullable()), Is.True);
+        });
+
+        await Server.WaitPost(() =>
+        {
             system.Stop(SEntity<JukeboxComponent>(jukebox).AsNullable());
         });
 
