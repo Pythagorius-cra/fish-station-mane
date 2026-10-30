@@ -230,7 +230,7 @@
   path:
     path: /Audio/StationEvents/sponsored-by-syndicate.ogg
 
-# A-Guy — SS13 community music (CC-BY-SA-3.0), remakes already in Fish
+# A-Guy (A-Guy173/Music) — full catalog, CC0-1.0
 - type: jukebox
   id: NuclearOpsFull
   name: A-Guy - Nuclear Operations
@@ -260,6 +260,96 @@
   name: A-Guy - Revolution
   path:
     path: /Audio/_Fish/StationEvents/Music-main/revolution.ogg
+
+- type: jukebox
+  id: AGuyNuclearOperationsOriginal
+  name: A-Guy - Nuclear Operations (Original)
+  path:
+    path: /Audio/_Fish/Jukebox/AGuy/nuclear_operations.ogg
+
+- type: jukebox
+  id: AGuyChaosTheory
+  name: A-Guy - Chaos Theory
+  path:
+    path: /Audio/_Fish/Jukebox/AGuy/chaos_theory.ogg
+
+- type: jukebox
+  id: AGuyMainframeBitflip
+  name: A-Guy - Mainframe Bitflip
+  path:
+    path: /Audio/_Fish/Jukebox/AGuy/mainframe_bitflip.ogg
+
+- type: jukebox
+  id: AGuyManMachine
+  name: A-Guy - Man-Machine
+  path:
+    path: /Audio/_Fish/Jukebox/AGuy/man_machine.ogg
+
+- type: jukebox
+  id: AGuyNoKingsInOrbit
+  name: A-Guy - No Kings In Orbit
+  path:
+    path: /Audio/_Fish/Jukebox/AGuy/no_kings_in_orbit.ogg
+
+- type: jukebox
+  id: AGuyNothingWrongWithMegacorpos
+  name: A-Guy - Nothing Wrong With Megacorpos
+  path:
+    path: /Audio/_Fish/Jukebox/AGuy/nothing_wrong_with_megacorpos.ogg
+
+- type: jukebox
+  id: AGuyTomfooleryRequired
+  name: A-Guy - Tomfoolery Required
+  path:
+    path: /Audio/_Fish/Jukebox/AGuy/tomfoolery_required.ogg
+
+- type: jukebox
+  id: AGuyUndefinedTheory
+  name: A-Guy - Undefined Theory
+  path:
+    path: /Audio/_Fish/Jukebox/AGuy/undefined_theory.ogg
+
+- type: jukebox
+  id: AGuyGetItDone
+  name: A-Guy - Get It Done
+  path:
+    path: /Audio/_Fish/Jukebox/AGuy/get_it_done.ogg
+
+- type: jukebox
+  id: AGuyLavaland
+  name: A-Guy - Lavaland
+  path:
+    path: /Audio/_Fish/Jukebox/AGuy/lavaland.ogg
+
+- type: jukebox
+  id: AGuyLowfunk
+  name: A-Guy - Lowfunk
+  path:
+    path: /Audio/_Fish/Jukebox/AGuy/lowfunk.ogg
+
+- type: jukebox
+  id: AGuyMotive
+  name: A-Guy - Motive
+  path:
+    path: /Audio/_Fish/Jukebox/AGuy/motive.ogg
+
+- type: jukebox
+  id: AGuyRadify
+  name: A-Guy - Radify
+  path:
+    path: /Audio/_Fish/Jukebox/AGuy/radify.ogg
+
+- type: jukebox
+  id: AGuySeclusion
+  name: A-Guy - Seclusion
+  path:
+    path: /Audio/_Fish/Jukebox/AGuy/seclusion.ogg
+
+- type: jukebox
+  id: AGuyTheStation
+  name: A-Guy - The Station
+  path:
+    path: /Audio/_Fish/Jukebox/AGuy/the_station.ogg
 
 # boich9585 — written for SS14 (Мёртвый Космос), CC-BY-SA-4.0
 - type: jukebox
