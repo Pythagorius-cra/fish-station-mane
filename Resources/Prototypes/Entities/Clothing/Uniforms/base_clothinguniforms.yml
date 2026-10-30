@@ -40,7 +40,8 @@
 
 - type: entity
   abstract: true
-  parent: UnsensoredClothingUniformBase
+  # Fish-edit - слот медали из FishClothingUniformMedalBase
+  parent: [UnsensoredClothingUniformBase, FishClothingUniformMedalBase]
   id: ClothingUniformBase
   components:
   - type: SuitSensor
@@ -62,23 +63,6 @@
     sound:
       path: /Audio/_Sunrise/Items/Handling/cloth_drop.ogg
   # Sunrise end
-  # Fish-start - слот медали на форме (smart equip выключен: иначе Z снимает медаль вместо формы)
-  # ContainerContainer required: ItemSlots EnsureContainer on ComponentInit would otherwise
-  # add ContainerManager at spawn and fail PrototypeSaveTest.UninitializedSaveTest.
-  - type: ItemSlots
-    allowSmartEquip: false
-    slots:
-      medal:
-        name: fish-clothing-slot-medal
-        insertOnInteract: true
-        whitelist:
-          tags:
-          - Medal
-  - type: ContainerContainer
-    containers:
-      medal: !type:ContainerSlot
-  - type: MedalHolder
-  # Fish-end
 
 - type: entity
   abstract: true

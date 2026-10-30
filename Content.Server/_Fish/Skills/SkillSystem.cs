@@ -71,7 +71,6 @@ public sealed partial class SkillSystem : SharedSkillSystem
         if (skillset.BudgetGranted && skillset.JobId != null && skillset.JobId != jobId)
         {
             skillset.Skills.Clear();
-            skillset.PendingAllocation.Clear();
             skillset.CompletedTrainings.Clear();
             skillset.BudgetGranted = false;
             skillset.Locked = false;
@@ -87,7 +86,6 @@ public sealed partial class SkillSystem : SharedSkillSystem
         skillset.TotalPoints = GetJobSkillPoints(jobId);
         skillset.RemainingPoints = skillset.TotalPoints;
         skillset.Skills.Clear();
-        skillset.PendingAllocation.Clear();
         skillset.CompletedTrainings.Clear();
         skillset.Locked = false;
 

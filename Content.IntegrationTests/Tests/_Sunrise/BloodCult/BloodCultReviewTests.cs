@@ -301,4 +301,53 @@ public sealed class BloodCultReviewTests
 
         await pair.CleanReturnAsync();
     }
+
+    [Test]
+    public async Task TargetsKill_EmptyListIsNotComplete()
+    {
+        await using var pair = await PoolManager.GetServerClient();
+        var server = pair.Server;
+        var map = await pair.CreateTestMap();
+
+        EntityUid victim = default;
+        BloodCultRuleComponent ruleComp = default!;
+
+        await server.WaitPost(() =>
+        {
+            var rule = server.EntMan.Spawn("Paper", map.MapCoords);
+            ruleComp = server.EntMan.EnsureComponent<BloodCultRuleComponent>(rule);
+            server.EntMan.EnsureComponent<GameRuleComponent>(rule);
+        });
+
+        await server.WaitAssertion(() =>
+        {
+            Assert.That(
+                server.System<BloodCultRuleSystem>().TargetsKill(),
+                Is.False,
+                "Пустой список целей не должен считаться выполненным");
+        });
+
+        await server.WaitPost(() =>
+        {
+            victim = server.EntMan.Spawn("MobHuman", map.MapCoords);
+            Assert.That(server.System<BloodCultRuleSystem>().AddSpecificCultTarget(victim, ruleComp), Is.True);
+        });
+
+        await server.WaitAssertion(() =>
+        {
+            Assert.That(server.System<BloodCultRuleSystem>().TargetsKill(), Is.False);
+        });
+
+        await server.WaitPost(() =>
+        {
+            Assert.That(server.System<BloodCultRuleSystem>().MarkCultTargetKilled(victim, ruleComp), Is.True);
+        });
+
+        await server.WaitAssertion(() =>
+        {
+            Assert.That(server.System<BloodCultRuleSystem>().TargetsKill(), Is.True);
+        });
+
+        await pair.CleanReturnAsync();
+    }
 }

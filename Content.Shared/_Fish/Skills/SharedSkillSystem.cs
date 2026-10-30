@@ -13,6 +13,8 @@ public abstract partial class SharedSkillSystem : EntitySystem
 {
     public const int DefaultJobSkillPoints = 14;
 
+    private static readonly Dictionary<int, float> _emptySkillTable = new();
+
     [Dependency] protected IPrototypeManager Prototypes = default!;
     [Dependency] private SharedPopupSystem _popup = default!;
 
@@ -82,8 +84,6 @@ public abstract partial class SharedSkillSystem : EntitySystem
 
         return SkillMath.GetQualityMultiplier(_emptySkillTable, 0.15f, points);
     }
-
-    private static readonly Dictionary<int, float> _emptySkillTable = new();
 
     public TimeSpan ApplySkillDelay(EntityUid uid, ProtoId<SkillPrototype> skill, TimeSpan baseDelay, float? factorOverride = null)
     {

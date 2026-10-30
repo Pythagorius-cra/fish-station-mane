@@ -14,6 +14,7 @@ using Content.Shared._Sunrise.BloodCult;
 using Content.Shared._Sunrise.BloodCult.Components;
 using Content.Shared._Sunrise.CollectiveMind;
 using Content.Shared._Sunrise.Humanoid;
+using Content.Shared._Fish.Antag;
 using Content.Shared.Actions;
 using Content.Shared.Actions.Components;
 using Content.Shared.Bible.Components;
@@ -63,6 +64,7 @@ public sealed partial class BloodCultRuleSystem : GameRuleSystem<BloodCultRuleCo
     [Dependency] private SharedRoleSystem _roles = default!;
     [Dependency] private SunriseHumanoidBodySystem _sunriseBody = default!;
     [Dependency] private StatusEffectsSystem _statusEffects = default!;
+    [Dependency] private SharedAntagTargetingProtectionSystem _antagProtection = default!;
 
     private static readonly ProtoId<TagPrototype> CultistTag = "Cultist";
     private static readonly ProtoId<TagPrototype> DeconvertedCultistTag = "DeconvertedCultist";
@@ -499,9 +501,9 @@ public sealed partial class BloodCultRuleSystem : GameRuleSystem<BloodCultRuleCo
 
     private List<EntityUid> FindPotentialTargets()
     {
-        var potentialTargets = new List<EntityUid>();
-        // Fish-start - исключаем защищённых от целей антагов
-        var protection = EntityManager.System<Content.Shared._Fish.Antag.SharedAntagTargetingProtectionSystem>();
+        var preferred = new List<EntityUid>();
+        // Fish-start - если защищены все, оставляем запасной список: пустой CultTargets не даёт завершить культ
+        var fallback = new List<EntityUid>();
         // Fish-end
 
         var query = EntityQueryEnumerator<MindContainerComponent, AntagTargetComponent, HumanoidProfileComponent>();
@@ -511,14 +513,16 @@ public sealed partial class BloodCultRuleSystem : GameRuleSystem<BloodCultRuleCo
                 continue;
 
             // Fish-start
-            if (protection.IsBodyProtected(uid, mind.Mind))
+            fallback.Add(uid);
+            if (_antagProtection.IsBodyProtected(uid, mind.Mind))
                 continue;
             // Fish-end
 
-            potentialTargets.Add(uid);
+            preferred.Add(uid);
         }
 
-        return potentialTargets;
+        // Fish-edit - предпочтение незащищённым; иначе любой не-культист, чтобы ритуал оставался достижимым
+        return preferred.Count > 0 ? preferred : fallback;
     }
 
     public bool MakeCultist(EntityUid cultist, BloodCultRuleComponent rule, bool assignMindData = true, bool giveStartingItems = false)

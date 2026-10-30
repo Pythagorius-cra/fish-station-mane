@@ -15,7 +15,7 @@
             <Label Text="{Loc 'skills-window-points'}" StyleClasses="LabelKeyText"/>
             <Label Name="PointsLabel" Margin="4 0 0 0"/>
             <Control HorizontalExpand="True"/>
-            <Label Name="LockedHintLabel" Visible="False" FontColorOverride="#FFAA66"/>
+            <Label Name="LockedHintLabel" Visible="False" StyleClasses="status-warning"/>
         </BoxContainer>
 
         <Label Name="StatusLabel" Align="Center" Visible="False"/>
