@@ -30,9 +30,13 @@ public abstract partial class SharedFishTraumaSystem : EntitySystem
     [Dependency] private SharedPopupSystem _popup = default!;
     [Dependency] private IGameTiming _timing = default!;
     [Dependency] private SharedFishComplexCritSystem _crit = default!;
+    [Dependency] private EntityQuery<BloodstreamComponent> _bloodQuery = default!;
 
     /// <summary>ATLS class III (~30% крови) — вставать крайне тяжело.</summary>
     public const float ShockStandBlock = 0.55f;
+
+    /// <summary>Затухание травм и пересчёт шока не чаще раза в секунду.</summary>
+    private static readonly TimeSpan UpdateInterval = TimeSpan.FromSeconds(1);
 
     /// <summary>Сильная хромота — не встать без помощи.</summary>
     public const float LegStandBlock = 0.7f;
@@ -59,6 +63,11 @@ public abstract partial class SharedFishTraumaSystem : EntitySystem
         var query = EntityQueryEnumerator<FishTraumaStatusComponent>();
         while (query.MoveNext(out var uid, out var trauma))
         {
+            if (trauma.NextUpdate > cur)
+                continue;
+
+            trauma.NextUpdate = cur + UpdateInterval;
+
             var dirty = false;
 
             if (trauma.ConcussionUntil != TimeSpan.Zero && cur >= trauma.ConcussionUntil)
@@ -90,7 +99,8 @@ public abstract partial class SharedFishTraumaSystem : EntitySystem
             // Ноги медленно восстанавливаются без лечения (игровой компромисс).
             if (trauma.LegImpairment > 0f)
             {
-                trauma.LegImpairment = Math.Max(0f, trauma.LegImpairment - frameTime * 0.015f);
+                var step = (float)UpdateInterval.TotalSeconds;
+                trauma.LegImpairment = Math.Max(0f, trauma.LegImpairment - step * 0.015f);
                 dirty = true;
             }
 
@@ -190,7 +200,7 @@ public abstract partial class SharedFishTraumaSystem : EntitySystem
     /// </summary>
     public float CalculateShockFactor(EntityUid uid)
     {
-        if (!TryComp<BloodstreamComponent>(uid, out var blood))
+        if (!_bloodQuery.TryComp(uid, out var blood))
             return 0f;
 
         var level = _bloodstream.GetBloodLevel((uid, blood));

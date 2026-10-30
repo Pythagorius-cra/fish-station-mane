@@ -268,7 +268,6 @@ public abstract partial class SharedFishComplexCritSystem : EntitySystem
 
         var lose = EnsureComp<FishLoseBreathComponent>(uid);
         lose.Remaining = amount > lose.MaxRemaining ? lose.MaxRemaining : amount;
-        Dirty(uid, lose);
     }
 
     public bool TrySetHeartAttack(EntityUid uid, bool arrest)

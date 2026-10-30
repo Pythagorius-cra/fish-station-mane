@@ -49,7 +49,6 @@ public sealed class FishCharacterReactionsTests : InteractionTest
         {
             traumaSys.ApplyLegImpairment(STarget!.Value, 0.95f);
         });
-        await RunTicks(2);
 
         var trauma = Comp<FishTraumaStatusComponent>();
         Assert.That(traumaSys.CanAttemptStand((STarget!.Value, trauma), out var reason), Is.False);
@@ -73,7 +72,6 @@ public sealed class FishCharacterReactionsTests : InteractionTest
                 Expires = TimeSpan.FromSeconds(9999), // не истекает за время теста
             });
         });
-        await RunTicks(5);
 
         var trauma = Comp<FishTraumaStatusComponent>();
         Assert.That(trauma.ConcussionSeverity, Is.GreaterThan(0f), "Primary blast должен дать контузию");

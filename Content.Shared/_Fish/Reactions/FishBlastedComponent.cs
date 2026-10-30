@@ -9,9 +9,15 @@ namespace Content.Shared._Fish.Reactions;
 [RegisterComponent, NetworkedComponent, AutoGenerateComponentState, AutoGenerateComponentPause]
 public sealed partial class FishBlastedComponent : Component
 {
+    /// <summary>
+    /// Скорость броска от взрыва, тайлы в секунду. Масштабирует тяжесть удара о стену.
+    /// </summary>
     [DataField, AutoNetworkedField]
     public float ThrowSpeed;
 
+    /// <summary>
+    /// Момент, после которого серверный Update снимает компонент. Удар о стену снимает его раньше.
+    /// </summary>
     [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
     [AutoNetworkedField, AutoPausedField]
     public TimeSpan Expires;

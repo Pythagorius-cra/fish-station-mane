@@ -46,6 +46,8 @@ public sealed partial class FishCharacterReactionsSystem : SharedFishCharacterRe
     [Dependency] private StandingStateSystem _standing = default!;
     [Dependency] private ChatSystem _chat = default!;
     [Dependency] private IPrototypeManager _proto = default!;
+    [Dependency] private EntityQuery<BloodstreamComponent> _bloodQuery = default!;
+    [Dependency] private EntityQuery<FootprintEmitterComponent> _emitterQuery = default!;
 
     private static readonly ProtoId<DamageTypePrototype> HeatDamage = "Heat";
     private static readonly ProtoId<DamageTypePrototype> SlashDamage = "Slash";
@@ -170,14 +172,14 @@ public sealed partial class FishCharacterReactionsSystem : SharedFishCharacterRe
         if (bleedDmg < ent.Comp.HitBloodMinDamage)
             return;
 
-        if (!TryComp<BloodstreamComponent>(ent, out var blood))
+        if (!_bloodQuery.TryComp(ent, out var blood))
             return;
 
         var scale = Math.Clamp(bleedDmg / 10f, 0.5f, 2.5f);
         var spill = FixedPoint2.New(ent.Comp.HitBloodSpill * scale);
         _bloodstream.TryBleedOut((ent.Owner, blood), spill);
 
-        if (!TryComp<FootprintEmitterComponent>(ent, out var emitter))
+        if (!_emitterQuery.TryComp(ent, out var emitter))
             return;
 
         var surfaceAmount = FixedPoint2.New(ent.Comp.HitBloodOnSurface * scale);
@@ -195,10 +197,10 @@ public sealed partial class FishCharacterReactionsSystem : SharedFishCharacterRe
         if (Timing.CurTime < ent.Comp.NextBleedTrail)
             return;
 
-        if (!TryComp<BloodstreamComponent>(ent, out var blood) || blood.BleedAmount <= 0)
+        if (!_bloodQuery.TryComp(ent, out var blood) || blood.BleedAmount <= 0)
             return;
 
-        if (!TryComp<FootprintEmitterComponent>(ent, out var emitter))
+        if (!_emitterQuery.TryComp(ent, out var emitter))
             return;
 
         var amount = FixedPoint2.New(ent.Comp.BleedTrailTransfer * Math.Clamp(blood.BleedAmount / 5f, 0.35f, 2.5f));

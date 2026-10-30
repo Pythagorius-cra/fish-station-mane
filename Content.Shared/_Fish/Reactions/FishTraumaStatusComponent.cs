@@ -23,6 +23,7 @@ public sealed partial class FishTraumaStatusComponent : Component
     [DataField, AutoNetworkedField]
     public float ConcussionSeverity;
 
+    /// <summary>Момент окончания контузии. <see cref="TimeSpan.Zero"/> — эффекта нет.</summary>
     [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
     [AutoNetworkedField, AutoPausedField]
     public TimeSpan ConcussionUntil;
@@ -32,6 +33,7 @@ public sealed partial class FishTraumaStatusComponent : Component
     [AutoNetworkedField, AutoPausedField]
     public TimeSpan TinnitusUntil;
 
+    /// <summary>Момент окончания дезориентации. <see cref="TimeSpan.Zero"/> — эффекта нет.</summary>
     [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
     [AutoNetworkedField, AutoPausedField]
     public TimeSpan DisorientUntil;
@@ -41,8 +43,16 @@ public sealed partial class FishTraumaStatusComponent : Component
     [AutoNetworkedField, AutoPausedField]
     public TimeSpan ChestTraumaUntil;
 
+    /// <summary>Тяжесть травмы груди, диапазон 0–1. Действует, пока не истёк <see cref="ChestTraumaUntil"/>.</summary>
     [DataField, AutoNetworkedField]
     public float ChestTraumaSeverity;
+
+    /// <summary>
+    /// Следующий серверный тик затухания. Не сетевой: клиент таймер не читает.
+    /// </summary>
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
+    [AutoPausedField]
+    public TimeSpan NextUpdate;
 
     /// <summary>Последняя сила отброса взрывом (для UI / диагностики).</summary>
     [DataField, AutoNetworkedField]

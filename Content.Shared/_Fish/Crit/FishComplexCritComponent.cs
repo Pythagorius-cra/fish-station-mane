@@ -28,8 +28,9 @@ public sealed partial class FishComplexCritComponent : Component
     [DataField, AutoNetworkedField]
     public TimeSpan TickInterval = TimeSpan.FromSeconds(2);
 
+    /// <summary>Серверный таймер следующего тика осложнений. Клиент его не читает.</summary>
     [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
-    [AutoNetworkedField, AutoPausedField]
+    [AutoPausedField]
     public TimeSpan NextTick;
 
     /// <summary>

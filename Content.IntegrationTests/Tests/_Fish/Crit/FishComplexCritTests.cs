@@ -72,7 +72,10 @@ public sealed class FishComplexCritTests : InteractionTest
             : FixedPoint2.Zero;
 #pragma warning restore CS0618
 
-        await RunTicks(150);
+        // Два интервала тика: NextTick ставится на TickInterval вперёд, одного интервала не хватает на границе.
+        var critInterval = Comp<FishComplexCritComponent>().TickInterval;
+        var critTicks = (int)System.Math.Ceiling(critInterval.TotalSeconds / TickPeriod * 2) + 2;
+        await RunTicks(critTicks);
 
 #pragma warning disable CS0618
         var oxyAfter = damageableSystem.GetAllDamage(STarget.Value).DamageDict.TryGetValue(AsphyxiationId, out var after)
@@ -186,12 +189,19 @@ public sealed class FishComplexCritTests : InteractionTest
 
         await Server.WaitPost(() =>
         {
-            SEntMan.EnsureComponent<FishCritShockComponent>(STarget!.Value);
+            Assert.That(SEntMan.HasComponent<FishComplexCritComponent>(STarget!.Value), Is.True);
+            SEntMan.EnsureComponent<FishCritShockComponent>(STarget.Value);
             SEntMan.EnsureComponent<FishLoseBreathComponent>(STarget.Value);
-            SEntMan.DeleteEntity(STarget.Value);
+            SEntMan.RemoveComponent<FishComplexCritComponent>(STarget.Value);
         });
+        // OnShutdown снимает шок и удушье через RemCompDeferred — нужен тик.
         await RunTicks(2);
 
-        Assert.Pass();
+        Assert.Multiple(() =>
+        {
+            Assert.That(SEntMan.Deleted(STarget!.Value), Is.False);
+            Assert.That(SEntMan.HasComponent<FishCritShockComponent>(STarget.Value), Is.False);
+            Assert.That(SEntMan.HasComponent<FishLoseBreathComponent>(STarget.Value), Is.False);
+        });
     }
 }
