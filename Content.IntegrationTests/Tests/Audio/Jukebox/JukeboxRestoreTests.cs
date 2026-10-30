@@ -46,13 +46,44 @@ public sealed class JukeboxRestoreTests : GameTest
         "DoubleU",
     ];
 
+    /// <summary>Explicit SS13/SS14 community soundtrack artists already licensed in-repo.</summary>
+    private static readonly string[] CommunitySsSoundtrackTracks =
+    [
+        "BolgarichBurnTheHive",
+        "BolgarichDestinyOfColonists",
+        "BolgarichDestroyed",
+        "BolgarichHikingInTheFog",
+        "BolgarichTangoWithBloodshed",
+        "BolgarichTearOfVeil",
+        "BolgarichTheirFinalShift",
+        "BolgarichVendetta",
+        "BolgarichRunningOut",
+        "Countdown",
+        "SoundStation14",
+        "BlatantlyNuclear",
+        "ClearlyNuclear",
+        "NukeMass",
+        "LastCall",
+        "SponsoredBySyndicate",
+        "NuclearOpsFull",
+        "NuclearOpsPrep",
+        "NuclearOpsInfil",
+        "NuclearOpsDef",
+        "RevolutionTheme",
+        "Enigma",
+        "CodeSierra",
+    ];
+
     [Test]
     [TestOf(typeof(JukeboxPrototype))]
     public async Task CatalogContainsLicensedTracks()
     {
         var protoMan = Server.ProtoMan;
         var resources = Server.ResolveDependency<IResourceManager>();
-        var required = UpstreamTracks.Concat(ClassicSs13AndFishTracks).ToArray();
+        var required = UpstreamTracks
+            .Concat(ClassicSs13AndFishTracks)
+            .Concat(CommunitySsSoundtrackTracks)
+            .ToArray();
 
         await Server.WaitAssertion(() =>
         {

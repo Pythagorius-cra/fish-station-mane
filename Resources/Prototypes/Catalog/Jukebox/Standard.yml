@@ -128,3 +128,148 @@
   name: QAntum - Double U
   path:
     path: /Audio/_Fish/Lobby/double-u.ogg
+
+# Explicit SS13/SS14 community soundtrack artists (licenses already recorded in-repo attributions).
+# Bolgarich — fanmade SS13/SS14 themes, CC-BY-4.0
+- type: jukebox
+  id: BolgarichBurnTheHive
+  name: Bolgarich - Burn The Hive
+  path:
+    path: /Audio/_Sunrise/Bolgarich/bolgarich_burn_the_hive.ogg
+
+- type: jukebox
+  id: BolgarichDestinyOfColonists
+  name: Bolgarich - Destiny of Colonists
+  path:
+    path: /Audio/_Sunrise/Bolgarich/bolgarich_destiny_of_colonists.ogg
+
+- type: jukebox
+  id: BolgarichDestroyed
+  name: Bolgarich - Destroyed
+  path:
+    path: /Audio/_Sunrise/Bolgarich/bolgarich_destroyed.ogg
+
+- type: jukebox
+  id: BolgarichHikingInTheFog
+  name: Bolgarich - Hiking in the Fog
+  path:
+    path: /Audio/_Sunrise/Bolgarich/bolgarich_hiking_in_the_fog.ogg
+
+- type: jukebox
+  id: BolgarichTangoWithBloodshed
+  name: Bolgarich - Tango With Bloodshed
+  path:
+    path: /Audio/_Sunrise/Bolgarich/bolgarich_tango_with_bloodshed.ogg
+
+- type: jukebox
+  id: BolgarichTearOfVeil
+  name: Bolgarich - Tear of Veil
+  path:
+    path: /Audio/_Sunrise/Bolgarich/bolgarich_tear_of_veil.ogg
+
+- type: jukebox
+  id: BolgarichTheirFinalShift
+  name: Bolgarich - Their Final Shift
+  path:
+    path: /Audio/_Sunrise/Bolgarich/bolgarich_their_final_shift.ogg
+
+- type: jukebox
+  id: BolgarichVendetta
+  name: Bolgarich - Vendetta
+  path:
+    path: /Audio/_Sunrise/Bolgarich/bolgarich_vendetta.ogg
+
+- type: jukebox
+  id: BolgarichRunningOut
+  name: Bolgarich - Running Out
+  path:
+    path: /Audio/StationEvents/running_out.ogg
+
+# qwertyquerty — BeeStation / SS14 soundtrack, CC-BY-SA-3.0 (Starlight/Constellations/Drifting already above)
+- type: jukebox
+  id: Countdown
+  name: Qwertyquerty - Countdown
+  path:
+    path: /Audio/StationEvents/countdown.ogg
+
+# Donchan — explicit Space Station 14 track, CC-BY-3.0
+- type: jukebox
+  id: SoundStation14
+  name: Donchan - Sound Station 14
+  path:
+    path: /Audio/StationEvents/sound_station_14.ogg
+
+# mrjajkes — SS13/SS14 event soundtrack, CC-BY-3.0 (+ one custom non-ERP community license)
+- type: jukebox
+  id: BlatantlyNuclear
+  name: mrjajkes - Blatantly Nuclear
+  path:
+    path: /Audio/StationEvents/blatantly_nuclear.ogg
+
+- type: jukebox
+  id: ClearlyNuclear
+  name: mrjajkes - Clearly Nuclear
+  path:
+    path: /Audio/StationEvents/clearly_nuclear.ogg
+
+- type: jukebox
+  id: NukeMass
+  name: mrjajkes - Nuke Mass
+  path:
+    path: /Audio/StationEvents/nukemass.ogg
+
+- type: jukebox
+  id: LastCall
+  name: mrjajkes - Last Call
+  path:
+    path: /Audio/StationEvents/last_call.ogg
+
+- type: jukebox
+  id: SponsoredBySyndicate
+  name: mrjajkes - Sponsored By Syndicate
+  path:
+    path: /Audio/StationEvents/sponsored-by-syndicate.ogg
+
+# A-Guy — SS13 community music (CC-BY-SA-3.0), remakes already in Fish
+- type: jukebox
+  id: NuclearOpsFull
+  name: A-Guy - Nuclear Operations
+  path:
+    path: /Audio/_Fish/StationEvents/Music-main/0_nuclearoperations_remake_full.ogg
+
+- type: jukebox
+  id: NuclearOpsPrep
+  name: A-Guy - Nuclear Operations (Prep)
+  path:
+    path: /Audio/_Fish/StationEvents/Music-main/1_nuclearoperations_remake_prep.ogg
+
+- type: jukebox
+  id: NuclearOpsInfil
+  name: A-Guy - Nuclear Operations (Infil)
+  path:
+    path: /Audio/_Fish/StationEvents/Music-main/2_nuclearoperations_remake_infil.ogg
+
+- type: jukebox
+  id: NuclearOpsDef
+  name: A-Guy - Nuclear Operations (Defense)
+  path:
+    path: /Audio/_Fish/StationEvents/Music-main/3_nuclearoperations_remake_def.ogg
+
+- type: jukebox
+  id: RevolutionTheme
+  name: A-Guy - Revolution
+  path:
+    path: /Audio/_Fish/StationEvents/Music-main/revolution.ogg
+
+# boich9585 — written for SS14 (Мёртвый Космос), CC-BY-SA-4.0
+- type: jukebox
+  id: Enigma
+  name: boich9585 - Enigma
+  path:
+    path: /Audio/_Fish/StationEvents/enigma.ogg
+
+- type: jukebox
+  id: CodeSierra
+  name: boich9585 - Code Sierra
+  path:
+    path: /Audio/_Fish/StationEvents/Code-Sierra.ogg
