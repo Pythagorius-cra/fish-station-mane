@@ -8,7 +8,8 @@ namespace Content.Shared.Humanoid.Prototypes;
 public sealed partial class SpeciesPrototype
 {
     /// <summary>
-    /// Доступен ли вид только спонсорам.
+    /// Исторический флаг спонсорской расы.
+    /// Fish: не используется для ограничения выбора — все roundStart расы бесплатны.
     /// </summary>
     [DataField]
     public bool SponsorOnly { get; private set; }
