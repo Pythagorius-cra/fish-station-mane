@@ -9,10 +9,10 @@
     sprite: Structures/Machines/jukebox.rsi
     layers:
     - state: "off"
-      map: ["enum.JukeboxVisualLayers.Base"]
+      map: ["enum.JukeboxVisualLayers.Base"] # Fish-edit
   - type: Transform
     anchored: true
-  - type: Jukebox
+  - type: Jukebox # Fish-edit
     onState: on
     offState: off
     selectState: select
