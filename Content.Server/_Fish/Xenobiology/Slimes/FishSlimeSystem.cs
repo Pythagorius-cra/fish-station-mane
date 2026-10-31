@@ -405,7 +405,7 @@ public sealed partial class FishSlimeSystem : EntitySystem
         EntityUid? pick = null;
         foreach (var uid in _lookup.GetEntitiesInRange(ent.Owner, 7f))
         {
-            if (!IsEdible(ent, uid))
+            if (!IsEdible(ent, uid) || IsVictimAlreadyLatched(uid, ent.Owner))
                 continue;
 
             var monkey = HasComp<MonkeyAccentComponent>(uid);
@@ -558,11 +558,32 @@ public sealed partial class FishSlimeSystem : EntitySystem
 
     private bool CanFeed(Entity<FishSlimeComponent> ent, EntityUid target)
     {
-        return IsEdible(ent, target) && InRange(ent.Owner, target, 1.5f);
+        return IsEdible(ent, target)
+               && InRange(ent.Owner, target, 1.5f)
+               && !IsVictimAlreadyLatched(target, ent.Owner);
+    }
+
+    // Fish-edit: на одну жертву — один слайм (как SS220).
+    private bool IsVictimAlreadyLatched(EntityUid victim, EntityUid? exceptSlime = null)
+    {
+        var query = EntityQueryEnumerator<FishSlimeComponent>();
+        while (query.MoveNext(out var uid, out var slime))
+        {
+            if (exceptSlime != null && uid == exceptSlime)
+                continue;
+
+            if (slime.FeedTarget == victim)
+                return true;
+        }
+
+        return false;
     }
 
     private void StartFeed(Entity<FishSlimeComponent> ent, EntityUid target)
     {
+        if (IsVictimAlreadyLatched(target, ent.Owner))
+            return;
+
         ent.Comp.FeedTarget = target;
         _popup.PopupEntity(Loc.GetString("fish-slime-latched", ("target", target)), ent);
         Dirty(ent);
