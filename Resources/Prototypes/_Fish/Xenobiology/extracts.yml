@@ -1,0 +1,313 @@
+# Fish-start: ядра слаймов SS220. Реакции смотрят на color, оружие ядра не спавнится.
+- type: entity
+  parent: BaseItem
+  id: FishSlimeExtractBase
+  abstract: true
+  suffix: Fish
+  name: slime extract
+  description: Goo extracted from a slime. Legends claim it has strange powers.
+  components:
+  - type: Item
+    size: Tiny
+  - type: Sprite
+    sprite: _Fish/Xenobiology/extracts/extracts.rsi
+    state: extract
+  - type: Solution
+    solution:
+      maxVol: 100
+      canReact: false
+  - type: InjectableSolution
+    solution: solution
+  - type: DrawableSolution
+    solution: solution
+  - type: ExaminableSolution
+    solution: solution
+  - type: FishSlimeExtract
+    color: grey
+    maxUses: 5
+
+- type: entity
+  parent: FishSlimeExtractBase
+  id: FishSlimeExtractGrey
+  suffix: Fish
+  name: grey slime extract
+  description: A grey slime core. Plasma, water, and blood each do something different.
+  components:
+  - type: Sprite
+    color: "#b5b5b5"
+  - type: FishSlimeExtract
+    color: grey
+
+- type: entity
+  parent: FishSlimeExtractBase
+  id: FishSlimeExtractOrange
+  suffix: Fish
+  name: orange slime extract
+  description: An orange slime core that answers to blood and plasma.
+  components:
+  - type: Sprite
+    color: "#ff8c1a"
+  - type: FishSlimeExtract
+    color: orange
+    associatedGun: /obj/item/gun/energy/gun/mini
+
+- type: entity
+  parent: FishSlimeExtractBase
+  id: FishSlimeExtractMetal
+  suffix: Fish
+  name: metal slime extract
+  description: A metal slime core. It smells faintly of steel.
+  components:
+  - type: Sprite
+    color: "#c5ccd4"
+  - type: FishSlimeExtract
+    color: metal
+    associatedGun: /obj/item/gun/energy/gun/mini
+
+- type: entity
+  parent: FishSlimeExtractBase
+  id: FishSlimeExtractBlue
+  suffix: Fish
+  name: blue slime extract
+  description: A blue slime core, cold to the touch.
+  components:
+  - type: Sprite
+    color: "#3d7dff"
+  - type: FishSlimeExtract
+    color: blue
+    associatedGun: /obj/item/gun/energy/disabler
+
+- type: entity
+  parent: FishSlimeExtractBase
+  id: FishSlimeExtractPurple
+  suffix: Fish
+  name: purple slime extract
+  description: A purple slime core. Sugar and plasma both wake it up.
+  components:
+  - type: Sprite
+    color: "#a04dff"
+  - type: FishSlimeExtract
+    color: purple
+    associatedGun: /obj/item/gun/energy/disabler
+
+- type: entity
+  parent: FishSlimeExtractBase
+  id: FishSlimeExtractDarkPurple
+  suffix: Fish
+  name: dark purple slime extract
+  description: A dark purple slime core. Plasma sheets come out of this one.
+  components:
+  - type: Sprite
+    color: "#5c1d8a"
+  - type: FishSlimeExtract
+    color: dark purple
+    associatedGun: /obj/item/gun/energy/laser
+
+- type: entity
+  parent: FishSlimeExtractBase
+  id: FishSlimeExtractDarkBlue
+  suffix: Fish
+  name: dark blue slime extract
+  description: A dark blue slime core. It chills the air when fed plasma.
+  components:
+  - type: Sprite
+    color: "#1c2f8a"
+  - type: FishSlimeExtract
+    color: dark blue
+    associatedGun: /obj/item/gun/energy/gun
+
+- type: entity
+  parent: FishSlimeExtractBase
+  id: FishSlimeExtractGreen
+  suffix: Fish
+  name: green slime extract
+  description: A green slime core. Plasma turns into mutation toxin.
+  components:
+  - type: Sprite
+    color: "#3dcc6a"
+  - type: FishSlimeExtract
+    color: green
+    associatedGun: /obj/item/gun/projectile/automatic/laserrifle
+
+- type: entity
+  parent: FishSlimeExtractBase
+  id: FishSlimeExtractSilver
+  suffix: Fish
+  name: silver slime extract
+  description: A silver slime core. It conjures food and drinks.
+  components:
+  - type: Sprite
+    color: "#e6e6f0"
+  - type: FishSlimeExtract
+    color: silver
+    associatedGun: /obj/item/gun/energy/disabler/smg
+
+- type: entity
+  parent: FishSlimeExtractBase
+  id: FishSlimeExtractYellow
+  suffix: Fish
+  name: yellow slime extract
+  description: A yellow slime core. Blood makes it scream with electricity.
+  components:
+  - type: Sprite
+    color: "#ffe14a"
+  - type: FishSlimeExtract
+    color: yellow
+    associatedGun: /obj/item/gun/energy/ionrifle/carbine
+
+- type: entity
+  parent: FishSlimeExtractBase
+  id: FishSlimeExtractGold
+  suffix: Fish
+  name: gold slime extract
+  description: A gold slime core. It vibrates when it is about to call something.
+  components:
+  - type: Sprite
+    color: "#e6b422"
+  - type: FishSlimeExtract
+    color: gold
+    associatedGun: /obj/item/gun/energy/gun/shotgun
+
+- type: entity
+  parent: FishSlimeExtractBase
+  id: FishSlimeExtractPink
+  suffix: Fish
+  name: pink slime extract
+  description: A pink slime core. It calms slimes, or yields omnizine.
+  components:
+  - type: Sprite
+    color: "#ff7ab8"
+  - type: FishSlimeExtract
+    color: pink
+    associatedGun: /obj/item/gun/energy/gun/blueshield
+
+- type: entity
+  parent: FishSlimeExtractBase
+  id: FishSlimeExtractRed
+  suffix: Fish
+  name: red slime extract
+  description: A red slime core. Plasma, blood, and water each pull a different trick.
+  components:
+  - type: Sprite
+    color: "#e23b3b"
+  - type: FishSlimeExtract
+    color: red
+    associatedGun: /obj/item/gun/energy/plasma_pistol
+
+- type: entity
+  parent: FishSlimeExtractBase
+  id: FishSlimeExtractOil
+  suffix: Fish
+  name: oil slime extract
+  description: An oil slime core. Plasma makes it shake. Stand back.
+  components:
+  - type: Sprite
+    color: "#2a2a2a"
+  - type: FishSlimeExtract
+    color: oil
+    associatedGun: /obj/item/gun/energy/immolator
+
+- type: entity
+  parent: FishSlimeExtractBase
+  id: FishSlimeExtractLightPink
+  suffix: Fish
+  name: light pink slime extract
+  description: A light pink slime core. Plasma grows a sentience potion.
+  components:
+  - type: Sprite
+    color: "#ffc2de"
+  - type: FishSlimeExtract
+    color: light pink
+    associatedGun: /obj/item/gun/energy/arc_revolver
+
+- type: entity
+  parent: FishSlimeExtractBase
+  id: FishSlimeExtractBlack
+  suffix: Fish
+  name: black slime extract
+  description: A black slime core. Plasma yields an advanced mutation toxin.
+  components:
+  - type: Sprite
+    color: "#1a1a1a"
+  - type: FishSlimeExtract
+    color: black
+    associatedGun: /obj/item/gun/energy/lasercannon
+
+- type: entity
+  parent: FishSlimeExtractBase
+  id: FishSlimeExtractAdamantine
+  suffix: Fish
+  name: adamantine slime extract
+  description: An adamantine slime core. Plasma condenses into a sheet of the metal.
+  components:
+  - type: Sprite
+    color: "#6ec8c8"
+  - type: FishSlimeExtract
+    color: adamantine
+    associatedGun: /obj/item/gun/energy/gun/nuclear
+
+- type: entity
+  parent: FishSlimeExtractBase
+  id: FishSlimeExtractBluespace
+  suffix: Fish
+  name: bluespace slime extract
+  description: A bluespace slime core. Blood lays floor tiles, plasma a crystal.
+  components:
+  - type: Sprite
+    color: "#4d5bff"
+  - type: FishSlimeExtract
+    color: bluespace
+    associatedGun: /obj/item/gun/energy/sparker
+
+- type: entity
+  parent: FishSlimeExtractBase
+  id: FishSlimeExtractCerulean
+  suffix: Fish
+  name: cerulean slime extract
+  description: A cerulean slime core. Plasma enhances extracts. Blood marks territory.
+  components:
+  - type: Sprite
+    color: "#2aa8c9"
+  - type: FishSlimeExtract
+    color: cerulean
+    associatedGun: /obj/item/gun/energy/gun/shotgun
+
+- type: entity
+  parent: FishSlimeExtractBase
+  id: FishSlimeExtractSepia
+  suffix: Fish
+  name: sepia slime extract
+  description: A sepia slime core. Time, cameras, and slow floors.
+  components:
+  - type: Sprite
+    color: "#c4a574"
+  - type: FishSlimeExtract
+    color: sepia
+    associatedGun: /obj/item/gun/energy/laser/retro
+
+- type: entity
+  parent: FishSlimeExtractBase
+  id: FishSlimeExtractPyrite
+  suffix: Fish
+  name: pyrite slime extract
+  description: A pyrite slime core. Plasma picks a paint can at random.
+  components:
+  - type: Sprite
+    color: "#d6c15a"
+  - type: FishSlimeExtract
+    color: pyrite
+    associatedGun: /obj/item/gun/energy/gun/mini
+
+- type: entity
+  parent: FishSlimeExtractBase
+  id: FishSlimeExtractRainbow
+  suffix: Fish
+  name: rainbow slime extract
+  description: A rainbow slime core. Plasma births a random slime. Blood a transference potion.
+  components:
+  - type: Sprite
+    color: "#ffffff"
+  - type: FishSlimeExtract
+    color: rainbow
+    associatedGun: /obj/item/gun/energy/lwap
+# Fish-end
