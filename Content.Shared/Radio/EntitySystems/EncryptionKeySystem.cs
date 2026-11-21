@@ -152,7 +152,9 @@ public sealed partial class EncryptionKeySystem : EntitySystem
             return;
         }
 
-        _tool.UseTool(args.Used, args.User, uid, 1f, component.KeysExtractionMethod, new EncryptionRemovalFinishedEvent(), toolComponent: tool);
+        // Fish-start: ИТ влияет на извлечение ключей шифрования
+        _tool.UseTool(args.Used, args.User, uid, GetComputerKeyExtractDelay(args.User, 1f), component.KeysExtractionMethod, new EncryptionRemovalFinishedEvent(), toolComponent: tool);
+        // Fish-end
     }
 
     private void OnStartup(EntityUid uid, EncryptionKeyHolderComponent component, ComponentStartup args)
@@ -168,6 +170,10 @@ public sealed partial class EncryptionKeySystem : EntitySystem
 
         if (component.KeyContainer.ContainedEntities.Count == 0)
         {
+            // Fish-start: у КПБ каналы встроенные — не спамим «нет ключей» после батареи/examine
+            if (HasComp<Content.Shared._Fish.Ipc.FishIpcComponent>(uid))
+                return;
+            // Fish-end
             args.PushMarkup(Loc.GetString("encryption-keys-no-keys"));
             return;
         }
